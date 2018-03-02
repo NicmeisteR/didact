@@ -1,0 +1,548 @@
+-- ----------------------------------------------------------------------------
+-- UTILS
+-- ----------------------------------------------------------------------------
+
+CREATE OR REPLACE FUNCTION table_privileges(IN target_table VARCHAR)
+RETURNS TABLE(
+    grantee         information_schema.sql_identifier,
+    privilege_type  information_schema.character_data
+) AS $$
+    BEGIN
+        RETURN QUERY
+        SELECT
+            g.grantee AS grantee,
+            g.privilege_type AS privilege_type
+        FROM information_schema.role_table_grants g
+        WHERE g.table_name = target_table;
+    END
+$$ LANGUAGE plpgsql;
+
+-- ----------------------------------------------------------------------------
+-- PLAYER
+-- ----------------------------------------------------------------------------
+
+CREATE OR REPLACE FUNCTION didact_upsert_player(gamertag VARCHAR)
+RETURNS INTEGER AS $$
+    WITH existing_player_ AS (
+        SELECT p_id
+        FROM player
+        WHERE p_gamertag = gamertag
+    ), inserted_player_ AS (
+        INSERT INTO player(p_gamertag)
+        SELECT gamertag
+        ON CONFLICT DO NOTHING
+        RETURNING p_id
+    )
+    SELECT p_id FROM existing_player_
+    UNION ALL
+    SELECT p_id FROM inserted_player_
+    LIMIT 1;
+$$ LANGUAGE sql;
+
+-- ----------------------------------------------------------------------------
+-- TEAM
+-- ----------------------------------------------------------------------------
+
+CREATE OR REPLACE FUNCTION didact_match_teams(match_id INTEGER)
+RETURNS TABLE(
+    team_idx INTEGER,
+    player_1 INTEGER,
+    player_2 INTEGER,
+    player_3 INTEGER
+) AS $$
+    BEGIN
+        RETURN QUERY
+        WITH x AS (
+            SELECT
+                p_id AS player_id,
+                mp_match_id AS match_id,
+                mp_player_idx AS player_idx,
+                mp_team_id AS team_id,
+                rank() over (partition by mp_match_id, mp_team_id order by mp_player_idx asc) as rank
+            FROM match_player, player
+            WHERE mp_gamertag = p_gamertag
+            AND mp_match_id = match_id
+        )
+        SELECT
+            m1.team_id AS team_idx,
+            COALESCE(m1.player_id, 0) AS player_1,
+            COALESCE(m2.player_id, 0) AS player_2,
+            COALESCE(m3.player_id, 0) AS player_3
+        FROM x m1
+            LEFT OUTER JOIN x m2
+                ON m1.match_id = m2.match_id
+                AND m1.team_id = m2.team_id
+                AND m2.rank = 2
+            LEFT OUTER JOIN x m3
+                ON m1.match_id = m3.match_id
+                AND m1.team_id = m3.team_id
+                AND m3.rank = 3
+        WHERE m1.rank = 1;
+    END
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION didact_store_team_encounter(match_id INTEGER)
+RETURNS VOID AS $$
+    BEGIN
+        WITH match_teams_ AS (
+            SELECT *
+            FROM didact_match_teams(match_id)
+            LIMIT 2
+        ), inserted_teams_ AS (
+            INSERT INTO team(t_p1_id, t_p2_id, t_p3_id)
+            SELECT player_1, player_2, player_3
+            FROM match_teams_
+            ON CONFLICT DO NOTHING
+            RETURNING t_id, t_p1_id, t_p2_id, t_p3_id
+        ), team_ids_ AS (
+            SELECT
+                match_id AS mid,
+                mt.team_idx AS team_idx,
+                COALESCE(it.t_id, st.t_id, 0) AS team_id
+            FROM match_teams_ mt
+                LEFT JOIN inserted_teams_ it
+                    ON it.t_p1_id = mt.player_1
+                    AND it.t_p2_id = mt.player_2
+                    AND it.t_p3_id = mt.player_3
+                LEFT JOIN team st
+                    ON st.t_p1_id = mt.player_1
+                    AND st.t_p2_id = mt.player_2
+                    AND st.t_p3_id = mt.player_3
+            LIMIT 2
+        )
+        INSERT INTO team_encounter(
+            te_t1_id,
+            te_t2_id,
+            te_match_id,
+            te_start_date,
+            te_duration,
+            te_match_outcome,
+            te_map_uuid,
+            te_match_uuid,
+            te_playlist_uuid,
+            te_season_uuid
+        )
+        SELECT
+            t1.team_id,
+            t2.team_id,
+            m.m_id,
+            m.m_start_date,
+            m.m_duration,
+            mt.mt_match_outcome,
+            m.m_map_uuid,
+            m.m_match_uuid,
+            m.m_playlist_uuid,
+            m.m_season_uuid
+        FROM match m, match_team mt, team_ids_ t1, team_ids_ t2
+        WHERE m.m_id = match_id
+        AND mt.mt_match_id = match_id
+        AND mt.mt_team_id = 1
+        AND t1.mid = match_id
+        AND t2.mid = match_id
+        AND t1.team_idx = 1
+        AND t2.team_idx = 2
+        ON CONFLICT DO NOTHING;
+    END
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION didact_store_team_encounters()
+RETURNS VOID AS $$
+  DECLARE
+      t TIMESTAMP := clock_timestamp();
+  BEGIN
+      RAISE NOTICE 'Storing team encounters';
+      WITH match_player_ AS (
+          SELECT
+              p_id AS player_id,
+              mp_match_id AS match_id,
+              mp_player_idx AS player_idx,
+              mp_team_id AS team_id,
+              rank() over (partition by mp_match_id, mp_team_id order by mp_player_idx asc) as rank
+          FROM match_player
+            LEFT OUTER JOIN team_encounter ON mp_match_id = te_match_id
+            INNER JOIN player ON mp_gamertag = p_gamertag
+            WHERE te_match_id IS NULL
+      ), match_teams_ AS (
+          SELECT
+              m1.match_id AS match_id,
+              m1.team_id AS team_idx,
+              COALESCE(m1.player_id, 0) AS player_1,
+              COALESCE(m2.player_id, 0) AS player_2,
+              COALESCE(m3.player_id, 0) AS player_3
+          FROM match_player_ m1
+              LEFT OUTER JOIN match_player_ m2
+                  ON m1.match_id = m2.match_id
+                  AND m1.team_id = m2.team_id
+                  AND m2.rank = 2
+              LEFT OUTER JOIN match_player_ m3
+                  ON m1.match_id = m3.match_id
+                  AND m1.team_id = m3.team_id
+                  AND m3.rank = 3
+          WHERE m1.rank = 1
+      ), inserted_teams_ AS (
+          INSERT INTO team(t_p1_id, t_p2_id, t_p3_id)
+          SELECT player_1, player_2, player_3
+          FROM match_teams_
+          ON CONFLICT DO NOTHING
+          RETURNING t_id, t_p1_id, t_p2_id, t_p3_id
+      ), team_ids_ AS (
+          SELECT
+              mt.match_id AS mid,
+              mt.team_idx AS team_idx,
+              COALESCE(it.t_id, st.t_id, 0) AS team_id
+          FROM match_teams_ mt
+              LEFT JOIN inserted_teams_ it
+                  ON it.t_p1_id = mt.player_1
+                  AND it.t_p2_id = mt.player_2
+                  AND it.t_p3_id = mt.player_3
+              LEFT JOIN team st
+                  ON st.t_p1_id = mt.player_1
+                  AND st.t_p2_id = mt.player_2
+                  AND st.t_p3_id = mt.player_3
+      )
+      INSERT INTO team_encounter(
+          te_t1_id,
+          te_t2_id,
+          te_match_id,
+          te_start_date,
+          te_duration,
+          te_match_outcome,
+          te_map_uuid,
+          te_match_uuid,
+          te_playlist_uuid,
+          te_season_uuid
+      )
+      SELECT
+          t1.team_id,
+          t2.team_id,
+          m.m_id,
+          m.m_start_date,
+          m.m_duration,
+          mt.mt_match_outcome,
+          m.m_map_uuid,
+          m.m_match_uuid,
+          m.m_playlist_uuid,
+          m.m_season_uuid
+      FROM match m, match_team mt, team_ids_ t1, team_ids_ t2
+      WHERE m.m_id = mt.mt_match_id
+      AND mt.mt_team_id = 1
+      AND t1.mid = m.m_id
+      AND t2.mid = m.m_id
+      AND t1.team_idx = 1
+      AND t2.team_idx = 2
+      ON CONFLICT DO NOTHING;
+      RAISE NOTICE 'Duration=%', clock_timestamp() - t;
+    END
+$$ LANGUAGE plpgsql;
+
+-- ----------------------------------------------------------------------------
+-- TASKS
+-- ----------------------------------------------------------------------------
+
+CREATE OR REPLACE FUNCTION didact_init_player_stat_scan()
+RETURNS INTEGER AS $$
+    DECLARE
+        t TIMESTAMP := clock_timestamp();
+    BEGIN
+        RAISE NOTICE 'Initiate player statistic scans';
+        INSERT INTO task (t_type, t_updated, t_status, t_priority, t_data)
+            SELECT
+                1,      -- TaskPlayerStatsUpdate
+                now(),  -- Updated
+                0,      -- TaskQueued
+                0,      -- Priority
+                json_build_object(
+                    'PlayerID', p_id,
+                    'Gamertag', p_gamertag
+                )
+            FROM player;
+        RAISE NOTICE 'Duration=%', clock_timestamp() - t;
+        RETURN 1;
+    END
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION didact_init_match_update()
+RETURNS INTEGER AS $$
+    DECLARE
+        t TIMESTAMP := clock_timestamp();
+    BEGIN
+        RAISE NOTICE 'Initiate match updates';
+        INSERT INTO task (t_type, t_updated, t_status, t_priority, t_data)
+            SELECT
+                2,      -- TaskMatchResultUpdate
+                now(),  -- Updated
+                0,      -- TaskQueued
+                20,      -- Priority
+                json_build_object(
+                    'MatchUUID', m.match_uuid
+                )
+            FROM
+                (
+                    SELECT DISTINCT(mh_match_uuid) as match_uuid
+                    FROM
+                        match_history LEFT JOIN match
+                        ON mh_match_uuid = m_match_uuid
+                    WHERE m_id IS NULL
+                ) m;
+        RAISE NOTICE 'Duration=%', clock_timestamp() - t;
+        RETURN 1;
+    END
+$$ LANGUAGE plpgsql;
+
+-- ----------------------------------------------------------------------------
+-- REFRESH ALL MATERIALIZED VIEWS
+-- ----------------------------------------------------------------------------
+
+CREATE OR REPLACE FUNCTION didact_refresh_all_materialized_views(schema_arg TEXT DEFAULT 'public')
+RETURNS INT AS $$
+    DECLARE
+        r RECORD;
+    BEGIN
+        RAISE NOTICE 'Refreshing materialized view in schema %', schema_arg;
+        FOR r IN SELECT matviewname FROM pg_matviews WHERE schemaname = schema_arg
+        LOOP
+            RAISE NOTICE 'Refreshing %.%', schema_arg, r.matviewname;
+            EXECUTE 'REFRESH MATERIALIZED VIEW ' || schema_arg || '.' || r.matviewname;
+        END LOOP;
+        RETURN 1;
+    END 
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION didact_refresh_all_materialized_views_concurrently(schema_arg TEXT DEFAULT 'public')
+RETURNS INT AS $$
+    DECLARE
+        r RECORD;
+    BEGIN
+        RAISE NOTICE 'Refreshing materialized view in schema %', schema_arg;
+        FOR r IN SELECT matviewname FROM pg_matviews WHERE schemaname = schema_arg
+        LOOP
+            RAISE NOTICE 'Refreshing %.%', schema_arg, r.matviewname;
+            EXECUTE 'REFRESH MATERIALIZED VIEW CONCURRENTLY ' || schema_arg || '.' || r.matviewname;
+        END LOOP;
+
+        RETURN 1;
+    END
+$$ LANGUAGE plpgsql;
+
+-- ----------------------------------------------------------------------------
+-- REFRESH SPECIFIC MATERIALIZED VIEWS
+-- ----------------------------------------------------------------------------
+
+CREATE OR REPLACE FUNCTION didact_update_leaderboard()
+RETURNS INT AS $$
+    DECLARE
+        t TIMESTAMP := clock_timestamp();
+    BEGIN
+        RAISE NOTICE 'Refreshing public.mv_leaderboard';
+        EXECUTE 'REFRESH MATERIALIZED VIEW CONCURRENTLY public.mv_leaderboard';
+        RAISE NOTICE 'Duration=%', clock_timestamp() - t;
+        RETURN 1;
+    END
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION didact_data_maintenance()
+RETURNS INT AS $$
+    DECLARE
+        t TIMESTAMP := clock_timestamp();
+    BEGIN
+        RAISE NOTICE 'Refreshing public.mv_player_to_match_player';
+        EXECUTE 'REFRESH MATERIALIZED VIEW CONCURRENTLY public.mv_player_to_match_player';
+        RAISE NOTICE 'Duration=%', clock_timestamp() - t;
+
+        t := clock_timestamp();
+        RAISE NOTICE 'Refreshing public.mv_player_encounters';
+        EXECUTE 'REFRESH MATERIALIZED VIEW CONCURRENTLY public.mv_player_encounters';
+        RAISE NOTICE 'Duration=%', clock_timestamp() - t;
+
+        t := clock_timestamp();
+        RAISE NOTICE 'Refreshing public.mv_team_gamertags';
+        EXECUTE 'REFRESH MATERIALIZED VIEW CONCURRENTLY public.mv_team_gamertags';
+        RAISE NOTICE 'Duration=%', clock_timestamp() - t;
+        RETURN 1;
+    END
+$$ LANGUAGE plpgsql;
+
+-- ----------------------------------------------------------------------------
+-- MATCH EVENTS
+-- ----------------------------------------------------------------------------
+
+CREATE OR REPLACE FUNCTION didact_match_events_build_order(IN match_id INTEGER)
+RETURNS TABLE (
+    tag VARCHAR,
+    time_since_start INTEGER,
+    player_idx INTEGER,
+    instance INTEGER,
+    target VARCHAR,
+    supply INTEGER,
+    energy INTEGER
+) AS $$
+    DECLARE
+        building_queued_events JSONB;
+        building_completed_events JSONB;
+        building_upgraded_events JSONB;
+        building_recycled_events JSONB;
+        tech_researched_events JSONB;
+        unit_trained_events JSONB;
+    BEGIN
+        SELECT me_building_queued, me_building_completed, me_building_upgraded, me_building_recycled, me_tech_researched, me_unit_trained
+        INTO building_queued_events, building_completed_events, building_upgraded_events, building_recycled_events, tech_researched_events, unit_trained_events
+            FROM match_events
+            WHERE me_match_id = match_id
+            LIMIT 1;
+
+        -- Building Construction
+        RETURN QUERY
+            SELECT
+                'building_construction'::VARCHAR,
+                c."TimeSinceStartMilliseconds",
+                q."PlayerIndex",
+                q."InstanceId",
+                q."BuildingId",
+                q."SupplyCost",
+                q."EnergyCost"
+            FROM
+                jsonb_to_recordset(building_queued_events) AS q(
+                    "TimeSinceStartMilliseconds" INTEGER,
+                    "PlayerIndex" INTEGER,
+                    "InstanceId" INTEGER,
+                    "BuildingId" VARCHAR,
+                    "SupplyCost" INTEGER,
+                    "EnergyCost" INTEGER
+                ),
+                jsonb_to_recordset(building_completed_events) AS c(
+                    "TimeSinceStartMilliseconds" INTEGER,
+                    "InstanceId" INTEGER
+                )
+            WHERE
+                q."InstanceId" = c."InstanceId";
+
+        -- Building Upgrade
+        RETURN QUERY
+            SELECT
+                'building_upgrade'::VARCHAR,
+                u."TimeSinceStartMilliseconds",
+                u."PlayerIndex",
+                u."InstanceId",
+                u."NewBuildingId",
+                u."SupplyCost",
+                u."EnergyCost"
+            FROM
+                jsonb_to_recordset(building_upgraded_events) AS u(
+                    "TimeSinceStartMilliseconds" INTEGER,
+                    "PlayerIndex" INTEGER,
+                    "InstanceId" INTEGER,
+                    "NewBuildingId" VARCHAR,
+                    "SupplyCost" INTEGER,
+                    "EnergyCost" INTEGER
+                );
+
+        -- Building Recycled
+        RETURN QUERY
+            SELECT
+                'building_recycled'::VARCHAR,
+                r."TimeSinceStartMilliseconds",
+                r."PlayerIndex",
+                r."InstanceId",
+                ''::VARCHAR,
+                -r."SupplyEarned",
+                -r."EnergyEarned"
+            FROM
+                jsonb_to_recordset(building_recycled_events) AS r(
+                    "TimeSinceStartMilliseconds" INTEGER,
+                    "PlayerIndex" INTEGER,
+                    "InstanceId" INTEGER,
+                    "SupplyEarned" INTEGER,
+                    "EnergyEarned" INTEGER
+                );
+
+        -- Tech Researched
+        RETURN QUERY
+            SELECT
+                'tech_researched'::VARCHAR,
+                t."TimeSinceStartMilliseconds",
+                t."PlayerIndex",
+                t."ResearcherInstanceId",
+                t."TechId",
+                t."SupplyCost",
+                t."EnergyCost"
+            FROM
+                jsonb_to_recordset(tech_researched_events) AS t(
+                    "TimeSinceStartMilliseconds" INTEGER,
+                    "PlayerIndex" INTEGER,
+                    "ResearcherInstanceId" INTEGER,
+                    "TechId" VARCHAR,
+                    "SupplyCost" INTEGER,
+                    "EnergyCost" INTEGER
+                );
+
+        -- Unit Trained
+        RETURN QUERY
+            SELECT
+                'unit_trained'::VARCHAR,
+                t."TimeSinceStartMilliseconds",
+                t."PlayerIndex",
+                t."InstanceId",
+                t."SquadId",
+                t."SupplyCost",
+                t."EnergyCost"
+            FROM
+                jsonb_to_recordset(unit_trained_events) AS t(
+                    "TimeSinceStartMilliseconds" INTEGER,
+                    "PlayerIndex" INTEGER,
+                    "InstanceId" INTEGER,
+                    "SquadId" VARCHAR,
+                    "SupplyCost" INTEGER,
+                    "EnergyCost" INTEGER
+                );
+    END
+$$ LANGUAGE plpgsql STABLE;
+
+CREATE OR REPLACE FUNCTION didact_match_events_resource_heartbeats(IN match_id INTEGER)
+RETURNS TABLE (
+    time_since_start INTEGER,
+    player_idx INTEGER,
+    supply INTEGER,
+    energy INTEGER,
+    population INTEGER,
+    population_cap INTEGER,
+    tech_level INTEGER,
+    command_points INTEGER,
+    total_supply DECIMAL,
+    total_energy DECIMAL,
+    total_command_points DECIMAL,
+    command_xp INTEGER
+) AS $$
+    WITH heartbeats AS (
+        SELECT jsonb_array_elements(me_resource_heartbeat) heartbeat
+        FROM match_events
+        WHERE me_match_id = match_id
+    )
+    SELECT
+        (h.heartbeat->>'TimeSinceStartMilliseconds')::INTEGER AS time_since_start,
+        j.key::INTEGER AS player_idx,
+        r."Supply" AS supply,
+        r."Energy" AS energy,
+        r."Population" AS population,
+        r."PopulationCap" AS population_cap,
+        r."TechLevel" AS tech_level,
+        r."CommandPoints" AS command_points,
+        r."TotalSupply" AS total_supply,
+        r."TotalEnergy" AS total_energy,
+        r."TotalCommandPoints" AS total_command_points,
+        r."CommandXP" AS command_xp
+    FROM
+        heartbeats h,
+        jsonb_each(h.heartbeat->'PlayerResources') j,
+        jsonb_to_record(j.value) r(
+            "Supply" INTEGER,
+            "Energy" INTEGER,
+            "Population" INTEGER,
+            "PopulationCap" INTEGER,
+            "TechLevel" INTEGER,
+            "CommandPoints" INTEGER,
+            "TotalSupply" DECIMAL,
+            "TotalEnergy" DECIMAL,
+            "TotalCommandPoints" DECIMAL,
+            "CommandXP" INTEGER
+        )
+$$ LANGUAGE sql STABLE;

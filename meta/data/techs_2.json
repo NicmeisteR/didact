@@ -1,0 +1,4266 @@
+{
+    "Paging": {
+        "StartAt": 100,
+        "InlineCount": 63,
+        "TotalCount": 163
+    },
+    "ContentItems": [
+        {
+            "Id": 335979,
+            "Type": "HW2Tech",
+            "View": {
+                "Status": "Published",
+                "Common": {
+                    "Owner": "edostrov",
+                    "CreatedUtc": "2016-09-13T10:49:50Z",
+                    "ModifiedUtc": "2017-02-03T19:37:48Z",
+                    "PublishedUtc": "2017-04-27T21:33:00Z",
+                    "Container": -1
+                },
+                "Identity": "bd8f1522ce4842bf9c48d2f08c609c28",
+                "Autoroute": "hw2/tech/unsc_mongoose_upgrade1",
+                "Title": "MINI-FRAG LAUNCHER",
+                "HW2Tech": {
+                    "ObjectTypeId": "unsc_mongoose_upgrade1",
+                    "DisplayInfo": {
+                        "Id": 335141,
+                        "Type": "HW2TechDisplayInfo",
+                        "View": {
+                            "Status": "Published",
+                            "Common": {
+                                "Owner": "edostrov",
+                                "CreatedUtc": "2016-09-13T10:49:49Z",
+                                "ModifiedUtc": "2017-02-03T19:35:07Z",
+                                "PublishedUtc": "2017-02-03T19:35:07Z",
+                                "Container": -1
+                            },
+                            "Identity": "415e0c85f183444bb089576b83485f61",
+                            "BatchLocalization": {
+                                "IsLocked": false
+                            },
+                            "Localization": {
+                                "Culture": "en",
+                                "MasterContentItemId": ""
+                            },
+                            "Title": "MINI-FRAG LAUNCHER Display Info",
+                            "HW2TechDisplayInfo": {
+                                "Name": "MINI-FRAG LAUNCHER",
+                                "Description": "Weaponizes Jackrabbit"
+                            }
+                        }
+                    },
+                    "Image": {
+                        "Id": 348278,
+                        "Type": "Image",
+                        "View": {
+                            "Status": "Published",
+                            "Common": {
+                                "Owner": "kpaul",
+                                "CreatedUtc": "2017-04-05T23:39:15Z",
+                                "ModifiedUtc": "2017-04-27T21:32:06Z",
+                                "PublishedUtc": "2017-04-27T21:32:07Z",
+                                "Container": -1
+                            },
+                            "Media": {
+                                "MediaUrl": "https://content.halocdn.com/media/Default/games/halo-wars-2/unit-icons/build/unsc_mongoose_upgrade1_icon-2025fd2a61d44b238f82a23457e10997.png",
+                                "MimeType": "image/png",
+                                "Caption": "",
+                                "AlternateText": "",
+                                "FolderPath": "games/halo-wars-2/unit-icons/build",
+                                "FileName": "unsc_mongoose_upgrade1_icon-2025fd2a61d44b238f82a23457e10997.png"
+                            },
+                            "Image": {
+                                "Width": 256,
+                                "Height": 256
+                            },
+                            "Title": "unsc_mongoose_upgrade1_icon-2025fd2a61d44b238f82a23457e10997",
+                            "Identity": "3067bda2b50743daa7b1d7e3ce01483e"
+                        }
+                    }
+                }
+            },
+            "Links": [
+                {
+                    "Absolute": false,
+                    "Relation": "Self",
+                    "URI": "/content/335979"
+                }
+            ],
+            "ChildrenCount": 0
+        },
+        {
+            "Id": 336022,
+            "Type": "HW2Tech",
+            "View": {
+                "Status": "Published",
+                "Common": {
+                    "Owner": "edostrov",
+                    "CreatedUtc": "2016-09-13T10:51:13Z",
+                    "ModifiedUtc": "2017-02-03T19:37:57Z",
+                    "PublishedUtc": "2017-04-27T21:33:00Z",
+                    "Container": -1
+                },
+                "Identity": "9211b09893b548cc8b889bf2dac529d5",
+                "Autoroute": "hw2/tech/cov_prowler_upgrade1",
+                "Title": "THICK HIDE",
+                "HW2Tech": {
+                    "ObjectTypeId": "cov_prowler_upgrade1",
+                    "DisplayInfo": {
+                        "Id": 336017,
+                        "Type": "HW2TechDisplayInfo",
+                        "View": {
+                            "Status": "Published",
+                            "Common": {
+                                "Owner": "edostrov",
+                                "CreatedUtc": "2016-09-13T10:51:12Z",
+                                "ModifiedUtc": "2017-02-03T19:37:56Z",
+                                "PublishedUtc": "2017-09-25T17:42:55Z",
+                                "Container": -1
+                            },
+                            "Identity": "89fa40e1c86048eea0684733a4ed75aa",
+                            "BatchLocalization": {
+                                "IsLocked": false
+                            },
+                            "Localization": {
+                                "Culture": "en",
+                                "MasterContentItemId": ""
+                            },
+                            "Title": "THICK HIDE Display Info",
+                            "HW2TechDisplayInfo": {
+                                "Name": "THICK HIDE",
+                                "Description": "Greatly increases armor"
+                            }
+                        }
+                    },
+                    "Image": {
+                        "Id": 348258,
+                        "Type": "Image",
+                        "View": {
+                            "Status": "Published",
+                            "Common": {
+                                "Owner": "kpaul",
+                                "CreatedUtc": "2017-04-06T02:52:31Z",
+                                "ModifiedUtc": "2017-04-27T21:31:55Z",
+                                "PublishedUtc": "2017-04-27T21:31:55Z",
+                                "Container": -1
+                            },
+                            "Media": {
+                                "MediaUrl": "https://content.halocdn.com/media/Default/games/halo-wars-2/unit-icons/build/cov_prowler_upgrade1_icon-a595cbaad37c48f48bae7d14ac38f6d4.png",
+                                "MimeType": "image/png",
+                                "Caption": "",
+                                "AlternateText": "",
+                                "FolderPath": "games/halo-wars-2/unit-icons/build",
+                                "FileName": "cov_prowler_upgrade1_icon-a595cbaad37c48f48bae7d14ac38f6d4.png"
+                            },
+                            "Image": {
+                                "Width": 256,
+                                "Height": 256
+                            },
+                            "Title": "cov_prowler_upgrade1_icon-a595cbaad37c48f48bae7d14ac38f6d4",
+                            "Identity": "a1010f5c3d66410483b495a2c9a40a01"
+                        }
+                    }
+                }
+            },
+            "Links": [
+                {
+                    "Absolute": false,
+                    "Relation": "Self",
+                    "URI": "/content/336022"
+                }
+            ],
+            "ChildrenCount": 0
+        },
+        {
+            "Id": 336390,
+            "Type": "HW2Tech",
+            "View": {
+                "Status": "Published",
+                "Common": {
+                    "Owner": "edostrov",
+                    "CreatedUtc": "2016-09-13T10:52:05Z",
+                    "ModifiedUtc": "2017-02-03T19:39:08Z",
+                    "PublishedUtc": "2017-04-27T21:33:00Z",
+                    "Container": -1
+                },
+                "Identity": "205dcde3c20c48c88b195be12b857a53",
+                "Autoroute": "hw2/tech/unsc_spartan_upgrade3_laser",
+                "Title": "NEURAL IMPLANT",
+                "HW2Tech": {
+                    "ObjectTypeId": "unsc_spartan_upgrade3_laser",
+                    "DisplayInfo": {
+                        "Id": 336385,
+                        "Type": "HW2TechDisplayInfo",
+                        "View": {
+                            "Status": "Published",
+                            "Common": {
+                                "Owner": "edostrov",
+                                "CreatedUtc": "2016-09-13T10:52:05Z",
+                                "ModifiedUtc": "2017-02-03T19:39:07Z",
+                                "PublishedUtc": "2017-09-25T17:42:58Z",
+                                "Container": -1
+                            },
+                            "Identity": "689935640d5c4364bba9d44cbd4625ba",
+                            "BatchLocalization": {
+                                "IsLocked": false
+                            },
+                            "Localization": {
+                                "Culture": "en",
+                                "MasterContentItemId": ""
+                            },
+                            "Title": "NEURAL IMPLANT Display Info",
+                            "HW2TechDisplayInfo": {
+                                "Name": "NEURAL IMPLANT",
+                                "Description": "Increases health and damage"
+                            }
+                        }
+                    },
+                    "Image": {
+                        "Id": 348273,
+                        "Type": "Image",
+                        "View": {
+                            "Status": "Published",
+                            "Common": {
+                                "Owner": "kpaul",
+                                "CreatedUtc": "2017-04-06T03:14:03Z",
+                                "ModifiedUtc": "2017-04-27T21:32:05Z",
+                                "PublishedUtc": "2017-04-27T21:32:04Z",
+                                "Container": -1
+                            },
+                            "Media": {
+                                "MediaUrl": "https://content.halocdn.com/media/Default/games/halo-wars-2/unit-icons/tech/unsc_inf_spartan_laser_01_upgrade3_icon-5f1c9cc025264022847352342e44f70f.png",
+                                "MimeType": "image/png",
+                                "Caption": "",
+                                "AlternateText": "",
+                                "FolderPath": "games/halo-wars-2/unit-icons/tech",
+                                "FileName": "unsc_inf_spartan_laser_01_upgrade3_icon-5f1c9cc025264022847352342e44f70f.png"
+                            },
+                            "Image": {
+                                "Width": 256,
+                                "Height": 256
+                            },
+                            "Title": "unsc_inf_spartan_laser_01_upgrade3_icon-5f1c9cc025264022847352342e44f70f",
+                            "Identity": "4d4f7a65e3b047a4a37a6e1bd0fe22c2"
+                        }
+                    }
+                }
+            },
+            "Links": [
+                {
+                    "Absolute": false,
+                    "Relation": "Self",
+                    "URI": "/content/336390"
+                }
+            ],
+            "ChildrenCount": 0
+        },
+        {
+            "Id": 336460,
+            "Type": "HW2Tech",
+            "View": {
+                "Status": "Published",
+                "Common": {
+                    "Owner": "edostrov",
+                    "CreatedUtc": "2016-09-13T10:50:06Z",
+                    "ModifiedUtc": "2017-02-03T19:39:20Z",
+                    "PublishedUtc": "2017-04-27T21:33:00Z",
+                    "Container": -1
+                },
+                "Identity": "bc30a7491ccd44bb84c73d177d8734f0",
+                "Autoroute": "hw2/tech/unsc_scorpion_upgrade2",
+                "Title": "CANISTER SHELL",
+                "HW2Tech": {
+                    "ObjectTypeId": "unsc_scorpion_upgrade2",
+                    "DisplayInfo": {
+                        "Id": 336303,
+                        "Type": "HW2TechDisplayInfo",
+                        "View": {
+                            "Status": "Published",
+                            "Common": {
+                                "Owner": "edostrov",
+                                "CreatedUtc": "2016-09-13T10:50:04Z",
+                                "ModifiedUtc": "2017-02-03T19:38:51Z",
+                                "PublishedUtc": "2017-09-25T17:42:57Z",
+                                "Container": -1
+                            },
+                            "Identity": "49a97350fa9c43e89418ede13870c75e",
+                            "BatchLocalization": {
+                                "IsLocked": false
+                            },
+                            "Localization": {
+                                "Culture": "en",
+                                "MasterContentItemId": ""
+                            },
+                            "Title": "CANISTER SHELL Display Info",
+                            "HW2TechDisplayInfo": {
+                                "Name": "CANISTER SHELL",
+                                "Description": "Adds a targeted AoE attack. Strong against infantry. Canister Shell cannot target air"
+                            }
+                        }
+                    },
+                    "Image": {
+                        "Id": 348351,
+                        "Type": "Image",
+                        "View": {
+                            "Status": "Published",
+                            "Common": {
+                                "Owner": "kpaul",
+                                "CreatedUtc": "2017-04-05T18:46:53Z",
+                                "ModifiedUtc": "2017-04-27T21:32:25Z",
+                                "PublishedUtc": "2017-04-27T21:32:26Z",
+                                "Container": -1
+                            },
+                            "Media": {
+                                "MediaUrl": "https://content.halocdn.com/media/Default/games/halo-wars-2/unit-icons/tech/unsc_scorpion_upgrade2_icon-4d7e0de521b04cf69d6837a20412e952.png",
+                                "MimeType": "image/png",
+                                "Caption": "",
+                                "AlternateText": "",
+                                "FolderPath": "games/halo-wars-2/unit-icons/tech",
+                                "FileName": "unsc_scorpion_upgrade2_icon-4d7e0de521b04cf69d6837a20412e952.png"
+                            },
+                            "Image": {
+                                "Width": 256,
+                                "Height": 256
+                            },
+                            "Title": "unsc_scorpion_upgrade2_icon-4d7e0de521b04cf69d6837a20412e952",
+                            "Identity": "69686e2578a84e62a01832272dbd508f"
+                        }
+                    }
+                }
+            },
+            "Links": [
+                {
+                    "Absolute": false,
+                    "Relation": "Self",
+                    "URI": "/content/336460"
+                }
+            ],
+            "ChildrenCount": 0
+        },
+        {
+            "Id": 337001,
+            "Type": "HW2Tech",
+            "View": {
+                "Status": "Published",
+                "Common": {
+                    "Owner": "edostrov",
+                    "CreatedUtc": "2016-09-13T10:51:57Z",
+                    "ModifiedUtc": "2017-02-03T19:41:09Z",
+                    "PublishedUtc": "2017-04-27T21:33:00Z",
+                    "Container": -1
+                },
+                "Identity": "d768196fdd9d458f8ba7397c9fe11d4f",
+                "Autoroute": "hw2/tech/unsc_spartan_upgrade2_chaingun",
+                "Title": "HEAVY MACHINE GUN",
+                "HW2Tech": {
+                    "ObjectTypeId": "unsc_spartan_upgrade2_chaingun",
+                    "DisplayInfo": {
+                        "Id": 335873,
+                        "Type": "HW2TechDisplayInfo",
+                        "View": {
+                            "Status": "Published",
+                            "Common": {
+                                "Owner": "edostrov",
+                                "CreatedUtc": "2016-09-13T10:51:56Z",
+                                "ModifiedUtc": "2017-02-03T19:37:23Z",
+                                "PublishedUtc": "2017-09-25T17:42:59Z",
+                                "Container": -1
+                            },
+                            "Identity": "2036c3554c2944c786f7664b0e1e9597",
+                            "BatchLocalization": {
+                                "IsLocked": false
+                            },
+                            "Localization": {
+                                "Culture": "en",
+                                "MasterContentItemId": ""
+                            },
+                            "Title": "HEAVY MACHINE GUN Display Info",
+                            "HW2TechDisplayInfo": {
+                                "Name": "HEAVY MACHINE GUN",
+                                "Description": "Increases health and damage. Equips a Heavy Machine Gun"
+                            }
+                        }
+                    },
+                    "Image": {
+                        "Id": 348326,
+                        "Type": "Image",
+                        "View": {
+                            "Status": "Published",
+                            "Common": {
+                                "Owner": "kpaul",
+                                "CreatedUtc": "2017-04-06T03:02:04Z",
+                                "ModifiedUtc": "2017-04-27T21:32:20Z",
+                                "PublishedUtc": "2017-04-27T21:32:21Z",
+                                "Container": -1
+                            },
+                            "Media": {
+                                "MediaUrl": "https://content.halocdn.com/media/Default/games/halo-wars-2/unit-icons/build/unsc_inf_spartan_chaingun_01_upgrade2_icon-ccf1245bb3cc441ab326210d10f6df80.png",
+                                "MimeType": "image/png",
+                                "Caption": "",
+                                "AlternateText": "",
+                                "FolderPath": "games/halo-wars-2/unit-icons/build",
+                                "FileName": "unsc_inf_spartan_chaingun_01_upgrade2_icon-ccf1245bb3cc441ab326210d10f6df80.png"
+                            },
+                            "Image": {
+                                "Width": 256,
+                                "Height": 256
+                            },
+                            "Title": "unsc_inf_spartan_chaingun_01_upgrade2_icon-ccf1245bb3cc441ab326210d10f6df80",
+                            "Identity": "b50252ab068b42af8085b6f50cc20b60"
+                        }
+                    }
+                }
+            },
+            "Links": [
+                {
+                    "Absolute": false,
+                    "Relation": "Self",
+                    "URI": "/content/337001"
+                }
+            ],
+            "ChildrenCount": 0
+        },
+        {
+            "Id": 337196,
+            "Type": "HW2Tech",
+            "View": {
+                "Status": "Published",
+                "Common": {
+                    "Owner": "edostrov",
+                    "CreatedUtc": "2016-09-13T10:51:11Z",
+                    "ModifiedUtc": "2017-02-03T19:41:55Z",
+                    "PublishedUtc": "2017-04-27T21:33:00Z",
+                    "Container": -1
+                },
+                "Identity": "28896de9c55c4fe092183d376e3e7c2d",
+                "Autoroute": "hw2/tech/cov_bruteChopper_upgrade4",
+                "Title": "SHRAPNEL ROUNDS",
+                "HW2Tech": {
+                    "ObjectTypeId": "cov_bruteChopper_upgrade4",
+                    "DisplayInfo": {
+                        "Id": 336351,
+                        "Type": "HW2TechDisplayInfo",
+                        "View": {
+                            "Status": "Published",
+                            "Common": {
+                                "Owner": "edostrov",
+                                "CreatedUtc": "2016-09-13T10:51:10Z",
+                                "ModifiedUtc": "2017-02-03T19:39:01Z",
+                                "PublishedUtc": "2017-02-03T19:39:01Z",
+                                "Container": -1
+                            },
+                            "Identity": "fcc2068cff9d451f960c3b3cdb13ecba",
+                            "BatchLocalization": {
+                                "IsLocked": false
+                            },
+                            "Localization": {
+                                "Culture": "en",
+                                "MasterContentItemId": ""
+                            },
+                            "Title": "SHRAPNEL ROUNDS Display Info",
+                            "HW2TechDisplayInfo": {
+                                "Name": "SHRAPNEL ROUNDS",
+                                "Description": "Adds explosive rounds. Detects cloaked units"
+                            }
+                        }
+                    },
+                    "Image": {
+                        "Id": 348356,
+                        "Type": "Image",
+                        "View": {
+                            "Status": "Published",
+                            "Common": {
+                                "Owner": "kpaul",
+                                "CreatedUtc": "2017-04-06T02:28:17Z",
+                                "ModifiedUtc": "2017-04-27T21:32:28Z",
+                                "PublishedUtc": "2017-04-27T21:32:29Z",
+                                "Container": -1
+                            },
+                            "Media": {
+                                "MediaUrl": "https://content.halocdn.com/media/Default/games/halo-wars-2/unit-icons/build/cov_brutechopper_upgrade4_icon-75d23d44a62742558b24c7b644f4ed3f.png",
+                                "MimeType": "image/png",
+                                "Caption": "",
+                                "AlternateText": "",
+                                "FolderPath": "games/halo-wars-2/unit-icons/build",
+                                "FileName": "cov_brutechopper_upgrade4_icon-75d23d44a62742558b24c7b644f4ed3f.png"
+                            },
+                            "Image": {
+                                "Width": 256,
+                                "Height": 256
+                            },
+                            "Title": "cov_brutechopper_upgrade4_icon-75d23d44a62742558b24c7b644f4ed3f",
+                            "Identity": "5add3c0d2a9747a3b2dac7c7055eb330"
+                        }
+                    }
+                }
+            },
+            "Links": [
+                {
+                    "Absolute": false,
+                    "Relation": "Self",
+                    "URI": "/content/337196"
+                }
+            ],
+            "ChildrenCount": 0
+        },
+        {
+            "Id": 337219,
+            "Type": "HW2Tech",
+            "View": {
+                "Status": "Published",
+                "Common": {
+                    "Owner": "edostrov",
+                    "CreatedUtc": "2016-09-13T10:50:01Z",
+                    "ModifiedUtc": "2017-02-03T19:42:01Z",
+                    "PublishedUtc": "2017-04-27T21:33:00Z",
+                    "Container": -1
+                },
+                "Identity": "7b66f80e995c42e7ac6be24062a629e0",
+                "Autoroute": "hw2/tech/unsc_Sniper_upgrade1",
+                "Title": "STANCHION SNIPER SYSTEM",
+                "HW2Tech": {
+                    "ObjectTypeId": "unsc_Sniper_upgrade1",
+                    "DisplayInfo": {
+                        "Id": 336780,
+                        "Type": "HW2TechDisplayInfo",
+                        "View": {
+                            "Status": "Published",
+                            "Common": {
+                                "Owner": "edostrov",
+                                "CreatedUtc": "2016-09-13T10:50:00Z",
+                                "ModifiedUtc": "2017-02-03T19:40:24Z",
+                                "PublishedUtc": "2017-09-25T17:43:01Z",
+                                "Container": -1
+                            },
+                            "Identity": "bc8aff30b6f74ef5875557c8d767e944",
+                            "BatchLocalization": {
+                                "IsLocked": false
+                            },
+                            "Localization": {
+                                "Culture": "en",
+                                "MasterContentItemId": ""
+                            },
+                            "Title": "STANCHION SNIPER SYSTEM Display Info",
+                            "HW2TechDisplayInfo": {
+                                "Name": "STANCHION SNIPER SYSTEM",
+                                "Description": "Greatly increases damage. Shots slow targets"
+                            }
+                        }
+                    },
+                    "Image": {
+                        "Id": 348308,
+                        "Type": "Image",
+                        "View": {
+                            "Status": "Published",
+                            "Common": {
+                                "Owner": "kpaul",
+                                "CreatedUtc": "2017-04-05T22:01:21Z",
+                                "ModifiedUtc": "2017-04-27T21:32:16Z",
+                                "PublishedUtc": "2017-04-27T21:32:16Z",
+                                "Container": -1
+                            },
+                            "Media": {
+                                "MediaUrl": "https://content.halocdn.com/media/Default/games/halo-wars-2/unit-icons/tech/unsc_sniper_upgrade1_icon-e95a2a0ce41948d5b2ade5e1170a70c2.png",
+                                "MimeType": "image/png",
+                                "Caption": "",
+                                "AlternateText": "",
+                                "FolderPath": "games/halo-wars-2/unit-icons/tech",
+                                "FileName": "unsc_sniper_upgrade1_icon-e95a2a0ce41948d5b2ade5e1170a70c2.png"
+                            },
+                            "Image": {
+                                "Width": 256,
+                                "Height": 256
+                            },
+                            "Title": "unsc_sniper_upgrade1_icon-e95a2a0ce41948d5b2ade5e1170a70c2",
+                            "Identity": "483049fdf1f5485e87e4ecdb1d164eaa"
+                        }
+                    }
+                }
+            },
+            "Links": [
+                {
+                    "Absolute": false,
+                    "Relation": "Self",
+                    "URI": "/content/337219"
+                }
+            ],
+            "ChildrenCount": 0
+        },
+        {
+            "Id": 335231,
+            "Type": "HW2Tech",
+            "View": {
+                "Status": "Published",
+                "Common": {
+                    "Owner": "v-hugmic",
+                    "CreatedUtc": "2016-10-27T16:33:19Z",
+                    "ModifiedUtc": "2017-02-03T19:35:22Z",
+                    "PublishedUtc": "2017-04-27T21:32:59Z",
+                    "Container": -1
+                },
+                "Identity": "2d89d4a4c56148b98636e77e34c23bf5",
+                "Autoroute": "hw2/tech/cov_atrioxchosen_upgrade3",
+                "Title": "RIFLED BARREL",
+                "HW2Tech": {
+                    "ObjectTypeId": "cov_atrioxchosen_upgrade3",
+                    "DisplayInfo": {
+                        "Id": 335225,
+                        "Type": "HW2TechDisplayInfo",
+                        "View": {
+                            "Status": "Published",
+                            "Common": {
+                                "Owner": "v-hugmic",
+                                "CreatedUtc": "2016-10-27T16:33:19Z",
+                                "ModifiedUtc": "2017-02-03T19:35:21Z",
+                                "PublishedUtc": "2017-09-25T17:42:52Z",
+                                "Container": -1
+                            },
+                            "Identity": "90b69712e6e4469dae6c26a20a76e5bb",
+                            "BatchLocalization": {
+                                "IsLocked": false
+                            },
+                            "Localization": {
+                                "Culture": "en",
+                                "MasterContentItemId": ""
+                            },
+                            "Title": "RIFLED BARREL Display Info",
+                            "HW2TechDisplayInfo": {
+                                "Name": "RIFLED BARREL",
+                                "Description": "Increases health and damage. Greatly increases weapon range"
+                            }
+                        }
+                    },
+                    "Image": {
+                        "Id": 348373,
+                        "Type": "Image",
+                        "View": {
+                            "Status": "Published",
+                            "Common": {
+                                "Owner": "kpaul",
+                                "CreatedUtc": "2017-04-06T03:10:07Z",
+                                "ModifiedUtc": "2017-04-27T21:32:31Z",
+                                "PublishedUtc": "2017-04-27T21:32:32Z",
+                                "Container": -1
+                            },
+                            "Media": {
+                                "MediaUrl": "https://content.halocdn.com/media/Default/games/halo-wars-2/unit-icons/tech/cov_atrioxchosen_upgrade3_icon-724366d06ccd4f7d9720090f0636ddbb.png",
+                                "MimeType": "image/png",
+                                "Caption": "",
+                                "AlternateText": "",
+                                "FolderPath": "games/halo-wars-2/unit-icons/tech",
+                                "FileName": "cov_atrioxchosen_upgrade3_icon-724366d06ccd4f7d9720090f0636ddbb.png"
+                            },
+                            "Image": {
+                                "Width": 256,
+                                "Height": 256
+                            },
+                            "Title": "cov_atrioxchosen_upgrade3_icon-724366d06ccd4f7d9720090f0636ddbb",
+                            "Identity": "e700a914cdf04f89a763eca47b53ef06"
+                        }
+                    }
+                }
+            },
+            "Links": [
+                {
+                    "Absolute": false,
+                    "Relation": "Self",
+                    "URI": "/content/335231"
+                }
+            ],
+            "ChildrenCount": 0
+        },
+        {
+            "Id": 335268,
+            "Type": "HW2Tech",
+            "View": {
+                "Status": "Published",
+                "Common": {
+                    "Owner": "edostrov",
+                    "CreatedUtc": "2016-09-13T10:49:48Z",
+                    "ModifiedUtc": "2017-02-03T19:35:28Z",
+                    "PublishedUtc": "2017-04-27T21:32:59Z",
+                    "Container": -1
+                },
+                "Identity": "19b837d228374fcaafb2ba31dbfd2f0c",
+                "Autoroute": "hw2/tech/unsc_marine_upgrade2",
+                "Title": "COMBAT TECH",
+                "HW2Tech": {
+                    "ObjectTypeId": "unsc_marine_upgrade2",
+                    "DisplayInfo": {
+                        "Id": 335263,
+                        "Type": "HW2TechDisplayInfo",
+                        "View": {
+                            "Status": "Published",
+                            "Common": {
+                                "Owner": "edostrov",
+                                "CreatedUtc": "2016-09-13T10:49:47Z",
+                                "ModifiedUtc": "2017-02-03T19:35:27Z",
+                                "PublishedUtc": "2017-09-25T17:42:55Z",
+                                "Container": -1
+                            },
+                            "Identity": "31fed35679ca468383cd4d7ca57a4c89",
+                            "BatchLocalization": {
+                                "IsLocked": false
+                            },
+                            "Localization": {
+                                "Culture": "en",
+                                "MasterContentItemId": ""
+                            },
+                            "Title": "COMBAT TECH Display Info",
+                            "HW2TechDisplayInfo": {
+                                "Name": "COMBAT TECH",
+                                "Description": "Adds an Engineer to the squad. Can repair vehicles, air units and buildings. Equipped with Rocket Launcher"
+                            }
+                        }
+                    },
+                    "Image": {
+                        "Id": 348365,
+                        "Type": "Image",
+                        "View": {
+                            "Status": "Published",
+                            "Common": {
+                                "Owner": "kpaul",
+                                "CreatedUtc": "2017-04-06T02:33:47Z",
+                                "ModifiedUtc": "2017-04-27T21:32:30Z",
+                                "PublishedUtc": "2017-04-27T21:32:29Z",
+                                "Container": -1
+                            },
+                            "Media": {
+                                "MediaUrl": "https://content.halocdn.com/media/Default/games/halo-wars-2/unit-icons/build/unsc_marine_upgrade2_icon-4e6a7c6620e44c2191da2fc7bd945477.png",
+                                "MimeType": "image/png",
+                                "Caption": "",
+                                "AlternateText": "",
+                                "FolderPath": "games/halo-wars-2/unit-icons/build",
+                                "FileName": "unsc_marine_upgrade2_icon-4e6a7c6620e44c2191da2fc7bd945477.png"
+                            },
+                            "Image": {
+                                "Width": 256,
+                                "Height": 256
+                            },
+                            "Title": "unsc_marine_upgrade2_icon-4e6a7c6620e44c2191da2fc7bd945477",
+                            "Identity": "15165cf8ee264515a555e3ac37e67740"
+                        }
+                    }
+                }
+            },
+            "Links": [
+                {
+                    "Absolute": false,
+                    "Relation": "Self",
+                    "URI": "/content/335268"
+                }
+            ],
+            "ChildrenCount": 0
+        },
+        {
+            "Id": 335376,
+            "Type": "HW2Tech",
+            "View": {
+                "Status": "Published",
+                "Common": {
+                    "Owner": "edostrov",
+                    "CreatedUtc": "2016-09-13T10:49:40Z",
+                    "ModifiedUtc": "2017-02-03T19:35:47Z",
+                    "PublishedUtc": "2017-04-27T21:32:59Z",
+                    "Container": -1
+                },
+                "Identity": "e04fe5dc039149489a1b810a8e7c500e",
+                "Autoroute": "hw2/tech/unsc_tech_reinforcements_1",
+                "Title": "REINFORCEMENTS I",
+                "HW2Tech": {
+                    "ObjectTypeId": "unsc_tech_reinforcements_1",
+                    "DisplayInfo": {
+                        "Id": 334905,
+                        "Type": "HW2TechDisplayInfo",
+                        "View": {
+                            "Status": "Published",
+                            "Common": {
+                                "Owner": "edostrov",
+                                "CreatedUtc": "2016-09-13T10:49:39Z",
+                                "ModifiedUtc": "2017-02-03T19:34:23Z",
+                                "PublishedUtc": "2017-09-25T17:42:58Z",
+                                "Container": -1
+                            },
+                            "Identity": "c0badf49581948319bf0c0aa29262a51",
+                            "BatchLocalization": {
+                                "IsLocked": false
+                            },
+                            "Localization": {
+                                "Culture": "en",
+                                "MasterContentItemId": ""
+                            },
+                            "Title": "REINFORCEMENTS I Display Info",
+                            "HW2TechDisplayInfo": {
+                                "Name": "REINFORCEMENTS I",
+                                "Description": "Boosts population cap by +20. Raises potential army size"
+                            }
+                        }
+                    },
+                    "Image": {
+                        "Id": 348379,
+                        "Type": "Image",
+                        "View": {
+                            "Status": "Published",
+                            "Common": {
+                                "Owner": "kpaul",
+                                "CreatedUtc": "2017-04-05T21:12:44Z",
+                                "ModifiedUtc": "2017-04-27T21:32:34Z",
+                                "PublishedUtc": "2017-04-27T21:32:35Z",
+                                "Container": -1
+                            },
+                            "Media": {
+                                "MediaUrl": "https://content.halocdn.com/media/Default/games/halo-wars-2/unit-icons/tech/unsc_tech_reinforcements_1_icon-f92ca9315fee4f91a1f7a65929debd32.png",
+                                "MimeType": "image/png",
+                                "Caption": "",
+                                "AlternateText": "",
+                                "FolderPath": "games/halo-wars-2/unit-icons/tech",
+                                "FileName": "unsc_tech_reinforcements_1_icon-f92ca9315fee4f91a1f7a65929debd32.png"
+                            },
+                            "Image": {
+                                "Width": 256,
+                                "Height": 256
+                            },
+                            "Title": "unsc_tech_reinforcements_1_icon-f92ca9315fee4f91a1f7a65929debd32",
+                            "Identity": "4e4c61515f5c425aa2af96707ff3ff1b"
+                        }
+                    }
+                }
+            },
+            "Links": [
+                {
+                    "Absolute": false,
+                    "Relation": "Self",
+                    "URI": "/content/335376"
+                }
+            ],
+            "ChildrenCount": 0
+        },
+        {
+            "Id": 335452,
+            "Type": "HW2Tech",
+            "View": {
+                "Status": "Published",
+                "Common": {
+                    "Owner": "edostrov",
+                    "CreatedUtc": "2016-09-13T10:50:46Z",
+                    "ModifiedUtc": "2017-02-03T19:36:02Z",
+                    "PublishedUtc": "2017-04-27T21:32:59Z",
+                    "Container": -1
+                },
+                "Identity": "5baa2540988d459ea13f1b48f6c8db65",
+                "Autoroute": "hw2/tech/cov_tech_recruitTraining_2",
+                "Title": "ADV. LOGISTICS II",
+                "HW2Tech": {
+                    "ObjectTypeId": "cov_tech_recruitTraining_2",
+                    "DisplayInfo": {
+                        "Id": 335059,
+                        "Type": "HW2TechDisplayInfo",
+                        "View": {
+                            "Status": "Published",
+                            "Common": {
+                                "Owner": "edostrov",
+                                "CreatedUtc": "2016-09-13T10:50:45Z",
+                                "ModifiedUtc": "2017-02-03T19:34:52Z",
+                                "PublishedUtc": "2017-09-25T17:42:57Z",
+                                "Container": -1
+                            },
+                            "Identity": "675bb8ec05374377b68640edc32581c5",
+                            "BatchLocalization": {
+                                "IsLocked": false
+                            },
+                            "Localization": {
+                                "Culture": "en",
+                                "MasterContentItemId": ""
+                            },
+                            "Title": "ADV. LOGISTICS II Display Info",
+                            "HW2TechDisplayInfo": {
+                                "Name": "ADV. LOGISTICS II",
+                                "Description": "Reduces unit build time by 30%. Units are produced faster"
+                            }
+                        }
+                    },
+                    "Image": {
+                        "Id": 348274,
+                        "Type": "Image",
+                        "View": {
+                            "Status": "Published",
+                            "Common": {
+                                "Owner": "kpaul",
+                                "CreatedUtc": "2017-04-05T17:58:14Z",
+                                "ModifiedUtc": "2017-04-27T21:32:05Z",
+                                "PublishedUtc": "2017-04-27T21:32:06Z",
+                                "Container": -1
+                            },
+                            "Media": {
+                                "MediaUrl": "https://content.halocdn.com/media/Default/games/halo-wars-2/unit-icons/tech/cov_tech_recruittraining_2_icon-11edda581d2a41b293788565313b7960.png",
+                                "MimeType": "image/png",
+                                "Caption": "",
+                                "AlternateText": "",
+                                "FolderPath": "games/halo-wars-2/unit-icons/tech",
+                                "FileName": "cov_tech_recruittraining_2_icon-11edda581d2a41b293788565313b7960.png"
+                            },
+                            "Image": {
+                                "Width": 256,
+                                "Height": 256
+                            },
+                            "Title": "cov_tech_recruittraining_2_icon-11edda581d2a41b293788565313b7960",
+                            "Identity": "36c79786e62d4f8b84ec136d2c790f13"
+                        }
+                    }
+                }
+            },
+            "Links": [
+                {
+                    "Absolute": false,
+                    "Relation": "Self",
+                    "URI": "/content/335452"
+                }
+            ],
+            "ChildrenCount": 0
+        },
+        {
+            "Id": 335590,
+            "Type": "HW2Tech",
+            "View": {
+                "Status": "Published",
+                "Common": {
+                    "Owner": "edostrov",
+                    "CreatedUtc": "2016-09-13T10:50:26Z",
+                    "ModifiedUtc": "2017-02-03T19:36:33Z",
+                    "PublishedUtc": "2017-04-27T21:32:59Z",
+                    "Container": -1
+                },
+                "Identity": "e4cbf5da3a1042ecb203ca852d3bc81a",
+                "Autoroute": "hw2/tech/unsc_tech_global_structure_01",
+                "Title": "FORTIFY BASE UPGRADE I",
+                "HW2Tech": {
+                    "ObjectTypeId": "unsc_tech_global_structure_01",
+                    "DisplayInfo": {
+                        "Id": 335585,
+                        "Type": "HW2TechDisplayInfo",
+                        "View": {
+                            "Status": "Published",
+                            "Common": {
+                                "Owner": "edostrov",
+                                "CreatedUtc": "2016-09-13T10:50:25Z",
+                                "ModifiedUtc": "2017-02-03T19:36:32Z",
+                                "PublishedUtc": "2017-05-22T16:40:03Z",
+                                "Container": -1
+                            },
+                            "Identity": "f9ce92127894456fa1468e67c0ffe93e",
+                            "BatchLocalization": {
+                                "IsLocked": false
+                            },
+                            "Localization": {
+                                "Culture": "en",
+                                "MasterContentItemId": ""
+                            },
+                            "Title": "FORTIFY BASE UPGRADE I Display Info",
+                            "HW2TechDisplayInfo": {
+                                "Name": "FORTIFY BASE UPGRADE I",
+                                "Description": "10% Building health boost. 10% Turret health boost. 10% Turret damage boost. 50 Supply discount to new bases"
+                            }
+                        }
+                    },
+                    "Image": {
+                        "Id": 348306,
+                        "Type": "Image",
+                        "View": {
+                            "Status": "Published",
+                            "Common": {
+                                "Owner": "kpaul",
+                                "CreatedUtc": "2017-04-06T02:29:14Z",
+                                "ModifiedUtc": "2017-04-27T21:32:13Z",
+                                "PublishedUtc": "2017-04-27T21:32:14Z",
+                                "Container": -1
+                            },
+                            "Media": {
+                                "MediaUrl": "https://content.halocdn.com/media/Default/games/halo-wars-2/unit-icons/build/unsc_tech_global_structure_01_icon-f39c2642c28e4a849114dc7a2c43dc68.png",
+                                "MimeType": "image/png",
+                                "Caption": "",
+                                "AlternateText": "",
+                                "FolderPath": "games/halo-wars-2/unit-icons/build",
+                                "FileName": "unsc_tech_global_structure_01_icon-f39c2642c28e4a849114dc7a2c43dc68.png"
+                            },
+                            "Image": {
+                                "Width": 256,
+                                "Height": 256
+                            },
+                            "Title": "unsc_tech_global_structure_01_icon-f39c2642c28e4a849114dc7a2c43dc68",
+                            "Identity": "94c0c57b701844e1820362d7f429fd38"
+                        }
+                    }
+                }
+            },
+            "Links": [
+                {
+                    "Absolute": false,
+                    "Relation": "Self",
+                    "URI": "/content/335590"
+                }
+            ],
+            "ChildrenCount": 0
+        },
+        {
+            "Id": 336474,
+            "Type": "HW2Tech",
+            "View": {
+                "Status": "Published",
+                "Common": {
+                    "Owner": "edostrov",
+                    "CreatedUtc": "2016-09-13T10:49:59Z",
+                    "ModifiedUtc": "2017-02-03T19:39:23Z",
+                    "PublishedUtc": "2017-04-27T21:32:59Z",
+                    "Container": -1
+                },
+                "Identity": "91604b7440c74ab0ab740b00c7bf6184",
+                "Autoroute": "hw2/tech/unsc_cyclops_upgrade1",
+                "Title": "SHOCK ROUNDS",
+                "HW2Tech": {
+                    "ObjectTypeId": "unsc_cyclops_upgrade1",
+                    "DisplayInfo": {
+                        "Id": 336266,
+                        "Type": "HW2TechDisplayInfo",
+                        "View": {
+                            "Status": "Published",
+                            "Common": {
+                                "Owner": "edostrov",
+                                "CreatedUtc": "2016-09-13T10:49:58Z",
+                                "ModifiedUtc": "2017-02-03T19:38:44Z",
+                                "PublishedUtc": "2017-09-25T17:43:00Z",
+                                "Container": -1
+                            },
+                            "Identity": "5d046e2782cd4d1e93d9bf76abf3e919",
+                            "BatchLocalization": {
+                                "IsLocked": false
+                            },
+                            "Localization": {
+                                "Culture": "en",
+                                "MasterContentItemId": ""
+                            },
+                            "Title": "SHOCK ROUNDS Display Info",
+                            "HW2TechDisplayInfo": {
+                                "Name": "SHOCK ROUNDS",
+                                "Description": "Increases damage. Shots slow vehicles"
+                            }
+                        }
+                    },
+                    "Image": {
+                        "Id": 348259,
+                        "Type": "Image",
+                        "View": {
+                            "Status": "Published",
+                            "Common": {
+                                "Owner": "kpaul",
+                                "CreatedUtc": "2017-04-05T21:09:11Z",
+                                "ModifiedUtc": "2017-04-27T21:31:54Z",
+                                "PublishedUtc": "2017-04-27T21:31:54Z",
+                                "Container": -1
+                            },
+                            "Media": {
+                                "MediaUrl": "https://content.halocdn.com/media/Default/games/halo-wars-2/unit-icons/tech/unsc_cyclops_upgrade1_icon-8955bb07f5b94f629a483a99cbe01085.png",
+                                "MimeType": "image/png",
+                                "Caption": "",
+                                "AlternateText": "",
+                                "FolderPath": "games/halo-wars-2/unit-icons/tech",
+                                "FileName": "unsc_cyclops_upgrade1_icon-8955bb07f5b94f629a483a99cbe01085.png"
+                            },
+                            "Image": {
+                                "Width": 256,
+                                "Height": 256
+                            },
+                            "Title": "unsc_cyclops_upgrade1_icon-8955bb07f5b94f629a483a99cbe01085",
+                            "Identity": "80f79a1415344298bb857482c1c846a1"
+                        }
+                    }
+                }
+            },
+            "Links": [
+                {
+                    "Absolute": false,
+                    "Relation": "Self",
+                    "URI": "/content/336474"
+                }
+            ],
+            "ChildrenCount": 0
+        },
+        {
+            "Id": 336525,
+            "Type": "HW2Tech",
+            "View": {
+                "Status": "Published",
+                "Common": {
+                    "Owner": "v-hugmic",
+                    "CreatedUtc": "2016-10-27T16:33:17Z",
+                    "ModifiedUtc": "2017-02-03T19:39:33Z",
+                    "PublishedUtc": "2017-04-27T21:32:59Z",
+                    "Container": -1
+                },
+                "Identity": "3f6d6f7399814445a2b5dbaaadbe1205",
+                "Autoroute": "hw2/tech/cov_atrioxchosen_upgrade1",
+                "Title": "PLASMA ROUNDS",
+                "HW2Tech": {
+                    "ObjectTypeId": "cov_atrioxchosen_upgrade1",
+                    "DisplayInfo": {
+                        "Id": 336383,
+                        "Type": "HW2TechDisplayInfo",
+                        "View": {
+                            "Status": "Published",
+                            "Common": {
+                                "Owner": "v-hugmic",
+                                "CreatedUtc": "2016-10-27T16:33:17Z",
+                                "ModifiedUtc": "2017-02-03T19:39:07Z",
+                                "PublishedUtc": "2017-09-25T17:42:54Z",
+                                "Container": -1
+                            },
+                            "Identity": "2020ecf55d39479a8e65551bf7e9d337",
+                            "BatchLocalization": {
+                                "IsLocked": false
+                            },
+                            "Localization": {
+                                "Culture": "en",
+                                "MasterContentItemId": ""
+                            },
+                            "Title": "PLASMA ROUNDS Display Info",
+                            "HW2TechDisplayInfo": {
+                                "Name": "PLASMA ROUNDS",
+                                "Description": "Increases health and damage. Adds AoE damage to weapon"
+                            }
+                        }
+                    },
+                    "Image": {
+                        "Id": 348313,
+                        "Type": "Image",
+                        "View": {
+                            "Status": "Published",
+                            "Common": {
+                                "Owner": "kpaul",
+                                "CreatedUtc": "2017-04-05T17:52:07Z",
+                                "ModifiedUtc": "2017-04-27T21:32:17Z",
+                                "PublishedUtc": "2017-04-27T21:32:18Z",
+                                "Container": -1
+                            },
+                            "Media": {
+                                "MediaUrl": "https://content.halocdn.com/media/Default/games/halo-wars-2/unit-icons/tech/cov_atrioxchosen_upgrade1_icon-9c16602365d04fc3a96900ffb652145b.png",
+                                "MimeType": "image/png",
+                                "Caption": "",
+                                "AlternateText": "",
+                                "FolderPath": "games/halo-wars-2/unit-icons/tech",
+                                "FileName": "cov_atrioxchosen_upgrade1_icon-9c16602365d04fc3a96900ffb652145b.png"
+                            },
+                            "Image": {
+                                "Width": 256,
+                                "Height": 256
+                            },
+                            "Title": "cov_atrioxchosen_upgrade1_icon-9c16602365d04fc3a96900ffb652145b",
+                            "Identity": "46bc36894f6547f5b09c8e61e6bbed72"
+                        }
+                    }
+                }
+            },
+            "Links": [
+                {
+                    "Absolute": false,
+                    "Relation": "Self",
+                    "URI": "/content/336525"
+                }
+            ],
+            "ChildrenCount": 0
+        },
+        {
+            "Id": 336543,
+            "Type": "HW2Tech",
+            "View": {
+                "Status": "Published",
+                "Common": {
+                    "Owner": "edostrov",
+                    "CreatedUtc": "2016-09-13T10:50:13Z",
+                    "ModifiedUtc": "2017-02-03T19:39:37Z",
+                    "PublishedUtc": "2017-04-27T21:32:59Z",
+                    "Container": -1
+                },
+                "Identity": "031c01a41a2f4421b18a53fb5f87398c",
+                "Autoroute": "hw2/tech/unsc_tech_global_infantry_03",
+                "Title": "INFANTRY UPGRADE III",
+                "HW2Tech": {
+                    "ObjectTypeId": "unsc_tech_global_infantry_03",
+                    "DisplayInfo": {
+                        "Id": 335353,
+                        "Type": "HW2TechDisplayInfo",
+                        "View": {
+                            "Status": "Published",
+                            "Common": {
+                                "Owner": "edostrov",
+                                "CreatedUtc": "2016-09-13T10:50:12Z",
+                                "ModifiedUtc": "2017-02-03T19:35:42Z",
+                                "PublishedUtc": "2017-02-03T19:35:42Z",
+                                "Container": -1
+                            },
+                            "Identity": "a1968964df534f6389692a73909ee7cc",
+                            "BatchLocalization": {
+                                "IsLocked": false
+                            },
+                            "Localization": {
+                                "Culture": "en",
+                                "MasterContentItemId": ""
+                            },
+                            "Title": "INFANTRY UPGRADE III Display Info",
+                            "HW2TechDisplayInfo": {
+                                "Name": "INFANTRY UPGRADE III",
+                                "Description": "30% damage boost. 30% health boost"
+                            }
+                        }
+                    },
+                    "Image": {
+                        "Id": 348289,
+                        "Type": "Image",
+                        "View": {
+                            "Status": "Published",
+                            "Common": {
+                                "Owner": "kpaul",
+                                "CreatedUtc": "2017-04-05T23:42:25Z",
+                                "ModifiedUtc": "2017-04-27T21:32:08Z",
+                                "PublishedUtc": "2017-04-27T21:32:09Z",
+                                "Container": -1
+                            },
+                            "Media": {
+                                "MediaUrl": "https://content.halocdn.com/media/Default/games/halo-wars-2/unit-icons/build/unsc_tech_global_infantry_03_icon-940ef9b23b1b463693405b399733f585.png",
+                                "MimeType": "image/png",
+                                "Caption": "",
+                                "AlternateText": "",
+                                "FolderPath": "games/halo-wars-2/unit-icons/build",
+                                "FileName": "unsc_tech_global_infantry_03_icon-940ef9b23b1b463693405b399733f585.png"
+                            },
+                            "Image": {
+                                "Width": 256,
+                                "Height": 256
+                            },
+                            "Title": "unsc_tech_global_infantry_03_icon-940ef9b23b1b463693405b399733f585",
+                            "Identity": "f45912a33cf14cf093b1da98ddef5fe1"
+                        }
+                    }
+                }
+            },
+            "Links": [
+                {
+                    "Absolute": false,
+                    "Relation": "Self",
+                    "URI": "/content/336543"
+                }
+            ],
+            "ChildrenCount": 0
+        },
+        {
+            "Id": 336825,
+            "Type": "HW2Tech",
+            "View": {
+                "Status": "Published",
+                "Common": {
+                    "Owner": "edostrov",
+                    "CreatedUtc": "2016-09-13T10:51:22Z",
+                    "ModifiedUtc": "2017-02-03T19:40:31Z",
+                    "PublishedUtc": "2017-04-27T21:32:59Z",
+                    "Container": -1
+                },
+                "Identity": "a7515cfbb2384ecb9a095846946c1d44",
+                "Autoroute": "hw2/tech/cov_tech_global_vehicle_02",
+                "Title": "VEHICLE UPGRADE II",
+                "HW2Tech": {
+                    "ObjectTypeId": "cov_tech_global_vehicle_02",
+                    "DisplayInfo": {
+                        "Id": 336739,
+                        "Type": "HW2TechDisplayInfo",
+                        "View": {
+                            "Status": "Published",
+                            "Common": {
+                                "Owner": "edostrov",
+                                "CreatedUtc": "2016-09-13T10:51:21Z",
+                                "ModifiedUtc": "2017-02-03T19:40:17Z",
+                                "PublishedUtc": "2017-02-03T19:40:17Z",
+                                "Container": -1
+                            },
+                            "Identity": "8ae0023bdddf4f8ca39a79f9573c413f",
+                            "BatchLocalization": {
+                                "IsLocked": false
+                            },
+                            "Localization": {
+                                "Culture": "en",
+                                "MasterContentItemId": ""
+                            },
+                            "Title": "VEHICLE UPGRADE II Display Info",
+                            "HW2TechDisplayInfo": {
+                                "Name": "VEHICLE UPGRADE II",
+                                "Description": "20% damage boost. 20% health boost"
+                            }
+                        }
+                    },
+                    "Image": {
+                        "Id": 348317,
+                        "Type": "Image",
+                        "View": {
+                            "Status": "Published",
+                            "Common": {
+                                "Owner": "kpaul",
+                                "CreatedUtc": "2017-04-05T21:21:02Z",
+                                "ModifiedUtc": "2017-04-27T21:32:16Z",
+                                "PublishedUtc": "2017-04-27T21:32:17Z",
+                                "Container": -1
+                            },
+                            "Media": {
+                                "MediaUrl": "https://content.halocdn.com/media/Default/games/halo-wars-2/unit-icons/tech/cov_tech_global_vehicle_02_icon-02ee37bd9f4544539f96f044fdebb9e8.png",
+                                "MimeType": "image/png",
+                                "Caption": "",
+                                "AlternateText": "",
+                                "FolderPath": "games/halo-wars-2/unit-icons/tech",
+                                "FileName": "cov_tech_global_vehicle_02_icon-02ee37bd9f4544539f96f044fdebb9e8.png"
+                            },
+                            "Image": {
+                                "Width": 256,
+                                "Height": 256
+                            },
+                            "Title": "cov_tech_global_vehicle_02_icon-02ee37bd9f4544539f96f044fdebb9e8",
+                            "Identity": "4260cbccd8ff4f23a6acff695be69a48"
+                        }
+                    }
+                }
+            },
+            "Links": [
+                {
+                    "Absolute": false,
+                    "Relation": "Self",
+                    "URI": "/content/336825"
+                }
+            ],
+            "ChildrenCount": 0
+        },
+        {
+            "Id": 336899,
+            "Type": "HW2Tech",
+            "View": {
+                "Status": "Published",
+                "Common": {
+                    "Owner": "edostrov",
+                    "CreatedUtc": "2016-09-13T10:50:39Z",
+                    "ModifiedUtc": "2017-02-03T19:40:48Z",
+                    "PublishedUtc": "2017-04-27T21:32:59Z",
+                    "Container": -1
+                },
+                "Identity": "b8250f8e322f40c785ee71d861f01692",
+                "Autoroute": "hw2/tech/cov_turret_upgradeAI",
+                "Title": "ADD ANTI-INFANTRY UPGRADE",
+                "HW2Tech": {
+                    "ObjectTypeId": "cov_turret_upgradeAI",
+                    "DisplayInfo": {
+                        "Id": 336740,
+                        "Type": "HW2TechDisplayInfo",
+                        "View": {
+                            "Status": "Published",
+                            "Common": {
+                                "Owner": "edostrov",
+                                "CreatedUtc": "2016-09-13T10:50:38Z",
+                                "ModifiedUtc": "2017-02-03T19:40:17Z",
+                                "PublishedUtc": "2017-02-03T19:40:17Z",
+                                "Container": -1
+                            },
+                            "Identity": "7b52568b49754a4db1c8b9c5f4eeedd0",
+                            "BatchLocalization": {
+                                "IsLocked": false
+                            },
+                            "Localization": {
+                                "Culture": "en",
+                                "MasterContentItemId": ""
+                            },
+                            "Title": "ADD ANTI-INFANTRY UPGRADE Display Info",
+                            "HW2TechDisplayInfo": {
+                                "Name": "ADD ANTI-INFANTRY UPGRADE",
+                                "Description": "Adds an anti-infantry weapon"
+                            }
+                        }
+                    },
+                    "Image": {
+                        "Id": 348254,
+                        "Type": "Image",
+                        "View": {
+                            "Status": "Published",
+                            "Common": {
+                                "Owner": "kpaul",
+                                "CreatedUtc": "2017-04-05T17:53:45Z",
+                                "ModifiedUtc": "2017-04-27T21:31:54Z",
+                                "PublishedUtc": "2017-04-27T21:31:54Z",
+                                "Container": -1
+                            },
+                            "Media": {
+                                "MediaUrl": "https://content.halocdn.com/media/Default/games/halo-wars-2/unit-icons/tech/cov_turret_upgradeai_icon-758bd37f1fbc4b068bc1628d495c9c8a.png",
+                                "MimeType": "image/png",
+                                "Caption": "",
+                                "AlternateText": "",
+                                "FolderPath": "games/halo-wars-2/unit-icons/tech",
+                                "FileName": "cov_turret_upgradeai_icon-758bd37f1fbc4b068bc1628d495c9c8a.png"
+                            },
+                            "Image": {
+                                "Width": 256,
+                                "Height": 256
+                            },
+                            "Title": "cov_turret_upgradeai_icon-758bd37f1fbc4b068bc1628d495c9c8a",
+                            "Identity": "9aefd2288d514420a2b1e4d2db9c1f3d"
+                        }
+                    }
+                }
+            },
+            "Links": [
+                {
+                    "Absolute": false,
+                    "Relation": "Self",
+                    "URI": "/content/336899"
+                }
+            ],
+            "ChildrenCount": 0
+        },
+        {
+            "Id": 335943,
+            "Type": "HW2Tech",
+            "View": {
+                "Status": "Published",
+                "Common": {
+                    "Owner": "edostrov",
+                    "CreatedUtc": "2016-09-13T10:51:09Z",
+                    "ModifiedUtc": "2017-02-03T19:37:37Z",
+                    "PublishedUtc": "2017-04-27T21:32:58Z",
+                    "Container": -1
+                },
+                "Identity": "f3269c0548ec4809bfcda36adec4ce62",
+                "Autoroute": "hw2/tech/cov_wraith_upgrade1",
+                "Title": "SCORCH MORTAR",
+                "HW2Tech": {
+                    "ObjectTypeId": "cov_wraith_upgrade1",
+                    "DisplayInfo": {
+                        "Id": 335027,
+                        "Type": "HW2TechDisplayInfo",
+                        "View": {
+                            "Status": "Published",
+                            "Common": {
+                                "Owner": "edostrov",
+                                "CreatedUtc": "2016-09-13T10:51:09Z",
+                                "ModifiedUtc": "2017-02-03T19:34:44Z",
+                                "PublishedUtc": "2017-09-25T17:42:57Z",
+                                "Container": -1
+                            },
+                            "Identity": "62bd944b6de54ccaa4d46dc1f9020adb",
+                            "BatchLocalization": {
+                                "IsLocked": false
+                            },
+                            "Localization": {
+                                "Culture": "en",
+                                "MasterContentItemId": ""
+                            },
+                            "Title": "SCORCH MORTAR Display Info",
+                            "HW2TechDisplayInfo": {
+                                "Name": "SCORCH MORTAR",
+                                "Description": "Adds a targeted attack that deals damage over time. Strong against ground targets. Scorch Mortar cannot target air"
+                            }
+                        }
+                    },
+                    "Image": {
+                        "Id": 348309,
+                        "Type": "Image",
+                        "View": {
+                            "Status": "Published",
+                            "Common": {
+                                "Owner": "kpaul",
+                                "CreatedUtc": "2017-04-06T02:35:44Z",
+                                "ModifiedUtc": "2017-04-27T21:32:14Z",
+                                "PublishedUtc": "2017-04-27T21:32:15Z",
+                                "Container": -1
+                            },
+                            "Media": {
+                                "MediaUrl": "https://content.halocdn.com/media/Default/games/halo-wars-2/unit-icons/build/cov_wraith_upgrade1_icon-f5c9e46e87a540d4a5da5dd160caecca.png",
+                                "MimeType": "image/png",
+                                "Caption": "",
+                                "AlternateText": "",
+                                "FolderPath": "games/halo-wars-2/unit-icons/build",
+                                "FileName": "cov_wraith_upgrade1_icon-f5c9e46e87a540d4a5da5dd160caecca.png"
+                            },
+                            "Image": {
+                                "Width": 256,
+                                "Height": 256
+                            },
+                            "Title": "cov_wraith_upgrade1_icon-f5c9e46e87a540d4a5da5dd160caecca",
+                            "Identity": "59ce093829a84adcb350d9641b5b0d14"
+                        }
+                    }
+                }
+            },
+            "Links": [
+                {
+                    "Absolute": false,
+                    "Relation": "Self",
+                    "URI": "/content/335943"
+                }
+            ],
+            "ChildrenCount": 0
+        },
+        {
+            "Id": 336837,
+            "Type": "HW2Tech",
+            "View": {
+                "Status": "Published",
+                "Common": {
+                    "Owner": "edostrov",
+                    "CreatedUtc": "2016-09-13T10:50:47Z",
+                    "ModifiedUtc": "2017-02-03T19:40:33Z",
+                    "PublishedUtc": "2017-04-27T21:32:58Z",
+                    "Container": -1
+                },
+                "Identity": "98923ba841374dcb86f3a500bc13686d",
+                "Autoroute": "hw2/tech/cov_tech_recruitTraining_3",
+                "Title": "ADV. LOGISTICS III",
+                "HW2Tech": {
+                    "ObjectTypeId": "cov_tech_recruitTraining_3",
+                    "DisplayInfo": {
+                        "Id": 335852,
+                        "Type": "HW2TechDisplayInfo",
+                        "View": {
+                            "Status": "Published",
+                            "Common": {
+                                "Owner": "edostrov",
+                                "CreatedUtc": "2016-09-13T10:50:47Z",
+                                "ModifiedUtc": "2017-02-03T19:37:18Z",
+                                "PublishedUtc": "2017-09-25T17:42:59Z",
+                                "Container": -1
+                            },
+                            "Identity": "2fbf4505b8ad4fb68a752813d65a524b",
+                            "BatchLocalization": {
+                                "IsLocked": false
+                            },
+                            "Localization": {
+                                "Culture": "en",
+                                "MasterContentItemId": ""
+                            },
+                            "Title": "ADV. LOGISTICS III Display Info",
+                            "HW2TechDisplayInfo": {
+                                "Name": "ADV. LOGISTICS III",
+                                "Description": "Reduces unit build time by 45%. Units are produced faster"
+                            }
+                        }
+                    },
+                    "Image": {
+                        "Id": 348268,
+                        "Type": "Image",
+                        "View": {
+                            "Status": "Published",
+                            "Common": {
+                                "Owner": "kpaul",
+                                "CreatedUtc": "2017-04-06T03:12:27Z",
+                                "ModifiedUtc": "2017-04-27T21:31:59Z",
+                                "PublishedUtc": "2017-04-27T21:31:58Z",
+                                "Container": -1
+                            },
+                            "Media": {
+                                "MediaUrl": "https://content.halocdn.com/media/Default/games/halo-wars-2/unit-icons/tech/cov_tech_recruittraining_3_icon-502f7e17df0649e2b2e082d0d5a12d4c.png",
+                                "MimeType": "image/png",
+                                "Caption": "",
+                                "AlternateText": "",
+                                "FolderPath": "games/halo-wars-2/unit-icons/tech",
+                                "FileName": "cov_tech_recruittraining_3_icon-502f7e17df0649e2b2e082d0d5a12d4c.png"
+                            },
+                            "Image": {
+                                "Width": 256,
+                                "Height": 256
+                            },
+                            "Title": "cov_tech_recruittraining_3_icon-502f7e17df0649e2b2e082d0d5a12d4c",
+                            "Identity": "662598bcdf524186a517196da01a7d66"
+                        }
+                    }
+                }
+            },
+            "Links": [
+                {
+                    "Absolute": false,
+                    "Relation": "Self",
+                    "URI": "/content/336837"
+                }
+            ],
+            "ChildrenCount": 0
+        },
+        {
+            "Id": 336898,
+            "Type": "HW2Tech",
+            "View": {
+                "Status": "Published",
+                "Common": {
+                    "Owner": "edostrov",
+                    "CreatedUtc": "2016-09-13T10:50:56Z",
+                    "ModifiedUtc": "2017-02-03T19:40:47Z",
+                    "PublishedUtc": "2017-04-27T21:32:58Z",
+                    "Container": -1
+                },
+                "Identity": "b31eb8f6eb6f44cdb8082776fba0d617",
+                "Autoroute": "hw2/tech/cov_grunt_upgrade2",
+                "Title": "PACK BROTHER",
+                "HW2Tech": {
+                    "ObjectTypeId": "cov_grunt_upgrade2",
+                    "DisplayInfo": {
+                        "Id": 335646,
+                        "Type": "HW2TechDisplayInfo",
+                        "View": {
+                            "Status": "Published",
+                            "Common": {
+                                "Owner": "edostrov",
+                                "CreatedUtc": "2016-09-13T10:50:55Z",
+                                "ModifiedUtc": "2017-02-03T19:36:43Z",
+                                "PublishedUtc": "2017-09-25T17:42:54Z",
+                                "Container": -1
+                            },
+                            "Identity": "d8a4cf8eaf244415ae71237b9d9b44a9",
+                            "BatchLocalization": {
+                                "IsLocked": false
+                            },
+                            "Localization": {
+                                "Culture": "en",
+                                "MasterContentItemId": ""
+                            },
+                            "Title": "PACK BROTHER Display Info",
+                            "HW2TechDisplayInfo": {
+                                "Name": "PACK BROTHER",
+                                "Description": "Increases squad size"
+                            }
+                        }
+                    },
+                    "Image": {
+                        "Id": 348248,
+                        "Type": "Image",
+                        "View": {
+                            "Status": "Published",
+                            "Common": {
+                                "Owner": "kpaul",
+                                "CreatedUtc": "2017-04-06T02:17:31Z",
+                                "ModifiedUtc": "2017-04-27T21:31:48Z",
+                                "PublishedUtc": "2017-04-27T21:31:49Z",
+                                "Container": -1
+                            },
+                            "Media": {
+                                "MediaUrl": "https://content.halocdn.com/media/Default/games/halo-wars-2/unit-icons/build/cov_grunt_upgrade2_icon-3f1254140e3e4bc88b98aac90d2fc2cd.png",
+                                "MimeType": "image/png",
+                                "Caption": "",
+                                "AlternateText": "",
+                                "FolderPath": "games/halo-wars-2/unit-icons/build",
+                                "FileName": "cov_grunt_upgrade2_icon-3f1254140e3e4bc88b98aac90d2fc2cd.png"
+                            },
+                            "Image": {
+                                "Width": 256,
+                                "Height": 256
+                            },
+                            "Title": "cov_grunt_upgrade2_icon-3f1254140e3e4bc88b98aac90d2fc2cd",
+                            "Identity": "ef946392f14b451385f68f5f9a58432d"
+                        }
+                    }
+                }
+            },
+            "Links": [
+                {
+                    "Absolute": false,
+                    "Relation": "Self",
+                    "URI": "/content/336898"
+                }
+            ],
+            "ChildrenCount": 0
+        },
+        {
+            "Id": 336999,
+            "Type": "HW2Tech",
+            "View": {
+                "Status": "Published",
+                "Common": {
+                    "Owner": "edostrov",
+                    "CreatedUtc": "2016-09-13T10:51:59Z",
+                    "ModifiedUtc": "2017-02-03T19:41:09Z",
+                    "PublishedUtc": "2017-04-27T21:32:58Z",
+                    "Container": -1
+                },
+                "Identity": "dbe90b82510d410ba58b85f5618e6eba",
+                "Autoroute": "hw2/tech/unsc_spartan_upgrade2_rocket",
+                "Title": "ROCKET LAUNCHER",
+                "HW2Tech": {
+                    "ObjectTypeId": "unsc_spartan_upgrade2_rocket",
+                    "DisplayInfo": {
+                        "Id": 335703,
+                        "Type": "HW2TechDisplayInfo",
+                        "View": {
+                            "Status": "Published",
+                            "Common": {
+                                "Owner": "edostrov",
+                                "CreatedUtc": "2016-09-13T10:51:58Z",
+                                "ModifiedUtc": "2017-02-03T19:36:52Z",
+                                "PublishedUtc": "2017-09-25T17:42:56Z",
+                                "Container": -1
+                            },
+                            "Identity": "7d8714d28ea64ed2919b1eed22de13da",
+                            "BatchLocalization": {
+                                "IsLocked": false
+                            },
+                            "Localization": {
+                                "Culture": "en",
+                                "MasterContentItemId": ""
+                            },
+                            "Title": "ROCKET LAUNCHER Display Info",
+                            "HW2TechDisplayInfo": {
+                                "Name": "ROCKET LAUNCHER",
+                                "Description": "Increases health and damage. Equips a Rocket Launcher"
+                            }
+                        }
+                    },
+                    "Image": {
+                        "Id": 348335,
+                        "Type": "Image",
+                        "View": {
+                            "Status": "Published",
+                            "Common": {
+                                "Owner": "kpaul",
+                                "CreatedUtc": "2017-04-06T02:57:42Z",
+                                "ModifiedUtc": "2017-04-27T21:32:23Z",
+                                "PublishedUtc": "2017-04-27T21:32:23Z",
+                                "Container": -1
+                            },
+                            "Media": {
+                                "MediaUrl": "https://content.halocdn.com/media/Default/games/halo-wars-2/unit-icons/build/unsc_inf_spartan_rocket_01_upgrade2_icon-714e9105a24d4b6a97fa18dabfd30637.png",
+                                "MimeType": "image/png",
+                                "Caption": "",
+                                "AlternateText": "",
+                                "FolderPath": "games/halo-wars-2/unit-icons/build",
+                                "FileName": "unsc_inf_spartan_rocket_01_upgrade2_icon-714e9105a24d4b6a97fa18dabfd30637.png"
+                            },
+                            "Image": {
+                                "Width": 256,
+                                "Height": 256
+                            },
+                            "Title": "unsc_inf_spartan_rocket_01_upgrade2_icon-714e9105a24d4b6a97fa18dabfd30637",
+                            "Identity": "289cebdc172c4e69a55f6003407b8b6f"
+                        }
+                    }
+                }
+            },
+            "Links": [
+                {
+                    "Absolute": false,
+                    "Relation": "Self",
+                    "URI": "/content/336999"
+                }
+            ],
+            "ChildrenCount": 0
+        },
+        {
+            "Id": 337006,
+            "Type": "HW2Tech",
+            "View": {
+                "Status": "Published",
+                "Common": {
+                    "Owner": "edostrov",
+                    "CreatedUtc": "2016-09-13T10:52:02Z",
+                    "ModifiedUtc": "2017-02-03T19:41:10Z",
+                    "PublishedUtc": "2017-04-27T21:32:58Z",
+                    "Container": -1
+                },
+                "Identity": "8508736aa6a5414bb47832b3a26b2f08",
+                "Autoroute": "hw2/tech/unsc_spartan_upgrade3_chaingun",
+                "Title": "NEURAL IMPLANT",
+                "HW2Tech": {
+                    "ObjectTypeId": "unsc_spartan_upgrade3_chaingun",
+                    "DisplayInfo": {
+                        "Id": 336410,
+                        "Type": "HW2TechDisplayInfo",
+                        "View": {
+                            "Status": "Published",
+                            "Common": {
+                                "Owner": "edostrov",
+                                "CreatedUtc": "2016-09-13T10:52:01Z",
+                                "ModifiedUtc": "2017-02-03T19:39:12Z",
+                                "PublishedUtc": "2017-09-25T17:42:58Z",
+                                "Container": -1
+                            },
+                            "Identity": "1562d328879b4203b80e003f4ddc7b3c",
+                            "BatchLocalization": {
+                                "IsLocked": false
+                            },
+                            "Localization": {
+                                "Culture": "en",
+                                "MasterContentItemId": ""
+                            },
+                            "Title": "NEURAL IMPLANT Display Info",
+                            "HW2TechDisplayInfo": {
+                                "Name": "NEURAL IMPLANT",
+                                "Description": "Increases health and damage"
+                            }
+                        }
+                    },
+                    "Image": {
+                        "Id": 348370,
+                        "Type": "Image",
+                        "View": {
+                            "Status": "Published",
+                            "Common": {
+                                "Owner": "kpaul",
+                                "CreatedUtc": "2017-04-06T03:02:13Z",
+                                "ModifiedUtc": "2017-04-27T21:32:30Z",
+                                "PublishedUtc": "2017-04-27T21:32:31Z",
+                                "Container": -1
+                            },
+                            "Media": {
+                                "MediaUrl": "https://content.halocdn.com/media/Default/games/halo-wars-2/unit-icons/build/unsc_inf_spartan_chaingun_01_upgrade3_icon-7498fadd0ad14f5ea0827726056bbaba.png",
+                                "MimeType": "image/png",
+                                "Caption": "",
+                                "AlternateText": "",
+                                "FolderPath": "games/halo-wars-2/unit-icons/build",
+                                "FileName": "unsc_inf_spartan_chaingun_01_upgrade3_icon-7498fadd0ad14f5ea0827726056bbaba.png"
+                            },
+                            "Image": {
+                                "Width": 256,
+                                "Height": 256
+                            },
+                            "Title": "unsc_inf_spartan_chaingun_01_upgrade3_icon-7498fadd0ad14f5ea0827726056bbaba",
+                            "Identity": "f504dfd1064744eeb640e86a9a40d5af"
+                        }
+                    }
+                }
+            },
+            "Links": [
+                {
+                    "Absolute": false,
+                    "Relation": "Self",
+                    "URI": "/content/337006"
+                }
+            ],
+            "ChildrenCount": 0
+        },
+        {
+            "Id": 336399,
+            "Type": "HW2Tech",
+            "View": {
+                "Status": "Published",
+                "Common": {
+                    "Owner": "edostrov",
+                    "CreatedUtc": "2016-09-13T10:52:09Z",
+                    "ModifiedUtc": "2017-02-03T19:39:10Z",
+                    "PublishedUtc": "2017-04-27T21:32:57Z",
+                    "Container": -1
+                },
+                "Identity": "12a3d494bb284a33a8c18f1fbce2b37e",
+                "Autoroute": "hw2/tech/cov_eliteCommando_upgrade2",
+                "Title": "MERCENARY WRATH",
+                "HW2Tech": {
+                    "ObjectTypeId": "cov_eliteCommando_upgrade2",
+                    "DisplayInfo": {
+                        "Id": 335515,
+                        "Type": "HW2TechDisplayInfo",
+                        "View": {
+                            "Status": "Published",
+                            "Common": {
+                                "Owner": "edostrov",
+                                "CreatedUtc": "2016-09-13T10:52:08Z",
+                                "ModifiedUtc": "2017-02-03T19:36:16Z",
+                                "PublishedUtc": "2017-09-25T17:43:00Z",
+                                "Container": -1
+                            },
+                            "Identity": "e17142a6c44d4e5fa09f491e27bf8f07",
+                            "BatchLocalization": {
+                                "IsLocked": false
+                            },
+                            "Localization": {
+                                "Culture": "en",
+                                "MasterContentItemId": ""
+                            },
+                            "Title": "MERCENARY WRATH Display Info",
+                            "HW2TechDisplayInfo": {
+                                "Name": "MERCENARY WRATH",
+                                "Description": "Increases health and damage"
+                            }
+                        }
+                    },
+                    "Image": {
+                        "Id": 348267,
+                        "Type": "Image",
+                        "View": {
+                            "Status": "Published",
+                            "Common": {
+                                "Owner": "kpaul",
+                                "CreatedUtc": "2017-04-06T02:48:54Z",
+                                "ModifiedUtc": "2017-04-27T21:31:58Z",
+                                "PublishedUtc": "2017-04-27T21:31:59Z",
+                                "Container": -1
+                            },
+                            "Media": {
+                                "MediaUrl": "https://content.halocdn.com/media/Default/games/halo-wars-2/unit-icons/build/cov_elitecommando_upgrade2_icon-26292bd37357407e9522af96b694381f.png",
+                                "MimeType": "image/png",
+                                "Caption": "",
+                                "AlternateText": "",
+                                "FolderPath": "games/halo-wars-2/unit-icons/build",
+                                "FileName": "cov_elitecommando_upgrade2_icon-26292bd37357407e9522af96b694381f.png"
+                            },
+                            "Image": {
+                                "Width": 256,
+                                "Height": 256
+                            },
+                            "Title": "cov_elitecommando_upgrade2_icon-26292bd37357407e9522af96b694381f",
+                            "Identity": "6230c55741564ddb8784451e62da646a"
+                        }
+                    }
+                }
+            },
+            "Links": [
+                {
+                    "Absolute": false,
+                    "Relation": "Self",
+                    "URI": "/content/336399"
+                }
+            ],
+            "ChildrenCount": 0
+        },
+        {
+            "Id": 337088,
+            "Type": "HW2Tech",
+            "View": {
+                "Status": "Published",
+                "Common": {
+                    "Owner": "edostrov",
+                    "CreatedUtc": "2016-09-13T10:49:56Z",
+                    "ModifiedUtc": "2017-02-03T19:41:25Z",
+                    "PublishedUtc": "2017-04-27T21:32:57Z",
+                    "Container": -1
+                },
+                "Identity": "573ac5aaa6424c1b81bf7446bd4839fd",
+                "Autoroute": "hw2/tech/unsc_flameMarine_upgrade3",
+                "Title": "DISPERSION NOZZLES",
+                "HW2Tech": {
+                    "ObjectTypeId": "unsc_flameMarine_upgrade3",
+                    "DisplayInfo": {
+                        "Id": 335065,
+                        "Type": "HW2TechDisplayInfo",
+                        "View": {
+                            "Status": "Published",
+                            "Common": {
+                                "Owner": "edostrov",
+                                "CreatedUtc": "2016-09-13T10:49:54Z",
+                                "ModifiedUtc": "2017-02-03T19:34:53Z",
+                                "PublishedUtc": "2017-09-25T17:42:56Z",
+                                "Container": -1
+                            },
+                            "Identity": "d60d808678944acbae0cf4d236e52f8c",
+                            "BatchLocalization": {
+                                "IsLocked": false
+                            },
+                            "Localization": {
+                                "Culture": "en",
+                                "MasterContentItemId": ""
+                            },
+                            "Title": "DISPERSION NOZZLES Display Info",
+                            "HW2TechDisplayInfo": {
+                                "Name": "DISPERSION NOZZLES",
+                                "Description": "Increases damage. Flames deal damage over time"
+                            }
+                        }
+                    },
+                    "Image": {
+                        "Id": 348243,
+                        "Type": "Image",
+                        "View": {
+                            "Status": "Published",
+                            "Common": {
+                                "Owner": "kpaul",
+                                "CreatedUtc": "2017-04-06T02:46:29Z",
+                                "ModifiedUtc": "2017-04-27T21:31:48Z",
+                                "PublishedUtc": "2017-04-27T21:31:47Z",
+                                "Container": -1
+                            },
+                            "Media": {
+                                "MediaUrl": "https://content.halocdn.com/media/Default/games/halo-wars-2/unit-icons/build/unsc_flamemarine_upgrade3_icon-b045dfb25246499297bbda29a7b73f06.png",
+                                "MimeType": "image/png",
+                                "Caption": "",
+                                "AlternateText": "",
+                                "FolderPath": "games/halo-wars-2/unit-icons/build",
+                                "FileName": "unsc_flamemarine_upgrade3_icon-b045dfb25246499297bbda29a7b73f06.png"
+                            },
+                            "Image": {
+                                "Width": 256,
+                                "Height": 256
+                            },
+                            "Title": "unsc_flamemarine_upgrade3_icon-b045dfb25246499297bbda29a7b73f06",
+                            "Identity": "ef88d6a2a6b946a69bd7bd70afa46f82"
+                        }
+                    }
+                }
+            },
+            "Links": [
+                {
+                    "Absolute": false,
+                    "Relation": "Self",
+                    "URI": "/content/337088"
+                }
+            ],
+            "ChildrenCount": 0
+        },
+        {
+            "Id": 337089,
+            "Type": "HW2Tech",
+            "View": {
+                "Status": "Published",
+                "Common": {
+                    "Owner": "edostrov",
+                    "CreatedUtc": "2016-09-13T10:52:17Z",
+                    "ModifiedUtc": "2017-02-03T19:41:25Z",
+                    "PublishedUtc": "2017-04-27T21:32:57Z",
+                    "Container": -1
+                },
+                "Identity": "5622ef7928f646399c94450e48b5fe74",
+                "Autoroute": "hw2/tech/cov_bruteHonour_upgrade3",
+                "Title": "SIPHON",
+                "HW2Tech": {
+                    "ObjectTypeId": "cov_bruteHonour_upgrade3",
+                    "DisplayInfo": {
+                        "Id": 335075,
+                        "Type": "HW2TechDisplayInfo",
+                        "View": {
+                            "Status": "Published",
+                            "Common": {
+                                "Owner": "edostrov",
+                                "CreatedUtc": "2016-09-13T10:52:16Z",
+                                "ModifiedUtc": "2017-02-03T19:34:56Z",
+                                "PublishedUtc": "2017-09-25T17:43:00Z",
+                                "Container": -1
+                            },
+                            "Identity": "fc5d4e3c36ea4082b49ccb844f4c66c7",
+                            "BatchLocalization": {
+                                "IsLocked": false
+                            },
+                            "Localization": {
+                                "Culture": "en",
+                                "MasterContentItemId": ""
+                            },
+                            "Title": "SIPHON Display Info",
+                            "HW2TechDisplayInfo": {
+                                "Name": "SIPHON",
+                                "Description": "Increases health and damage. Warlord gains health with each attack"
+                            }
+                        }
+                    },
+                    "Image": {
+                        "Id": 348334,
+                        "Type": "Image",
+                        "View": {
+                            "Status": "Published",
+                            "Common": {
+                                "Owner": "kpaul",
+                                "CreatedUtc": "2017-04-06T03:18:43Z",
+                                "ModifiedUtc": "2017-04-27T21:32:22Z",
+                                "PublishedUtc": "2017-04-27T21:32:23Z",
+                                "Container": -1
+                            },
+                            "Media": {
+                                "MediaUrl": "https://content.halocdn.com/media/Default/games/halo-wars-2/unit-icons/build/cov_brutehonour_upgrade3_icon-d3522c22fe82417dabb70a64797bc991.png",
+                                "MimeType": "image/png",
+                                "Caption": "",
+                                "AlternateText": "",
+                                "FolderPath": "games/halo-wars-2/unit-icons/build",
+                                "FileName": "cov_brutehonour_upgrade3_icon-d3522c22fe82417dabb70a64797bc991.png"
+                            },
+                            "Image": {
+                                "Width": 256,
+                                "Height": 256
+                            },
+                            "Title": "cov_brutehonour_upgrade3_icon-d3522c22fe82417dabb70a64797bc991",
+                            "Identity": "4413e45893aa417db6018d8d6983773f"
+                        }
+                    }
+                }
+            },
+            "Links": [
+                {
+                    "Absolute": false,
+                    "Relation": "Self",
+                    "URI": "/content/337089"
+                }
+            ],
+            "ChildrenCount": 0
+        },
+        {
+            "Id": 334860,
+            "Type": "HW2Tech",
+            "View": {
+                "Status": "Published",
+                "Common": {
+                    "Owner": "edostrov",
+                    "CreatedUtc": "2016-09-13T10:50:11Z",
+                    "ModifiedUtc": "2017-02-03T19:34:14Z",
+                    "PublishedUtc": "2017-04-27T21:32:56Z",
+                    "Container": -1
+                },
+                "Identity": "e35be48a7a6e4f018693e50e2cd629dc",
+                "Autoroute": "hw2/tech/unsc_tech_global_infantry_02",
+                "Title": "INFANTRY UPGRADE II",
+                "HW2Tech": {
+                    "ObjectTypeId": "unsc_tech_global_infantry_02",
+                    "DisplayInfo": {
+                        "Id": 334856,
+                        "Type": "HW2TechDisplayInfo",
+                        "View": {
+                            "Status": "Published",
+                            "Common": {
+                                "Owner": "edostrov",
+                                "CreatedUtc": "2016-09-13T10:50:10Z",
+                                "ModifiedUtc": "2017-02-03T19:34:13Z",
+                                "PublishedUtc": "2017-02-03T19:34:13Z",
+                                "Container": -1
+                            },
+                            "Identity": "fd8e27686ddf431084ed68140f29dcf5",
+                            "BatchLocalization": {
+                                "IsLocked": false
+                            },
+                            "Localization": {
+                                "Culture": "en",
+                                "MasterContentItemId": ""
+                            },
+                            "Title": "INFANTRY UPGRADE II Display Info",
+                            "HW2TechDisplayInfo": {
+                                "Name": "INFANTRY UPGRADE II",
+                                "Description": "20% damage boost. 20% health boost"
+                            }
+                        }
+                    },
+                    "Image": {
+                        "Id": 348257,
+                        "Type": "Image",
+                        "View": {
+                            "Status": "Published",
+                            "Common": {
+                                "Owner": "kpaul",
+                                "CreatedUtc": "2017-04-05T21:43:50Z",
+                                "ModifiedUtc": "2017-04-27T21:31:54Z",
+                                "PublishedUtc": "2017-04-27T21:31:53Z",
+                                "Container": -1
+                            },
+                            "Media": {
+                                "MediaUrl": "https://content.halocdn.com/media/Default/games/halo-wars-2/unit-icons/tech/unsc_tech_global_infantry_02_icon-317d8d2d9f01406581eb5e999237f0a3.png",
+                                "MimeType": "image/png",
+                                "Caption": "",
+                                "AlternateText": "",
+                                "FolderPath": "games/halo-wars-2/unit-icons/tech",
+                                "FileName": "unsc_tech_global_infantry_02_icon-317d8d2d9f01406581eb5e999237f0a3.png"
+                            },
+                            "Image": {
+                                "Width": 256,
+                                "Height": 256
+                            },
+                            "Title": "unsc_tech_global_infantry_02_icon-317d8d2d9f01406581eb5e999237f0a3",
+                            "Identity": "9e00956c0c5840bbb2ff20587904a5b4"
+                        }
+                    }
+                }
+            },
+            "Links": [
+                {
+                    "Absolute": false,
+                    "Relation": "Self",
+                    "URI": "/content/334860"
+                }
+            ],
+            "ChildrenCount": 0
+        },
+        {
+            "Id": 335393,
+            "Type": "HW2Tech",
+            "View": {
+                "Status": "Published",
+                "Common": {
+                    "Owner": "edostrov",
+                    "CreatedUtc": "2016-09-13T10:52:13Z",
+                    "ModifiedUtc": "2017-02-03T19:35:50Z",
+                    "PublishedUtc": "2017-04-27T21:32:56Z",
+                    "Container": -1
+                },
+                "Identity": "cbffb0c8a9e94266a86d4ba506c4332b",
+                "Autoroute": "hw2/tech/cov_bruteHonour_upgrade1",
+                "Title": "HAMMER PULL",
+                "HW2Tech": {
+                    "ObjectTypeId": "cov_bruteHonour_upgrade1",
+                    "DisplayInfo": {
+                        "Id": 335200,
+                        "Type": "HW2TechDisplayInfo",
+                        "View": {
+                            "Status": "Published",
+                            "Common": {
+                                "Owner": "edostrov",
+                                "CreatedUtc": "2016-09-13T10:52:12Z",
+                                "ModifiedUtc": "2017-02-03T19:35:16Z",
+                                "PublishedUtc": "2017-09-25T17:42:55Z",
+                                "Container": -1
+                            },
+                            "Identity": "30f255d01dde4f05a38ed25fe1ef2c1f",
+                            "BatchLocalization": {
+                                "IsLocked": false
+                            },
+                            "Localization": {
+                                "Culture": "en",
+                                "MasterContentItemId": ""
+                            },
+                            "Title": "HAMMER PULL Display Info",
+                            "HW2TechDisplayInfo": {
+                                "Name": "HAMMER PULL",
+                                "Description": "Increases health and damage. Adds a gravity beam that drags targets closer. "
+                            }
+                        }
+                    },
+                    "Image": {
+                        "Id": 348266,
+                        "Type": "Image",
+                        "View": {
+                            "Status": "Published",
+                            "Common": {
+                                "Owner": "kpaul",
+                                "CreatedUtc": "2017-04-06T03:14:54Z",
+                                "ModifiedUtc": "2017-04-27T21:31:56Z",
+                                "PublishedUtc": "2017-04-27T21:31:57Z",
+                                "Container": -1
+                            },
+                            "Media": {
+                                "MediaUrl": "https://content.halocdn.com/media/Default/games/halo-wars-2/unit-icons/tech/cov_brutehonour_upgrade1_icon-96d52ca702fe4d37ad518f7dfdfe6e2c.png",
+                                "MimeType": "image/png",
+                                "Caption": "",
+                                "AlternateText": "",
+                                "FolderPath": "games/halo-wars-2/unit-icons/tech",
+                                "FileName": "cov_brutehonour_upgrade1_icon-96d52ca702fe4d37ad518f7dfdfe6e2c.png"
+                            },
+                            "Image": {
+                                "Width": 256,
+                                "Height": 256
+                            },
+                            "Title": "cov_brutehonour_upgrade1_icon-96d52ca702fe4d37ad518f7dfdfe6e2c",
+                            "Identity": "669ed4efca83483fa7e6e59fc09aaff7"
+                        }
+                    }
+                }
+            },
+            "Links": [
+                {
+                    "Absolute": false,
+                    "Relation": "Self",
+                    "URI": "/content/335393"
+                }
+            ],
+            "ChildrenCount": 0
+        },
+        {
+            "Id": 346251,
+            "Type": "HW2Tech",
+            "View": {
+                "Status": "Published",
+                "Common": {
+                    "Owner": "v-chreng",
+                    "CreatedUtc": "2017-03-09T10:35:08Z",
+                    "ModifiedUtc": "2017-03-20T11:03:54Z",
+                    "PublishedUtc": "2017-03-20T11:03:55Z",
+                    "Container": -1
+                },
+                "Identity": "9cf009c3792a4008b74d9eeef769987d",
+                "Autoroute": "hw2/tech/unsc_flamecyclops_upgrade2",
+                "Title": "HIGH-TORQUE JOINT",
+                "HW2Tech": {
+                    "ObjectTypeId": "unsc_flamecyclops_upgrade2",
+                    "DisplayInfo": {
+                        "Id": 346189,
+                        "Type": "HW2TechDisplayInfo",
+                        "View": {
+                            "Status": "Published",
+                            "Common": {
+                                "Owner": "v-chreng",
+                                "CreatedUtc": "2017-03-09T10:35:07Z",
+                                "ModifiedUtc": "2017-03-20T11:03:42Z",
+                                "PublishedUtc": "2017-09-25T17:42:56Z",
+                                "Container": -1
+                            },
+                            "Identity": "2afd4872287f4f30ac2b348899c67583",
+                            "BatchLocalization": {
+                                "IsLocked": false
+                            },
+                            "Localization": {
+                                "Culture": "en",
+                                "MasterContentItemId": ""
+                            },
+                            "Title": "HIGH-TORQUE JOINT Display Info",
+                            "HW2TechDisplayInfo": {
+                                "Name": "HIGH-TORQUE JOINT",
+                                "Description": "Increases health and damage. Faster movement speed"
+                            }
+                        }
+                    },
+                    "Image": {}
+                }
+            },
+            "Links": [
+                {
+                    "Absolute": false,
+                    "Relation": "Self",
+                    "URI": "/content/346251"
+                }
+            ],
+            "ChildrenCount": 0
+        },
+        {
+            "Id": 346252,
+            "Type": "HW2Tech",
+            "View": {
+                "Status": "Published",
+                "Common": {
+                    "Owner": "v-chreng",
+                    "CreatedUtc": "2017-03-09T10:35:05Z",
+                    "ModifiedUtc": "2017-03-20T11:03:54Z",
+                    "PublishedUtc": "2017-03-20T11:03:55Z",
+                    "Container": -1
+                },
+                "Identity": "69530330fb8b4f6b9ad344e63ab969cd",
+                "Autoroute": "hw2/tech/unsc_flamehog_upgrade3",
+                "Title": "INCENDIARY GRENADES",
+                "HW2Tech": {
+                    "ObjectTypeId": "unsc_flamehog_upgrade3",
+                    "DisplayInfo": {
+                        "Id": 346190,
+                        "Type": "HW2TechDisplayInfo",
+                        "View": {
+                            "Status": "Published",
+                            "Common": {
+                                "Owner": "v-chreng",
+                                "CreatedUtc": "2017-03-09T10:35:05Z",
+                                "ModifiedUtc": "2017-03-20T11:03:42Z",
+                                "PublishedUtc": "2017-09-25T17:42:54Z",
+                                "Container": -1
+                            },
+                            "Identity": "5ee8b6f68bae4e6cb0440cf4708dcef2",
+                            "BatchLocalization": {
+                                "IsLocked": false
+                            },
+                            "Localization": {
+                                "Culture": "en",
+                                "MasterContentItemId": ""
+                            },
+                            "Title": "INCENDIARY GRENADES Display Info",
+                            "HW2TechDisplayInfo": {
+                                "Name": "INCENDIARY GRENADES",
+                                "Description": "Replaces Flamethrower with Incendiary Grenade Launcher. Increases damage and range. Weapon deals damage over time"
+                            }
+                        }
+                    },
+                    "Image": {}
+                }
+            },
+            "Links": [
+                {
+                    "Absolute": false,
+                    "Relation": "Self",
+                    "URI": "/content/346252"
+                }
+            ],
+            "ChildrenCount": 0
+        },
+        {
+            "Id": 346253,
+            "Type": "HW2Tech",
+            "View": {
+                "Status": "Published",
+                "Common": {
+                    "Owner": "v-chreng",
+                    "CreatedUtc": "2017-03-09T10:35:09Z",
+                    "ModifiedUtc": "2017-03-20T11:03:55Z",
+                    "PublishedUtc": "2017-03-20T11:03:55Z",
+                    "Container": -1
+                },
+                "Identity": "3505cadf98bb43b3bcc643e8e96cdf62",
+                "Autoroute": "hw2/tech/unsc_flamecyclops_upgrade3",
+                "Title": "DRAGON TANKS",
+                "HW2Tech": {
+                    "ObjectTypeId": "unsc_flamecyclops_upgrade3",
+                    "DisplayInfo": {
+                        "Id": 346193,
+                        "Type": "HW2TechDisplayInfo",
+                        "View": {
+                            "Status": "Published",
+                            "Common": {
+                                "Owner": "v-chreng",
+                                "CreatedUtc": "2017-03-09T10:35:09Z",
+                                "ModifiedUtc": "2017-03-20T11:03:43Z",
+                                "PublishedUtc": "2017-09-25T17:42:59Z",
+                                "Container": -1
+                            },
+                            "Identity": "311e2d5d70fe4d95932967cc23dcb9fa",
+                            "BatchLocalization": {
+                                "IsLocked": false
+                            },
+                            "Localization": {
+                                "Culture": "en",
+                                "MasterContentItemId": ""
+                            },
+                            "Title": "DRAGON TANKS Display Info",
+                            "HW2TechDisplayInfo": {
+                                "Name": "DRAGON TANKS",
+                                "Description": "Increases health and damage. Upgrades flamewall ability"
+                            }
+                        }
+                    },
+                    "Image": {}
+                }
+            },
+            "Links": [
+                {
+                    "Absolute": false,
+                    "Relation": "Self",
+                    "URI": "/content/346253"
+                }
+            ],
+            "ChildrenCount": 0
+        },
+        {
+            "Id": 346250,
+            "Type": "HW2Tech",
+            "View": {
+                "Status": "Published",
+                "Common": {
+                    "Owner": "v-chreng",
+                    "CreatedUtc": "2017-03-09T10:35:07Z",
+                    "ModifiedUtc": "2017-03-20T11:03:54Z",
+                    "PublishedUtc": "2017-03-20T11:03:54Z",
+                    "Container": -1
+                },
+                "Identity": "ce6d0677ae93457cbab5419ae20e66f2",
+                "Autoroute": "hw2/tech/unsc_flamecyclops_upgrade1",
+                "Title": "FLAMEWALL",
+                "HW2Tech": {
+                    "ObjectTypeId": "unsc_flamecyclops_upgrade1",
+                    "DisplayInfo": {
+                        "Id": 346187,
+                        "Type": "HW2TechDisplayInfo",
+                        "View": {
+                            "Status": "Published",
+                            "Common": {
+                                "Owner": "v-chreng",
+                                "CreatedUtc": "2017-03-09T10:35:06Z",
+                                "ModifiedUtc": "2017-03-20T11:03:42Z",
+                                "PublishedUtc": "2017-09-25T17:42:58Z",
+                                "Container": -1
+                            },
+                            "Identity": "ff95d5dff4d4480ca3e7a3580ceec577",
+                            "BatchLocalization": {
+                                "IsLocked": false
+                            },
+                            "Localization": {
+                                "Culture": "en",
+                                "MasterContentItemId": ""
+                            },
+                            "Title": "FLAMEWALL Display Info",
+                            "HW2TechDisplayInfo": {
+                                "Name": "FLAMEWALL",
+                                "Description": "Increases health and damage. Adds ability to create a wall of fire"
+                            }
+                        }
+                    },
+                    "Image": {}
+                }
+            },
+            "Links": [
+                {
+                    "Absolute": false,
+                    "Relation": "Self",
+                    "URI": "/content/346250"
+                }
+            ],
+            "ChildrenCount": 0
+        },
+        {
+            "Id": 337202,
+            "Type": "HW2Tech",
+            "View": {
+                "Status": "Published",
+                "Common": {
+                    "Owner": "edostrov",
+                    "CreatedUtc": "2016-09-13T10:49:29Z",
+                    "ModifiedUtc": "2017-02-03T19:41:56Z",
+                    "PublishedUtc": "2017-02-03T19:41:57Z",
+                    "Container": -1
+                },
+                "Identity": "941c37d3e77d47cc92f7323c2b5dea15",
+                "Autoroute": "hw2/techs/unsc_turret_upgradeAI",
+                "Title": "ANTI-INFANTRY TURRET",
+                "HW2Tech": {
+                    "ObjectTypeId": "unsc_turret_upgradeAI",
+                    "DisplayInfo": {
+                        "Id": 336472,
+                        "Type": "HW2TechDisplayInfo",
+                        "View": {
+                            "Status": "Published",
+                            "Common": {
+                                "Owner": "edostrov",
+                                "CreatedUtc": "2016-09-13T10:49:28Z",
+                                "ModifiedUtc": "2017-02-03T19:39:22Z",
+                                "PublishedUtc": "2017-02-03T19:39:22Z",
+                                "Container": -1
+                            },
+                            "Identity": "b3fd8b81703f4ea9bf8646d5da1f44e8",
+                            "BatchLocalization": {
+                                "IsLocked": false
+                            },
+                            "Localization": {
+                                "Culture": "en",
+                                "MasterContentItemId": ""
+                            },
+                            "Title": "ANTI-INFANTRY TURRET Display Info",
+                            "HW2TechDisplayInfo": {
+                                "Name": "ANTI-INFANTRY TURRET",
+                                "Description": "Converts to anti-infantry"
+                            }
+                        }
+                    },
+                    "Image": {}
+                }
+            },
+            "Links": [
+                {
+                    "Absolute": false,
+                    "Relation": "Self",
+                    "URI": "/content/337202"
+                }
+            ],
+            "ChildrenCount": 0
+        },
+        {
+            "Id": 337193,
+            "Type": "HW2Tech",
+            "View": {
+                "Status": "Published",
+                "Common": {
+                    "Owner": "edostrov",
+                    "CreatedUtc": "2016-09-13T10:50:33Z",
+                    "ModifiedUtc": "2017-02-03T19:41:54Z",
+                    "PublishedUtc": "2017-02-03T19:41:55Z",
+                    "Container": -1
+                },
+                "Identity": "497c9306289a43238017608a76e7bd68",
+                "Autoroute": "hw2/techs/cov_supplyDepot_upgrade2",
+                "Title": "UPGRADE TO SUPER HARVESTER",
+                "HW2Tech": {
+                    "ObjectTypeId": "cov_supplyDepot_upgrade2",
+                    "DisplayInfo": {
+                        "Id": 336298,
+                        "Type": "HW2TechDisplayInfo",
+                        "View": {
+                            "Status": "Published",
+                            "Common": {
+                                "Owner": "edostrov",
+                                "CreatedUtc": "2016-09-13T10:50:32Z",
+                                "ModifiedUtc": "2017-02-03T19:38:51Z",
+                                "PublishedUtc": "2017-02-03T19:38:51Z",
+                                "Container": -1
+                            },
+                            "Identity": "6222134f0f8e476aa6013036cb8b8e78",
+                            "BatchLocalization": {
+                                "IsLocked": false
+                            },
+                            "Localization": {
+                                "Culture": "en",
+                                "MasterContentItemId": ""
+                            },
+                            "Title": "UPGRADE TO SUPER HARVESTER Display Info",
+                            "HW2TechDisplayInfo": {
+                                "Name": "UPGRADE TO SUPER HARVESTER",
+                                "Description": "Fastest Supply Production"
+                            }
+                        }
+                    },
+                    "Image": {}
+                }
+            },
+            "Links": [
+                {
+                    "Absolute": false,
+                    "Relation": "Self",
+                    "URI": "/content/337193"
+                }
+            ],
+            "ChildrenCount": 0
+        },
+        {
+            "Id": 337177,
+            "Type": "HW2Tech",
+            "View": {
+                "Status": "Published",
+                "Common": {
+                    "Owner": "edostrov",
+                    "CreatedUtc": "2016-09-13T10:51:44Z",
+                    "ModifiedUtc": "2017-02-03T19:41:50Z",
+                    "PublishedUtc": "2017-02-03T19:41:50Z",
+                    "Container": -1
+                },
+                "Identity": "b00aed9db6ca42de8cb65ffd759004a0",
+                "Autoroute": "hw2/techs/cov_base_upgrade2",
+                "Title": "UPGRADE TO CITADEL",
+                "HW2Tech": {
+                    "ObjectTypeId": "cov_base_upgrade2",
+                    "DisplayInfo": {
+                        "Id": 335988,
+                        "Type": "HW2TechDisplayInfo",
+                        "View": {
+                            "Status": "Published",
+                            "Common": {
+                                "Owner": "edostrov",
+                                "CreatedUtc": "2016-09-13T10:51:43Z",
+                                "ModifiedUtc": "2017-02-03T19:37:50Z",
+                                "PublishedUtc": "2017-02-03T19:37:50Z",
+                                "Container": -1
+                            },
+                            "Identity": "09be7ec023e040f4b5c2fcc52eb52e0d",
+                            "BatchLocalization": {
+                                "IsLocked": false
+                            },
+                            "Localization": {
+                                "Culture": "en",
+                                "MasterContentItemId": ""
+                            },
+                            "Title": "UPGRADE TO CITADEL Display Info",
+                            "HW2TechDisplayInfo": {
+                                "Name": "UPGRADE TO CITADEL",
+                                "Description": "Produces vehicles and infantry. Can be upgraded to Fortress"
+                            }
+                        }
+                    },
+                    "Image": {}
+                }
+            },
+            "Links": [
+                {
+                    "Absolute": false,
+                    "Relation": "Self",
+                    "URI": "/content/337177"
+                }
+            ],
+            "ChildrenCount": 0
+        },
+        {
+            "Id": 337131,
+            "Type": "HW2Tech",
+            "View": {
+                "Status": "Published",
+                "Common": {
+                    "Owner": "edostrov",
+                    "CreatedUtc": "2016-09-13T10:49:30Z",
+                    "ModifiedUtc": "2017-02-03T19:41:36Z",
+                    "PublishedUtc": "2017-02-03T19:41:36Z",
+                    "Container": -1
+                },
+                "Identity": "66c534387a454275959c9ed8885faca8",
+                "Autoroute": "hw2/techs/unsc_turret_upgradeAV",
+                "Title": "ANTI-VEHICLE TURRET",
+                "HW2Tech": {
+                    "ObjectTypeId": "unsc_turret_upgradeAV",
+                    "DisplayInfo": {
+                        "Id": 335434,
+                        "Type": "HW2TechDisplayInfo",
+                        "View": {
+                            "Status": "Published",
+                            "Common": {
+                                "Owner": "edostrov",
+                                "CreatedUtc": "2016-09-13T10:49:29Z",
+                                "ModifiedUtc": "2017-02-03T19:35:59Z",
+                                "PublishedUtc": "2017-02-03T19:35:59Z",
+                                "Container": -1
+                            },
+                            "Identity": "019b1fbacb914925bd6bfed4ec05248a",
+                            "BatchLocalization": {
+                                "IsLocked": false
+                            },
+                            "Localization": {
+                                "Culture": "en",
+                                "MasterContentItemId": ""
+                            },
+                            "Title": "ANTI-VEHICLE TURRET Display Info",
+                            "HW2TechDisplayInfo": {
+                                "Name": "ANTI-VEHICLE TURRET",
+                                "Description": "Converts to anti-vehicle"
+                            }
+                        }
+                    },
+                    "Image": {}
+                }
+            },
+            "Links": [
+                {
+                    "Absolute": false,
+                    "Relation": "Self",
+                    "URI": "/content/337131"
+                }
+            ],
+            "ChildrenCount": 0
+        },
+        {
+            "Id": 337125,
+            "Type": "HW2Tech",
+            "View": {
+                "Status": "Published",
+                "Common": {
+                    "Owner": "edostrov",
+                    "CreatedUtc": "2016-09-13T10:50:37Z",
+                    "ModifiedUtc": "2017-02-03T19:41:34Z",
+                    "PublishedUtc": "2017-02-03T19:41:34Z",
+                    "Container": -1
+                },
+                "Identity": "c571ad9aca004c0f90f7849f3b6c4aae",
+                "Autoroute": "hw2/techs/cov_reactor_upgrade2",
+                "Title": "Upgrade to Super Extractor",
+                "HW2Tech": {
+                    "ObjectTypeId": "cov_reactor_upgrade2",
+                    "DisplayInfo": {
+                        "Id": 335398,
+                        "Type": "HW2TechDisplayInfo",
+                        "View": {
+                            "Status": "Published",
+                            "Common": {
+                                "Owner": "edostrov",
+                                "CreatedUtc": "2016-09-13T10:50:36Z",
+                                "ModifiedUtc": "2017-02-03T19:35:51Z",
+                                "PublishedUtc": "2017-02-03T19:35:51Z",
+                                "Container": -1
+                            },
+                            "Identity": "16ca6857efb24feeb22292eaf05202c4",
+                            "BatchLocalization": {
+                                "IsLocked": false
+                            },
+                            "Localization": {
+                                "Culture": "en",
+                                "MasterContentItemId": ""
+                            },
+                            "Title": "Upgrade to Super Extractor Display Info",
+                            "HW2TechDisplayInfo": {
+                                "Name": "Upgrade to Super Extractor",
+                                "Description": "Fastest Power Production"
+                            }
+                        }
+                    },
+                    "Image": {}
+                }
+            },
+            "Links": [
+                {
+                    "Absolute": false,
+                    "Relation": "Self",
+                    "URI": "/content/337125"
+                }
+            ],
+            "ChildrenCount": 0
+        },
+        {
+            "Id": 337118,
+            "Type": "HW2Tech",
+            "View": {
+                "Status": "Published",
+                "Common": {
+                    "Owner": "edostrov",
+                    "CreatedUtc": "2016-09-13T10:51:47Z",
+                    "ModifiedUtc": "2017-02-03T19:41:31Z",
+                    "PublishedUtc": "2017-02-03T19:41:31Z",
+                    "Container": -1
+                },
+                "Identity": "e38491bca4dd4b38980b57ffd51eb15d",
+                "Autoroute": "hw2/techs/unsc_aggressor_upgrade1",
+                "Title": "DRONE ESCORT",
+                "HW2Tech": {
+                    "ObjectTypeId": "unsc_aggressor_upgrade1",
+                    "DisplayInfo": {
+                        "Id": 335370,
+                        "Type": "HW2TechDisplayInfo",
+                        "View": {
+                            "Status": "Published",
+                            "Common": {
+                                "Owner": "edostrov",
+                                "CreatedUtc": "2016-09-13T10:51:46Z",
+                                "ModifiedUtc": "2017-02-03T19:35:45Z",
+                                "PublishedUtc": "2017-09-25T17:42:54Z",
+                                "Container": -1
+                            },
+                            "Identity": "ad64439ccb0f4d03aef822505ef99b5a",
+                            "BatchLocalization": {
+                                "IsLocked": false
+                            },
+                            "Localization": {
+                                "Culture": "en",
+                                "MasterContentItemId": ""
+                            },
+                            "Title": "DRONE ESCORT Display Info",
+                            "HW2TechDisplayInfo": {
+                                "Name": "DRONE ESCORT",
+                                "Description": "Protector is joined by two Aggressors. Increased health and damage. Adds targeted Lockdown Bolt that stuns and damages enemy units"
+                            }
+                        }
+                    },
+                    "Image": {}
+                }
+            },
+            "Links": [
+                {
+                    "Absolute": false,
+                    "Relation": "Self",
+                    "URI": "/content/337118"
+                }
+            ],
+            "ChildrenCount": 0
+        },
+        {
+            "Id": 337095,
+            "Type": "HW2Tech",
+            "View": {
+                "Status": "Published",
+                "Common": {
+                    "Owner": "edostrov",
+                    "CreatedUtc": "2016-09-13T10:49:32Z",
+                    "ModifiedUtc": "2017-02-03T19:41:26Z",
+                    "PublishedUtc": "2017-02-03T19:41:26Z",
+                    "Container": -1
+                },
+                "Identity": "43b0d360b6804550bdc298a04334dc72",
+                "Autoroute": "hw2/techs/unsc_turret_upgradeAA",
+                "Title": "ANTI-AIR TURRET",
+                "HW2Tech": {
+                    "ObjectTypeId": "unsc_turret_upgradeAA",
+                    "DisplayInfo": {
+                        "Id": 335132,
+                        "Type": "HW2TechDisplayInfo",
+                        "View": {
+                            "Status": "Published",
+                            "Common": {
+                                "Owner": "edostrov",
+                                "CreatedUtc": "2016-09-13T10:49:31Z",
+                                "ModifiedUtc": "2017-02-03T19:35:05Z",
+                                "PublishedUtc": "2017-02-03T19:35:05Z",
+                                "Container": -1
+                            },
+                            "Identity": "9fe1f98aeaa14ffe9f8979ab7da3158f",
+                            "BatchLocalization": {
+                                "IsLocked": false
+                            },
+                            "Localization": {
+                                "Culture": "en",
+                                "MasterContentItemId": ""
+                            },
+                            "Title": "ANTI-AIR TURRET Display Info",
+                            "HW2TechDisplayInfo": {
+                                "Name": "ANTI-AIR TURRET",
+                                "Description": "Converts to anti-air"
+                            }
+                        }
+                    },
+                    "Image": {}
+                }
+            },
+            "Links": [
+                {
+                    "Absolute": false,
+                    "Relation": "Self",
+                    "URI": "/content/337095"
+                }
+            ],
+            "ChildrenCount": 0
+        },
+        {
+            "Id": 337083,
+            "Type": "HW2Tech",
+            "View": {
+                "Status": "Published",
+                "Common": {
+                    "Owner": "edostrov",
+                    "CreatedUtc": "2016-09-13T10:51:49Z",
+                    "ModifiedUtc": "2017-02-03T19:41:23Z",
+                    "PublishedUtc": "2017-02-03T19:41:23Z",
+                    "Container": -1
+                },
+                "Identity": "6738e671fa6b40958a4d568a9a2cfecf",
+                "Autoroute": "hw2/techs/unsc_aggressor_upgrade2",
+                "Title": "DEFENSE GRID",
+                "HW2Tech": {
+                    "ObjectTypeId": "unsc_aggressor_upgrade2",
+                    "DisplayInfo": {
+                        "Id": 335036,
+                        "Type": "HW2TechDisplayInfo",
+                        "View": {
+                            "Status": "Published",
+                            "Common": {
+                                "Owner": "edostrov",
+                                "CreatedUtc": "2016-09-13T10:51:49Z",
+                                "ModifiedUtc": "2017-02-03T19:34:47Z",
+                                "PublishedUtc": "2017-09-25T17:42:54Z",
+                                "Container": -1
+                            },
+                            "Identity": "dc762cb757254af1a28a4c47a2085cdd",
+                            "BatchLocalization": {
+                                "IsLocked": false
+                            },
+                            "Localization": {
+                                "Culture": "en",
+                                "MasterContentItemId": ""
+                            },
+                            "Title": "DEFENSE GRID Display Info",
+                            "HW2TechDisplayInfo": {
+                                "Name": "DEFENSE GRID",
+                                "Description": "Increases speed. Unit detonates upon destruction"
+                            }
+                        }
+                    },
+                    "Image": {}
+                }
+            },
+            "Links": [
+                {
+                    "Absolute": false,
+                    "Relation": "Self",
+                    "URI": "/content/337083"
+                }
+            ],
+            "ChildrenCount": 0
+        },
+        {
+            "Id": 337004,
+            "Type": "HW2Tech",
+            "View": {
+                "Status": "Published",
+                "Common": {
+                    "Owner": "edostrov",
+                    "CreatedUtc": "2016-09-13T10:51:46Z",
+                    "ModifiedUtc": "2017-02-03T19:41:09Z",
+                    "PublishedUtc": "2017-02-03T19:41:09Z",
+                    "Container": -1
+                },
+                "Identity": "d1744623ec634543841f749dd19bc748",
+                "Autoroute": "hw2/techs/cov_base_upgrade3",
+                "Title": "UPGRADE TO FORTRESS",
+                "HW2Tech": {
+                    "ObjectTypeId": "cov_base_upgrade3",
+                    "DisplayInfo": {
+                        "Id": 335304,
+                        "Type": "HW2TechDisplayInfo",
+                        "View": {
+                            "Status": "Published",
+                            "Common": {
+                                "Owner": "edostrov",
+                                "CreatedUtc": "2016-09-13T10:51:45Z",
+                                "ModifiedUtc": "2017-02-03T19:35:33Z",
+                                "PublishedUtc": "2017-02-03T19:35:33Z",
+                                "Container": -1
+                            },
+                            "Identity": "11be85ad8470458383fd650d3a59da68",
+                            "BatchLocalization": {
+                                "IsLocked": false
+                            },
+                            "Localization": {
+                                "Culture": "en",
+                                "MasterContentItemId": ""
+                            },
+                            "Title": "UPGRADE TO FORTRESS Display Info",
+                            "HW2TechDisplayInfo": {
+                                "Name": "UPGRADE TO FORTRESS",
+                                "Description": "Produces vehicles and infantry. Top base structure"
+                            }
+                        }
+                    },
+                    "Image": {}
+                }
+            },
+            "Links": [
+                {
+                    "Absolute": false,
+                    "Relation": "Self",
+                    "URI": "/content/337004"
+                }
+            ],
+            "ChildrenCount": 0
+        },
+        {
+            "Id": 336993,
+            "Type": "HW2Tech",
+            "View": {
+                "Status": "Published",
+                "Common": {
+                    "Owner": "edostrov",
+                    "CreatedUtc": "2016-09-13T10:51:38Z",
+                    "ModifiedUtc": "2017-02-03T19:41:08Z",
+                    "PublishedUtc": "2017-02-03T19:41:08Z",
+                    "Container": -1
+                },
+                "Identity": "df54507917cc4871b9bbc174d51e16f6",
+                "Autoroute": "hw2/techs/unsc_base_upgrade2",
+                "Title": "UPGRADE TO COMMAND CENTER",
+                "HW2Tech": {
+                    "ObjectTypeId": "unsc_base_upgrade2",
+                    "DisplayInfo": {
+                        "Id": 336649,
+                        "Type": "HW2TechDisplayInfo",
+                        "View": {
+                            "Status": "Published",
+                            "Common": {
+                                "Owner": "edostrov",
+                                "CreatedUtc": "2016-09-13T10:51:38Z",
+                                "ModifiedUtc": "2017-02-03T19:40:01Z",
+                                "PublishedUtc": "2017-02-03T19:40:01Z",
+                                "Container": -1
+                            },
+                            "Identity": "f861afe9d74941a1be531d15ce6befeb",
+                            "BatchLocalization": {
+                                "IsLocked": false
+                            },
+                            "Localization": {
+                                "Culture": "en",
+                                "MasterContentItemId": ""
+                            },
+                            "Title": "UPGRADE TO COMMAND CENTER Display Info",
+                            "HW2TechDisplayInfo": {
+                                "Name": "UPGRADE TO COMMAND CENTER",
+                                "Description": "Produces vehicles and infantry. Can be upgraded to Headquarters"
+                            }
+                        }
+                    },
+                    "Image": {}
+                }
+            },
+            "Links": [
+                {
+                    "Absolute": false,
+                    "Relation": "Self",
+                    "URI": "/content/336993"
+                }
+            ],
+            "ChildrenCount": 0
+        },
+        {
+            "Id": 336994,
+            "Type": "HW2Tech",
+            "View": {
+                "Status": "Published",
+                "Common": {
+                    "Owner": "edostrov",
+                    "CreatedUtc": "2016-09-13T10:50:53Z",
+                    "ModifiedUtc": "2017-02-03T19:41:08Z",
+                    "PublishedUtc": "2017-02-03T19:41:08Z",
+                    "Container": -1
+                },
+                "Identity": "df1c5924f6ce44b9b9072fdeae592bfe",
+                "Autoroute": "hw2/tech/cov_tech_followers_3",
+                "Title": "RESERVES III",
+                "HW2Tech": {
+                    "ObjectTypeId": "cov_tech_followers_3",
+                    "DisplayInfo": {
+                        "Id": 334875,
+                        "Type": "HW2TechDisplayInfo",
+                        "View": {
+                            "Status": "Published",
+                            "Common": {
+                                "Owner": "edostrov",
+                                "CreatedUtc": "2016-09-13T10:50:52Z",
+                                "ModifiedUtc": "2017-02-03T19:34:18Z",
+                                "PublishedUtc": "2017-02-03T19:34:18Z",
+                                "Container": -1
+                            },
+                            "Identity": "bedaba6c4c5e4b9db9efe7c342837a3f",
+                            "BatchLocalization": {
+                                "IsLocked": false
+                            },
+                            "Localization": {
+                                "Culture": "en",
+                                "MasterContentItemId": ""
+                            },
+                            "Title": "RESERVES III Display Info",
+                            "HW2TechDisplayInfo": {
+                                "Name": "RESERVES III",
+                                "Description": "Population boosted by +20. Maximum number of. possible units increased."
+                            }
+                        }
+                    },
+                    "Image": {}
+                }
+            },
+            "Links": [
+                {
+                    "Absolute": false,
+                    "Relation": "Self",
+                    "URI": "/content/336994"
+                }
+            ],
+            "ChildrenCount": 0
+        },
+        {
+            "Id": 336943,
+            "Type": "HW2Tech",
+            "View": {
+                "Status": "Published",
+                "Common": {
+                    "Owner": "edostrov",
+                    "CreatedUtc": "2016-09-13T10:51:40Z",
+                    "ModifiedUtc": "2017-02-03T19:40:56Z",
+                    "PublishedUtc": "2017-02-03T19:40:56Z",
+                    "Container": -1
+                },
+                "Identity": "28f150fd08354fe291749d66e8f447f5",
+                "Autoroute": "hw2/techs/unsc_base_upgrade3",
+                "Title": "UPGRADE TO HEADQUARTERS",
+                "HW2Tech": {
+                    "ObjectTypeId": "unsc_base_upgrade3",
+                    "DisplayInfo": {
+                        "Id": 335249,
+                        "Type": "HW2TechDisplayInfo",
+                        "View": {
+                            "Status": "Published",
+                            "Common": {
+                                "Owner": "edostrov",
+                                "CreatedUtc": "2016-09-13T10:51:39Z",
+                                "ModifiedUtc": "2017-02-03T19:35:25Z",
+                                "PublishedUtc": "2017-02-03T19:35:25Z",
+                                "Container": -1
+                            },
+                            "Identity": "77a4b83a3f2b4159813c9038148e47ba",
+                            "BatchLocalization": {
+                                "IsLocked": false
+                            },
+                            "Localization": {
+                                "Culture": "en",
+                                "MasterContentItemId": ""
+                            },
+                            "Title": "UPGRADE TO HEADQUARTERS Display Info",
+                            "HW2TechDisplayInfo": {
+                                "Name": "UPGRADE TO HEADQUARTERS",
+                                "Description": "Produces vehicles and infantry. Top base upgrade"
+                            }
+                        }
+                    },
+                    "Image": {}
+                }
+            },
+            "Links": [
+                {
+                    "Absolute": false,
+                    "Relation": "Self",
+                    "URI": "/content/336943"
+                }
+            ],
+            "ChildrenCount": 0
+        },
+        {
+            "Id": 336944,
+            "Type": "HW2Tech",
+            "View": {
+                "Status": "Published",
+                "Common": {
+                    "Owner": "edostrov",
+                    "CreatedUtc": "2016-09-13T10:49:27Z",
+                    "ModifiedUtc": "2017-02-03T19:40:55Z",
+                    "PublishedUtc": "2017-02-03T19:40:56Z",
+                    "Container": -1
+                },
+                "Identity": "27e4bb620ccb4313ac7f312e37499dac",
+                "Autoroute": "hw2/techs/unsc_reactor_upgrade2",
+                "Title": "UPGRADE TO SUPER GENERATOR",
+                "HW2Tech": {
+                    "ObjectTypeId": "unsc_reactor_upgrade2",
+                    "DisplayInfo": {
+                        "Id": 336361,
+                        "Type": "HW2TechDisplayInfo",
+                        "View": {
+                            "Status": "Published",
+                            "Common": {
+                                "Owner": "edostrov",
+                                "CreatedUtc": "2016-09-13T10:49:26Z",
+                                "ModifiedUtc": "2017-02-03T19:39:03Z",
+                                "PublishedUtc": "2017-02-03T19:39:03Z",
+                                "Container": -1
+                            },
+                            "Identity": "9a486709eedb47eab44d21c55ef84c9c",
+                            "BatchLocalization": {
+                                "IsLocked": false
+                            },
+                            "Localization": {
+                                "Culture": "en",
+                                "MasterContentItemId": ""
+                            },
+                            "Title": "UPGRADE TO SUPER GENERATOR Display Info",
+                            "HW2TechDisplayInfo": {
+                                "Name": "UPGRADE TO SUPER GENERATOR",
+                                "Description": "Fastest Power Production"
+                            }
+                        }
+                    },
+                    "Image": {}
+                }
+            },
+            "Links": [
+                {
+                    "Absolute": false,
+                    "Relation": "Self",
+                    "URI": "/content/336944"
+                }
+            ],
+            "ChildrenCount": 0
+        },
+        {
+            "Id": 336945,
+            "Type": "HW2Tech",
+            "View": {
+                "Status": "Published",
+                "Common": {
+                    "Owner": "edostrov",
+                    "CreatedUtc": "2016-09-13T10:49:34Z",
+                    "ModifiedUtc": "2017-02-03T19:40:56Z",
+                    "PublishedUtc": "2017-02-03T19:40:56Z",
+                    "Container": -1
+                },
+                "Identity": "253ac7d8e8bc4133baddabcc4ad5f5da",
+                "Autoroute": "hw2/techs/unsc_tech_recruitTraining_1",
+                "Title": "ADV. LOGISTICS I",
+                "HW2Tech": {
+                    "ObjectTypeId": "unsc_tech_recruitTraining_1",
+                    "DisplayInfo": {
+                        "Id": 336375,
+                        "Type": "HW2TechDisplayInfo",
+                        "View": {
+                            "Status": "Published",
+                            "Common": {
+                                "Owner": "edostrov",
+                                "CreatedUtc": "2016-09-13T10:49:33Z",
+                                "ModifiedUtc": "2017-02-03T19:39:05Z",
+                                "PublishedUtc": "2017-09-25T17:42:59Z",
+                                "Container": -1
+                            },
+                            "Identity": "801f875feaaf4783ac8a8a6a8e084171",
+                            "BatchLocalization": {
+                                "IsLocked": false
+                            },
+                            "Localization": {
+                                "Culture": "en",
+                                "MasterContentItemId": ""
+                            },
+                            "Title": "ADV. LOGISTICS I Display Info",
+                            "HW2TechDisplayInfo": {
+                                "Name": "ADV. LOGISTICS I",
+                                "Description": "Reduces unit build time by 15%. Units are produced faster"
+                            }
+                        }
+                    },
+                    "Image": {}
+                }
+            },
+            "Links": [
+                {
+                    "Absolute": false,
+                    "Relation": "Self",
+                    "URI": "/content/336945"
+                }
+            ],
+            "ChildrenCount": 0
+        },
+        {
+            "Id": 336920,
+            "Type": "HW2Tech",
+            "View": {
+                "Status": "Published",
+                "Common": {
+                    "Owner": "v-hugmic",
+                    "CreatedUtc": "2016-10-27T16:33:07Z",
+                    "ModifiedUtc": "2017-02-03T19:40:52Z",
+                    "PublishedUtc": "2017-02-03T19:40:52Z",
+                    "Container": -1
+                },
+                "Identity": "4572ac4e522d40f692830b2903f0d0c9",
+                "Autoroute": "hw2/techs/unsc_forgehog_upgrade1",
+                "Title": "ANVIL ROUND",
+                "HW2Tech": {
+                    "ObjectTypeId": "unsc_forgehog_upgrade1",
+                    "DisplayInfo": {
+                        "Id": 335354,
+                        "Type": "HW2TechDisplayInfo",
+                        "View": {
+                            "Status": "Published",
+                            "Common": {
+                                "Owner": "v-hugmic",
+                                "CreatedUtc": "2016-10-27T16:33:07Z",
+                                "ModifiedUtc": "2017-02-03T19:35:42Z",
+                                "PublishedUtc": "2017-09-25T17:42:56Z",
+                                "Container": -1
+                            },
+                            "Identity": "00dfa1d8230f413f9849bcf415743279",
+                            "BatchLocalization": {
+                                "IsLocked": false
+                            },
+                            "Localization": {
+                                "Culture": "en",
+                                "MasterContentItemId": ""
+                            },
+                            "Title": "ANVIL ROUND Display Info",
+                            "HW2TechDisplayInfo": {
+                                "Name": "ANVIL ROUND",
+                                "Description": "Increases health and damage. Adds ability to fire an Anvil Round. Anvil Round damages enemy ground units and slows enemy vehicles"
+                            }
+                        }
+                    },
+                    "Image": {}
+                }
+            },
+            "Links": [
+                {
+                    "Absolute": false,
+                    "Relation": "Self",
+                    "URI": "/content/336920"
+                }
+            ],
+            "ChildrenCount": 0
+        },
+        {
+            "Id": 336900,
+            "Type": "HW2Tech",
+            "View": {
+                "Status": "Published",
+                "Common": {
+                    "Owner": "edostrov",
+                    "CreatedUtc": "2016-09-13T10:51:42Z",
+                    "ModifiedUtc": "2017-02-03T19:40:48Z",
+                    "PublishedUtc": "2017-02-03T19:40:48Z",
+                    "Container": -1
+                },
+                "Identity": "b4eb169ee2004d59876e749e5cf4c80b",
+                "Autoroute": "hw2/techs/cov_base_upgrade1",
+                "Title": "UPGRADE TO STRONGHOLD",
+                "HW2Tech": {
+                    "ObjectTypeId": "cov_base_upgrade1",
+                    "DisplayInfo": {
+                        "Id": 335084,
+                        "Type": "HW2TechDisplayInfo",
+                        "View": {
+                            "Status": "Published",
+                            "Common": {
+                                "Owner": "edostrov",
+                                "CreatedUtc": "2016-09-13T10:51:41Z",
+                                "ModifiedUtc": "2017-02-03T19:34:58Z",
+                                "PublishedUtc": "2017-02-03T19:34:58Z",
+                                "Container": -1
+                            },
+                            "Identity": "51dce809e25849c4b260f388f2a04811",
+                            "BatchLocalization": {
+                                "IsLocked": false
+                            },
+                            "Localization": {
+                                "Culture": "en",
+                                "MasterContentItemId": ""
+                            },
+                            "Title": "UPGRADE TO STRONGHOLD Display Info",
+                            "HW2TechDisplayInfo": {
+                                "Name": "UPGRADE TO STRONGHOLD",
+                                "Description": "Produces vehicles and infantry. Can be upgraded to Citadel. Supports four turrets"
+                            }
+                        }
+                    },
+                    "Image": {}
+                }
+            },
+            "Links": [
+                {
+                    "Absolute": false,
+                    "Relation": "Self",
+                    "URI": "/content/336900"
+                }
+            ],
+            "ChildrenCount": 0
+        },
+        {
+            "Id": 336902,
+            "Type": "HW2Tech",
+            "View": {
+                "Status": "Published",
+                "Common": {
+                    "Owner": "edostrov",
+                    "CreatedUtc": "2016-09-13T10:51:25Z",
+                    "ModifiedUtc": "2017-02-03T19:40:48Z",
+                    "PublishedUtc": "2017-02-03T19:40:48Z",
+                    "Container": -1
+                },
+                "Identity": "b2cd5a6da28f4bf19019718d4a74b076",
+                "Autoroute": "hw2/techs/cov_tech_global_aircraft_01",
+                "Title": "AIR UPGRADE I",
+                "HW2Tech": {
+                    "ObjectTypeId": "cov_tech_global_aircraft_01",
+                    "DisplayInfo": {
+                        "Id": 336165,
+                        "Type": "HW2TechDisplayInfo",
+                        "View": {
+                            "Status": "Published",
+                            "Common": {
+                                "Owner": "edostrov",
+                                "CreatedUtc": "2016-09-13T10:51:24Z",
+                                "ModifiedUtc": "2017-02-03T19:38:27Z",
+                                "PublishedUtc": "2017-02-03T19:38:27Z",
+                                "Container": -1
+                            },
+                            "Identity": "af5371088a8042cba42ca5327b7bfcf4",
+                            "BatchLocalization": {
+                                "IsLocked": false
+                            },
+                            "Localization": {
+                                "Culture": "en",
+                                "MasterContentItemId": ""
+                            },
+                            "Title": "AIR UPGRADE I Display Info",
+                            "HW2TechDisplayInfo": {
+                                "Name": "AIR UPGRADE I",
+                                "Description": "10% damage boost. 10% health boost"
+                            }
+                        }
+                    },
+                    "Image": {}
+                }
+            },
+            "Links": [
+                {
+                    "Absolute": false,
+                    "Relation": "Self",
+                    "URI": "/content/336902"
+                }
+            ],
+            "ChildrenCount": 0
+        },
+        {
+            "Id": 336861,
+            "Type": "HW2Tech",
+            "View": {
+                "Status": "Published",
+                "Common": {
+                    "Owner": "edostrov",
+                    "CreatedUtc": "2016-09-13T10:49:44Z",
+                    "ModifiedUtc": "2017-02-03T19:40:39Z",
+                    "PublishedUtc": "2017-02-03T19:40:39Z",
+                    "Container": -1
+                },
+                "Identity": "6edc8d6a0c0046458b1f258d55fb09d3",
+                "Autoroute": "hw2/tech/unsc_tech_reinforcements_3",
+                "Title": "RESERVES III",
+                "HW2Tech": {
+                    "ObjectTypeId": "unsc_tech_reinforcements_3",
+                    "DisplayInfo": {
+                        "Id": 336270,
+                        "Type": "HW2TechDisplayInfo",
+                        "View": {
+                            "Status": "Published",
+                            "Common": {
+                                "Owner": "edostrov",
+                                "CreatedUtc": "2016-09-13T10:49:43Z",
+                                "ModifiedUtc": "2017-02-03T19:38:44Z",
+                                "PublishedUtc": "2017-02-03T19:38:44Z",
+                                "Container": -1
+                            },
+                            "Identity": "5eb2e4547333482fb90b5cc29e58aa82",
+                            "BatchLocalization": {
+                                "IsLocked": false
+                            },
+                            "Localization": {
+                                "Culture": "en",
+                                "MasterContentItemId": ""
+                            },
+                            "Title": "RESERVES III Display Info",
+                            "HW2TechDisplayInfo": {
+                                "Name": "RESERVES III",
+                                "Description": "Population boosted by +20. Maximum number of. possible units increased."
+                            }
+                        }
+                    },
+                    "Image": {}
+                }
+            },
+            "Links": [
+                {
+                    "Absolute": false,
+                    "Relation": "Self",
+                    "URI": "/content/336861"
+                }
+            ],
+            "ChildrenCount": 0
+        },
+        {
+            "Id": 336822,
+            "Type": "HW2Tech",
+            "View": {
+                "Status": "Published",
+                "Common": {
+                    "Owner": "v-hugmic",
+                    "CreatedUtc": "2016-10-27T16:33:08Z",
+                    "ModifiedUtc": "2017-02-03T19:40:30Z",
+                    "PublishedUtc": "2017-02-03T19:40:30Z",
+                    "Container": -1
+                },
+                "Identity": "a39927ede3e842c484872f74c6ed073e",
+                "Autoroute": "hw2/techs/unsc_forgehog_upgrade2",
+                "Title": "DEFENSIVE AURA",
+                "HW2Tech": {
+                    "ObjectTypeId": "unsc_forgehog_upgrade2",
+                    "DisplayInfo": {
+                        "Id": 335811,
+                        "Type": "HW2TechDisplayInfo",
+                        "View": {
+                            "Status": "Published",
+                            "Common": {
+                                "Owner": "v-hugmic",
+                                "CreatedUtc": "2016-10-27T16:33:08Z",
+                                "ModifiedUtc": "2017-02-03T19:37:11Z",
+                                "PublishedUtc": "2017-09-25T17:42:55Z",
+                                "Container": -1
+                            },
+                            "Identity": "408e0bdaff68455c8095ef2f44f164c7",
+                            "BatchLocalization": {
+                                "IsLocked": false
+                            },
+                            "Localization": {
+                                "Culture": "en",
+                                "MasterContentItemId": ""
+                            },
+                            "Title": "DEFENSIVE AURA Display Info",
+                            "HW2TechDisplayInfo": {
+                                "Name": "DEFENSIVE AURA",
+                                "Description": "Increases health and damage. Improves Nanobots. Increases the speed of nearby allies"
+                            }
+                        }
+                    },
+                    "Image": {}
+                }
+            },
+            "Links": [
+                {
+                    "Absolute": false,
+                    "Relation": "Self",
+                    "URI": "/content/336822"
+                }
+            ],
+            "ChildrenCount": 0
+        },
+        {
+            "Id": 336806,
+            "Type": "HW2Tech",
+            "View": {
+                "Status": "Published",
+                "Common": {
+                    "Owner": "v-hugmic",
+                    "CreatedUtc": "2016-10-27T16:33:10Z",
+                    "ModifiedUtc": "2017-02-03T19:40:28Z",
+                    "PublishedUtc": "2017-02-03T19:40:28Z",
+                    "Container": -1
+                },
+                "Identity": "cc956e2e7b0141e983eb44ca0037f756",
+                "Autoroute": "hw2/techs/unsc_forgehog_upgrade3",
+                "Title": "GAUSS OVERCHARGE",
+                "HW2Tech": {
+                    "ObjectTypeId": "unsc_forgehog_upgrade3",
+                    "DisplayInfo": {
+                        "Id": 335782,
+                        "Type": "HW2TechDisplayInfo",
+                        "View": {
+                            "Status": "Published",
+                            "Common": {
+                                "Owner": "v-hugmic",
+                                "CreatedUtc": "2016-10-27T16:33:09Z",
+                                "ModifiedUtc": "2017-02-03T19:37:06Z",
+                                "PublishedUtc": "2017-09-25T17:42:54Z",
+                                "Container": -1
+                            },
+                            "Identity": "4c5db2c432484df7aa48a351e7cff911",
+                            "BatchLocalization": {
+                                "IsLocked": false
+                            },
+                            "Localization": {
+                                "Culture": "en",
+                                "MasterContentItemId": ""
+                            },
+                            "Title": "GAUSS OVERCHARGE Display Info",
+                            "HW2TechDisplayInfo": {
+                                "Name": "GAUSS OVERCHARGE",
+                                "Description": "Increases health and damage. Upgrades Gauss Cannon. Upgrades Anvil Round ability"
+                            }
+                        }
+                    },
+                    "Image": {}
+                }
+            },
+            "Links": [
+                {
+                    "Absolute": false,
+                    "Relation": "Self",
+                    "URI": "/content/336806"
+                }
+            ],
+            "ChildrenCount": 0
+        },
+        {
+            "Id": 336799,
+            "Type": "HW2Tech",
+            "View": {
+                "Status": "Published",
+                "Common": {
+                    "Owner": "edostrov",
+                    "CreatedUtc": "2016-09-13T10:51:37Z",
+                    "ModifiedUtc": "2017-02-03T19:40:27Z",
+                    "PublishedUtc": "2017-02-03T19:40:27Z",
+                    "Container": -1
+                },
+                "Identity": "cf661bf95698487e94aecd5e37790df4",
+                "Autoroute": "hw2/techs/unsc_base_upgrade1",
+                "Title": "UPGRADE TO COMBAT STATION",
+                "HW2Tech": {
+                    "ObjectTypeId": "unsc_base_upgrade1",
+                    "DisplayInfo": {
+                        "Id": 336258,
+                        "Type": "HW2TechDisplayInfo",
+                        "View": {
+                            "Status": "Published",
+                            "Common": {
+                                "Owner": "edostrov",
+                                "CreatedUtc": "2016-09-13T10:51:36Z",
+                                "ModifiedUtc": "2017-02-03T19:38:42Z",
+                                "PublishedUtc": "2017-02-03T19:38:42Z",
+                                "Container": -1
+                            },
+                            "Identity": "6c8d713521c8429587e902560e21c4aa",
+                            "BatchLocalization": {
+                                "IsLocked": false
+                            },
+                            "Localization": {
+                                "Culture": "en",
+                                "MasterContentItemId": ""
+                            },
+                            "Title": "UPGRADE TO COMBAT STATION Display Info",
+                            "HW2TechDisplayInfo": {
+                                "Name": "UPGRADE TO COMBAT STATION",
+                                "Description": "Produces vehicles and infantry. Can be upgraded to Command Center. Supports four turret emplacements"
+                            }
+                        }
+                    },
+                    "Image": {}
+                }
+            },
+            "Links": [
+                {
+                    "Absolute": false,
+                    "Relation": "Self",
+                    "URI": "/content/336799"
+                }
+            ],
+            "ChildrenCount": 0
+        },
+        {
+            "Id": 336790,
+            "Type": "HW2Tech",
+            "View": {
+                "Status": "Published",
+                "Common": {
+                    "Owner": "edostrov",
+                    "CreatedUtc": "2016-09-13T10:51:55Z",
+                    "ModifiedUtc": "2017-02-03T19:40:25Z",
+                    "PublishedUtc": "2017-02-03T19:40:26Z",
+                    "Container": -1
+                },
+                "Identity": "0d4158700be5480889e8ededa2605bcb",
+                "Autoroute": "hw2/techs/unsc_spartan_upgrade1_laser",
+                "Title": "HIJACK",
+                "HW2Tech": {
+                    "ObjectTypeId": "unsc_spartan_upgrade1_laser",
+                    "DisplayInfo": {
+                        "Id": 336786,
+                        "Type": "HW2TechDisplayInfo",
+                        "View": {
+                            "Status": "Published",
+                            "Common": {
+                                "Owner": "edostrov",
+                                "CreatedUtc": "2016-09-13T10:51:54Z",
+                                "ModifiedUtc": "2017-02-03T19:40:25Z",
+                                "PublishedUtc": "2017-09-25T17:42:59Z",
+                                "Container": -1
+                            },
+                            "Identity": "a5b88f94562d4e70acfa3d02809855dc",
+                            "BatchLocalization": {
+                                "IsLocked": false
+                            },
+                            "Localization": {
+                                "Culture": "en",
+                                "MasterContentItemId": ""
+                            },
+                            "Title": "HIJACK Display Info",
+                            "HW2TechDisplayInfo": {
+                                "Name": "HIJACK",
+                                "Description": "Increases health and damage. Adds ability to Hijack enemy vehicles and aircraft. Adds ability to Commandeer friendly vehicles and aircraft"
+                            }
+                        }
+                    },
+                    "Image": {}
+                }
+            },
+            "Links": [
+                {
+                    "Absolute": false,
+                    "Relation": "Self",
+                    "URI": "/content/336790"
+                }
+            ],
+            "ChildrenCount": 0
+        },
+        {
+            "Id": 336480,
+            "Type": "HW2Tech",
+            "View": {
+                "Status": "Published",
+                "Common": {
+                    "Owner": "v-hugmic",
+                    "CreatedUtc": "2016-10-27T16:33:12Z",
+                    "ModifiedUtc": "2017-02-03T19:39:24Z",
+                    "PublishedUtc": "2017-02-03T19:39:24Z",
+                    "Container": -1
+                },
+                "Identity": "895aa49d00f949c8ae770d1018f7ff6f",
+                "Autoroute": "hw2/techs/unsc_grizzly_upgrade1",
+                "Title": "MISSILE BARRAGE",
+                "HW2Tech": {
+                    "ObjectTypeId": "unsc_grizzly_upgrade1",
+                    "DisplayInfo": {
+                        "Id": 336389,
+                        "Type": "HW2TechDisplayInfo",
+                        "View": {
+                            "Status": "Published",
+                            "Common": {
+                                "Owner": "v-hugmic",
+                                "CreatedUtc": "2016-10-27T16:33:11Z",
+                                "ModifiedUtc": "2017-02-03T19:39:08Z",
+                                "PublishedUtc": "2017-09-25T17:42:51Z",
+                                "Container": -1
+                            },
+                            "Identity": "1fea7ab01a4a41539f870c9b2f67a88c",
+                            "BatchLocalization": {
+                                "IsLocked": false
+                            },
+                            "Localization": {
+                                "Culture": "en",
+                                "MasterContentItemId": ""
+                            },
+                            "Title": "MISSILE BARRAGE Display Info",
+                            "HW2TechDisplayInfo": {
+                                "Name": "MISSILE BARRAGE",
+                                "Description": "Adds Missile Barrage ability. Powerful targeted AoE attack"
+                            }
+                        }
+                    },
+                    "Image": {}
+                }
+            },
+            "Links": [
+                {
+                    "Absolute": false,
+                    "Relation": "Self",
+                    "URI": "/content/336480"
+                }
+            ],
+            "ChildrenCount": 0
+        },
+        {
+            "Id": 336463,
+            "Type": "HW2Tech",
+            "View": {
+                "Status": "Published",
+                "Common": {
+                    "Owner": "edostrov",
+                    "CreatedUtc": "2016-09-13T10:51:04Z",
+                    "ModifiedUtc": "2017-02-03T19:39:21Z",
+                    "PublishedUtc": "2017-02-03T19:39:21Z",
+                    "Container": -1
+                },
+                "Identity": "bd6906f64d7542e196f1e6db242f252d",
+                "Autoroute": "hw2/techs/cov_hunter_upgrade1",
+                "Title": "BEAM CANNON",
+                "HW2Tech": {
+                    "ObjectTypeId": "cov_hunter_upgrade1",
+                    "DisplayInfo": {
+                        "Id": 336133,
+                        "Type": "HW2TechDisplayInfo",
+                        "View": {
+                            "Status": "Published",
+                            "Common": {
+                                "Owner": "edostrov",
+                                "CreatedUtc": "2016-09-13T10:51:03Z",
+                                "ModifiedUtc": "2017-02-03T19:38:21Z",
+                                "PublishedUtc": "2017-09-25T17:42:57Z",
+                                "Container": -1
+                            },
+                            "Identity": "cb8030f2e080497fbed2aa174354c7fd",
+                            "BatchLocalization": {
+                                "IsLocked": false
+                            },
+                            "Localization": {
+                                "Culture": "en",
+                                "MasterContentItemId": ""
+                            },
+                            "Title": "BEAM CANNON Display Info",
+                            "HW2TechDisplayInfo": {
+                                "Name": "BEAM CANNON",
+                                "Description": "Replaces Fuel Rod with Beam Cannon. Increases damage. Deals damage along trajectory "
+                            }
+                        }
+                    },
+                    "Image": {}
+                }
+            },
+            "Links": [
+                {
+                    "Absolute": false,
+                    "Relation": "Self",
+                    "URI": "/content/336463"
+                }
+            ],
+            "ChildrenCount": 0
+        },
+        {
+            "Id": 336276,
+            "Type": "HW2Tech",
+            "View": {
+                "Status": "Published",
+                "Common": {
+                    "Owner": "edostrov",
+                    "CreatedUtc": "2016-09-13T10:50:31Z",
+                    "ModifiedUtc": "2017-02-03T19:38:47Z",
+                    "PublishedUtc": "2017-02-03T19:38:47Z",
+                    "Container": -1
+                },
+                "Identity": "5bad9715615b45ada4438ed25e3a93f4",
+                "Autoroute": "hw2/techs/cov_supplyDepot_upgrade1",
+                "Title": "UPGRADE TO AUG. HARVESTER",
+                "HW2Tech": {
+                    "ObjectTypeId": "cov_supplyDepot_upgrade1",
+                    "DisplayInfo": {
+                        "Id": 335457,
+                        "Type": "HW2TechDisplayInfo",
+                        "View": {
+                            "Status": "Published",
+                            "Common": {
+                                "Owner": "edostrov",
+                                "CreatedUtc": "2016-09-13T10:50:31Z",
+                                "ModifiedUtc": "2017-02-03T19:36:02Z",
+                                "PublishedUtc": "2017-02-03T19:36:02Z",
+                                "Container": -1
+                            },
+                            "Identity": "8bba0b8744e9489abff268688d41875e",
+                            "BatchLocalization": {
+                                "IsLocked": false
+                            },
+                            "Localization": {
+                                "Culture": "en",
+                                "MasterContentItemId": ""
+                            },
+                            "Title": "UPGRADE TO AUG. HARVESTER Display Info",
+                            "HW2TechDisplayInfo": {
+                                "Name": "UPGRADE TO AUG. HARVESTER",
+                                "Description": "Increases supply income"
+                            }
+                        }
+                    },
+                    "Image": {}
+                }
+            },
+            "Links": [
+                {
+                    "Absolute": false,
+                    "Relation": "Self",
+                    "URI": "/content/336276"
+                }
+            ],
+            "ChildrenCount": 0
+        },
+        {
+            "Id": 336172,
+            "Type": "HW2Tech",
+            "View": {
+                "Status": "Published",
+                "Common": {
+                    "Owner": "v-hugmic",
+                    "CreatedUtc": "2016-10-31T11:50:53Z",
+                    "ModifiedUtc": "2017-02-03T19:38:28Z",
+                    "PublishedUtc": "2017-02-03T19:38:28Z",
+                    "Container": -1
+                },
+                "Identity": "a3762d3814e648859e22b8f9ab863d7e",
+                "Autoroute": "hw2/techs/cov_bruteJumpPack_upgrade3",
+                "Title": "DARK SKIES",
+                "HW2Tech": {
+                    "ObjectTypeId": "cov_bruteJumpPack_upgrade3",
+                    "DisplayInfo": {
+                        "Id": 335405,
+                        "Type": "HW2TechDisplayInfo",
+                        "View": {
+                            "Status": "Published",
+                            "Common": {
+                                "Owner": "v-hugmic",
+                                "CreatedUtc": "2016-10-31T11:50:52Z",
+                                "ModifiedUtc": "2017-02-03T19:35:53Z",
+                                "PublishedUtc": "2017-09-25T17:43:01Z",
+                                "Container": -1
+                            },
+                            "Identity": "be9b3c1abd1a48f690924570f594b2fd",
+                            "BatchLocalization": {
+                                "IsLocked": false
+                            },
+                            "Localization": {
+                                "Culture": "en",
+                                "MasterContentItemId": ""
+                            },
+                            "Title": "DARK SKIES Display Info",
+                            "HW2TechDisplayInfo": {
+                                "Name": "DARK SKIES",
+                                "Description": "Increases squad size"
+                            }
+                        }
+                    },
+                    "Image": {}
+                }
+            },
+            "Links": [
+                {
+                    "Absolute": false,
+                    "Relation": "Self",
+                    "URI": "/content/336172"
+                }
+            ],
+            "ChildrenCount": 0
+        },
+        {
+            "Id": 335984,
+            "Type": "HW2Tech",
+            "View": {
+                "Status": "Published",
+                "Common": {
+                    "Owner": "edostrov",
+                    "CreatedUtc": "2016-09-13T10:49:21Z",
+                    "ModifiedUtc": "2017-02-03T19:37:49Z",
+                    "PublishedUtc": "2017-02-03T19:37:50Z",
+                    "Container": -1
+                },
+                "Identity": "b130afd34132468bb62d80f572e0341d",
+                "Autoroute": "hw2/techs/unsc_supplypad_upgrade1",
+                "Title": "UPGRADE TO HEAVY SUPPLY PAD",
+                "HW2Tech": {
+                    "ObjectTypeId": "unsc_supplypad_upgrade1",
+                    "DisplayInfo": {
+                        "Id": 335226,
+                        "Type": "HW2TechDisplayInfo",
+                        "View": {
+                            "Status": "Published",
+                            "Common": {
+                                "Owner": "edostrov",
+                                "CreatedUtc": "2016-09-13T10:49:20Z",
+                                "ModifiedUtc": "2017-02-03T19:35:21Z",
+                                "PublishedUtc": "2017-02-03T19:35:21Z",
+                                "Container": -1
+                            },
+                            "Identity": "2ac15de64b5746fea8bdebdbd4d6931e",
+                            "BatchLocalization": {
+                                "IsLocked": false
+                            },
+                            "Localization": {
+                                "Culture": "en",
+                                "MasterContentItemId": ""
+                            },
+                            "Title": "UPGRADE TO HEAVY SUPPLY PAD Display Info",
+                            "HW2TechDisplayInfo": {
+                                "Name": "UPGRADE TO HEAVY SUPPLY PAD",
+                                "Description": "Increases supply income"
+                            }
+                        }
+                    },
+                    "Image": {}
+                }
+            },
+            "Links": [
+                {
+                    "Absolute": false,
+                    "Relation": "Self",
+                    "URI": "/content/335984"
+                }
+            ],
+            "ChildrenCount": 0
+        },
+        {
+            "Id": 335951,
+            "Type": "HW2Tech",
+            "View": {
+                "Status": "Published",
+                "Common": {
+                    "Owner": "edostrov",
+                    "CreatedUtc": "2016-09-13T10:51:07Z",
+                    "ModifiedUtc": "2017-02-03T19:37:44Z",
+                    "PublishedUtc": "2017-02-03T19:37:44Z",
+                    "Container": -1
+                },
+                "Identity": "ee13116dc25f4adabdc34dc4d9813ee9",
+                "Autoroute": "hw2/techs/cov_banshee_upgrade1",
+                "Title": "PLASMA TORPEDO",
+                "HW2Tech": {
+                    "ObjectTypeId": "cov_banshee_upgrade1",
+                    "DisplayInfo": {
+                        "Id": 335185,
+                        "Type": "HW2TechDisplayInfo",
+                        "View": {
+                            "Status": "Published",
+                            "Common": {
+                                "Owner": "edostrov",
+                                "CreatedUtc": "2016-09-13T10:51:06Z",
+                                "ModifiedUtc": "2017-02-03T19:35:14Z",
+                                "PublishedUtc": "2017-09-25T17:42:56Z",
+                                "Container": -1
+                            },
+                            "Identity": "3577b12c374a46589c7321f198b69242",
+                            "BatchLocalization": {
+                                "IsLocked": false
+                            },
+                            "Localization": {
+                                "Culture": "en",
+                                "MasterContentItemId": ""
+                            },
+                            "Title": "PLASMA TORPEDO Display Info",
+                            "HW2TechDisplayInfo": {
+                                "Name": "PLASMA TORPEDO",
+                                "Description": "Increases health and damage. Adds a Plasma Torpedo attack. Greatly increases damage against air units"
+                            }
+                        }
+                    },
+                    "Image": {}
+                }
+            },
+            "Links": [
+                {
+                    "Absolute": false,
+                    "Relation": "Self",
+                    "URI": "/content/335951"
+                }
+            ],
+            "ChildrenCount": 0
+        },
+        {
+            "Id": 335933,
+            "Type": "HW2Tech",
+            "View": {
+                "Status": "Published",
+                "Common": {
+                    "Owner": "v-hugmic",
+                    "CreatedUtc": "2016-11-24T08:42:04Z",
+                    "ModifiedUtc": "2017-02-03T19:37:35Z",
+                    "PublishedUtc": "2017-02-03T19:37:35Z",
+                    "Container": -1
+                },
+                "Identity": "fb916c668f0240f88be320fdd7a440e2",
+                "Autoroute": "hw2/techs/unsc_Sniper_upgrade0",
+                "Title": "ACTIVE CAMO",
+                "HW2Tech": {
+                    "ObjectTypeId": "unsc_Sniper_upgrade0",
+                    "DisplayInfo": {
+                        "Id": 335232,
+                        "Type": "HW2TechDisplayInfo",
+                        "View": {
+                            "Status": "Published",
+                            "Common": {
+                                "Owner": "v-hugmic",
+                                "CreatedUtc": "2016-11-24T08:42:03Z",
+                                "ModifiedUtc": "2017-02-03T19:35:22Z",
+                                "PublishedUtc": "2017-09-25T17:42:54Z",
+                                "Container": -1
+                            },
+                            "Identity": "298235b78fa942ce8442b991d112c5bb",
+                            "BatchLocalization": {
+                                "IsLocked": false
+                            },
+                            "Localization": {
+                                "Culture": "en",
+                                "MasterContentItemId": ""
+                            },
+                            "Title": "ACTIVE CAMO Display Info",
+                            "HW2TechDisplayInfo": {
+                                "Name": "ACTIVE CAMO",
+                                "Description": "Adds the ability to temporarily cloak. Detection units can reveal cloak"
+                            }
+                        }
+                    },
+                    "Image": {}
+                }
+            },
+            "Links": [
+                {
+                    "Absolute": false,
+                    "Relation": "Self",
+                    "URI": "/content/335933"
+                }
+            ],
+            "ChildrenCount": 0
+        },
+        {
+            "Id": 335528,
+            "Type": "HW2Tech",
+            "View": {
+                "Status": "Published",
+                "Common": {
+                    "Owner": "edostrov",
+                    "CreatedUtc": "2016-09-13T10:51:02Z",
+                    "ModifiedUtc": "2017-02-03T19:36:19Z",
+                    "PublishedUtc": "2017-02-03T19:36:19Z",
+                    "Container": -1
+                },
+                "Identity": "062b4a14f0904d6f8ef3c8fe16d1593d",
+                "Autoroute": "hw2/tech/cov_brute_upgrade4",
+                "Title": "DARK SKIES",
+                "HW2Tech": {
+                    "ObjectTypeId": "cov_brute_upgrade4",
+                    "DisplayInfo": {
+                        "Id": 335344,
+                        "Type": "HW2TechDisplayInfo",
+                        "View": {
+                            "Status": "Published",
+                            "Common": {
+                                "Owner": "edostrov",
+                                "CreatedUtc": "2016-09-13T10:51:01Z",
+                                "ModifiedUtc": "2017-02-03T19:35:40Z",
+                                "PublishedUtc": "2017-02-03T19:35:40Z",
+                                "Container": -1
+                            },
+                            "Identity": "1d3c10b0dabd455ca07d3d0c6eecdbd1",
+                            "BatchLocalization": {
+                                "IsLocked": false
+                            },
+                            "Localization": {
+                                "Culture": "en",
+                                "MasterContentItemId": ""
+                            },
+                            "Title": "DARK SKIES Display Info",
+                            "HW2TechDisplayInfo": {
+                                "Name": "DARK SKIES",
+                                "Description": "Increases squad size"
+                            }
+                        }
+                    },
+                    "Image": {}
+                }
+            },
+            "Links": [
+                {
+                    "Absolute": false,
+                    "Relation": "Self",
+                    "URI": "/content/335528"
+                }
+            ],
+            "ChildrenCount": 0
+        },
+        {
+            "Id": 335526,
+            "Type": "HW2Tech",
+            "View": {
+                "Status": "Published",
+                "Common": {
+                    "Owner": "edostrov",
+                    "CreatedUtc": "2016-09-13T10:50:59Z",
+                    "ModifiedUtc": "2017-02-03T19:36:18Z",
+                    "PublishedUtc": "2017-02-03T19:36:18Z",
+                    "Container": -1
+                },
+                "Identity": "1120cb081543429aa98ee560cbeeeb9e",
+                "Autoroute": "hw2/techs/cov_suicideGrunt_upgrade1",
+                "Title": "KNOCK KNOCK!",
+                "HW2Tech": {
+                    "ObjectTypeId": "cov_suicideGrunt_upgrade1",
+                    "DisplayInfo": {
+                        "Id": 335522,
+                        "Type": "HW2TechDisplayInfo",
+                        "View": {
+                            "Status": "Published",
+                            "Common": {
+                                "Owner": "edostrov",
+                                "CreatedUtc": "2016-09-13T10:50:57Z",
+                                "ModifiedUtc": "2017-02-03T19:36:17Z",
+                                "PublishedUtc": "2017-02-03T19:36:17Z",
+                                "Container": -1
+                            },
+                            "Identity": "4a8c39a811d94d158a05c0ec5f9c4bc9",
+                            "BatchLocalization": {
+                                "IsLocked": false
+                            },
+                            "Localization": {
+                                "Culture": "en",
+                                "MasterContentItemId": ""
+                            },
+                            "Title": "KNOCK KNOCK! Display Info",
+                            "HW2TechDisplayInfo": {
+                                "Name": "KNOCK KNOCK!",
+                                "Description": "More damage to vehicles"
+                            }
+                        }
+                    },
+                    "Image": {}
+                }
+            },
+            "Links": [
+                {
+                    "Absolute": false,
+                    "Relation": "Self",
+                    "URI": "/content/335526"
+                }
+            ],
+            "ChildrenCount": 0
+        },
+        {
+            "Id": 335466,
+            "Type": "HW2Tech",
+            "View": {
+                "Status": "Published",
+                "Common": {
+                    "Owner": "edostrov",
+                    "CreatedUtc": "2016-09-13T10:49:23Z",
+                    "ModifiedUtc": "2017-02-03T19:36:07Z",
+                    "PublishedUtc": "2017-02-03T19:36:07Z",
+                    "Container": -1
+                },
+                "Identity": "5147ad9a735644498d874938324cae0b",
+                "Autoroute": "hw2/techs/unsc_supplypad_upgrade2",
+                "Title": "UPGRADE TO SUPER SUPPLY PAD",
+                "HW2Tech": {
+                    "ObjectTypeId": "unsc_supplypad_upgrade2",
+                    "DisplayInfo": {
+                        "Id": 335318,
+                        "Type": "HW2TechDisplayInfo",
+                        "View": {
+                            "Status": "Published",
+                            "Common": {
+                                "Owner": "edostrov",
+                                "CreatedUtc": "2016-09-13T10:49:22Z",
+                                "ModifiedUtc": "2017-02-03T19:35:36Z",
+                                "PublishedUtc": "2017-02-03T19:35:36Z",
+                                "Container": -1
+                            },
+                            "Identity": "0110b111a4664a56b7472be9c4df63ac",
+                            "BatchLocalization": {
+                                "IsLocked": false
+                            },
+                            "Localization": {
+                                "Culture": "en",
+                                "MasterContentItemId": ""
+                            },
+                            "Title": "UPGRADE TO SUPER SUPPLY PAD Display Info",
+                            "HW2TechDisplayInfo": {
+                                "Name": "UPGRADE TO SUPER SUPPLY PAD",
+                                "Description": "Fastest Supply Production"
+                            }
+                        }
+                    },
+                    "Image": {}
+                }
+            },
+            "Links": [
+                {
+                    "Absolute": false,
+                    "Relation": "Self",
+                    "URI": "/content/335466"
+                }
+            ],
+            "ChildrenCount": 0
+        }
+    ]
+}
