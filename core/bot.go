@@ -389,8 +389,8 @@ func (bot *Bot) findPlayer(m *discordgo.MessageCreate, args string) {
 			"player_id": strconv.Itoa(pid),
 		}
 
-		urlDashboard, _ := bot.dashboardURL("hw2-player-profile", pidParam)
-		urlDashboardMobile, _ := bot.dashboardURL("hw2-player-profile-mobile", pidParam)
+		urlDashboardL, _ := bot.dashboardURL("hw2-player-profile-l", pidParam)
+		urlDashboardS, _ := bot.dashboardURL("hw2-player-profile-s", pidParam)
 		urlWaypoint, _ := bot.waypointProfileURL(gt)
 
 		value := fmt.Sprintf("Didact ID: **%d**\n[PC](%s), [Mobile](%s), [Waypoint](%s)", pid, urlDashboard, urlDashboardMobile, urlWaypoint)
