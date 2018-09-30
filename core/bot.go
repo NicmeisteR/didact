@@ -2,8 +2,11 @@ package core
 
 import (
 	"database/sql"
+	"encoding/json"
 	"fmt"
 	"github.com/bwmarrin/discordgo"
+	"net/url"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -92,6 +95,46 @@ func (bot *Bot) sendResponse(m *discordgo.MessageCreate, r string) {
 }
 
 // -------------------------------------------------------------------------------------------------------------
+// URLs
+// -------------------------------------------------------------------------------------------------------------
+
+func (bot *Bot) dashboardURL(dashboardName string, params map[string]string) (*url.URL, error) {
+	// Superset filter_values expects filter values wrapped in arrays
+	wrappedParams := make(map[string][]string)
+	for k, v := range params {
+		var p []string
+		p = append(p, v)
+		wrappedParams[k] = p
+	}
+
+	// Marshall params to string
+	jsonBuffer, err := json.Marshal(wrappedParams)
+	if err != nil {
+		return nil, err
+	}
+
+	// Build URL
+	u, err := url.Parse("https://www.didact.io/superset/dashboard/")
+	if err != nil {
+		return nil, err
+	}
+	u.Path += dashboardName
+	q := u.Query()
+	q.Set("preselect_filters", url.QueryEscape(string(jsonBuffer)))
+	u.RawQuery = q.Encode()
+	return u, nil
+}
+
+func (bot *Bot) waypointProfileURL(gamertag string) (*url.URL, error) {
+	u, err := url.Parse("https://www.halowaypoint.com/en-us/games/halo-wars-2/service-record/players/")
+	if err != nil {
+		return nil, err
+	}
+	u.Path += gamertag
+	return u, nil
+}
+
+// -------------------------------------------------------------------------------------------------------------
 // Handlers
 // -------------------------------------------------------------------------------------------------------------
 
@@ -147,11 +190,15 @@ func (bot *Bot) onMessageCreate(s *discordgo.Session, m *discordgo.MessageCreate
 	case "profile":
 		bot.getProfile(m, args)
 		break
-	case "scan":
-		bot.scan(m, args)
+	case "sp":
+		fallthrough
+	case "scan-player":
+		bot.scanPlayer(m, args)
 		break
-	case "find":
-		bot.find(m, args)
+	case "fp":
+		fallthrough
+	case "find-player":
+		bot.findPlayer(m, args)
 		break
 	case "history":
 		break
@@ -200,7 +247,7 @@ func (bot *Bot) getProfile(m *discordgo.MessageCreate, args string) {
 // Scan player
 // -------------------------------------------------------------------------------------------------------------
 
-func (bot *Bot) scan(m *discordgo.MessageCreate, args string) {
+func (bot *Bot) scanPlayer(m *discordgo.MessageCreate, args string) {
 	// Get the gamertags
 	argList := strings.Split(args, ",")
 	gamertags := make([]string, 0)
@@ -301,15 +348,15 @@ func (bot *Bot) scan(m *discordgo.MessageCreate, args string) {
 // -------------------------------------------------------------------------------------------------------------
 
 // Find a player
-func (bot *Bot) find(m *discordgo.MessageCreate, args string) {
+func (bot *Bot) findPlayer(m *discordgo.MessageCreate, args string) {
 	prefix := strings.Trim(args, " ,\"'")
 
 	results, err := bot.dataStore.db.Query(`
 		SELECT p_id, p_gamertag
 		FROM player
-		WHERE p_gamertag LIKE $1
+		WHERE p_gamertag ILIKE $1
 		LIMIT 10
-	`, prefix+"%")
+	`, "%"+prefix+"%")
 
 	if err != nil {
 		bot.sendResponse(m, fmt.Sprintf("Ouch! Something went wrong: %v.", err))
@@ -333,19 +380,31 @@ func (bot *Bot) find(m *discordgo.MessageCreate, args string) {
 	}
 
 	fields := []*discordgo.MessageEmbedField{}
-	for _, gt := range gamertags {
+	for i, gt := range gamertags {
+		pid := pids[i]
+		name := fmt.Sprintf("%s", gt)
+
+		pidParam := map[string]string{
+			"player_id": strconv.Itoa(pid),
+		}
+
+		urlDashboard, _ := bot.dashboardURL("hw2-player-profile", pidParam)
+		urlDashboardMobile, _ := bot.dashboardURL("hw2-player-profile-mobile", pidParam)
+		urlWaypoint, _ := bot.waypointProfileURL(gt)
+
+		value := fmt.Sprintf("Didact ID: **%d**\n[PC](%s), [Mobile](%s), [Waypoint](%s)", pid, urlDashboard, urlDashboardMobile, urlWaypoint)
 		fields = append(fields, &discordgo.MessageEmbedField{
-			Name:   gt,
-			Value:  "[Didact](https://www.google.de), [Waypoint](https://www.google.de)",
+			Name:   name,
+			Value:  value,
 			Inline: true,
 		})
 	}
 
 	r := &discordgo.MessageEmbed{
-		Title:       "Player Prefix Lookup",
+		Title:       "Player Search",
 		Author:      &discordgo.MessageEmbedAuthor{},
 		Color:       0x010101,
-		Description: fmt.Sprintf("Prefix: *%s*, Limit: 10", prefix),
+		Description: fmt.Sprintf("String: %s, Limit: 10", prefix),
 		Fields:      fields,
 		Timestamp:   time.Now().Format(time.RFC3339),
 	}
