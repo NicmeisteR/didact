@@ -389,11 +389,10 @@ func (bot *Bot) findPlayer(m *discordgo.MessageCreate, args string) {
 			"player_id": strconv.Itoa(pid),
 		}
 
-		urlDashboardL, _ := bot.dashboardURL("hw2-player-profile-l", pidParam)
-		urlDashboardS, _ := bot.dashboardURL("hw2-player-profile-s", pidParam)
+		urlDashboard, _ := bot.dashboardURL("hw2-player-profile", pidParam)
 		urlWaypoint, _ := bot.waypointProfileURL(gt)
 
-		value := fmt.Sprintf("Didact ID: **%d**\n[PC](%s), [Mobile](%s), [Waypoint](%s)", pid, urlDashboard, urlDashboardMobile, urlWaypoint)
+		value := fmt.Sprintf("Didact ID: **%d**\n[Profile](%s), [Waypoint](%s)", pid, urlDashboard, urlWaypoint)
 		fields = append(fields, &discordgo.MessageEmbedField{
 			Name:   name,
 			Value:  value,
