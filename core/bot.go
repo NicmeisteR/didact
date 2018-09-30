@@ -121,6 +121,7 @@ func (bot *Bot) dashboardURL(dashboardName string, params map[string]string) (*u
 	u.Path += dashboardName
 	q := u.Query()
 	q.Set("preselect_filters", url.QueryEscape(string(jsonBuffer)))
+	q.Set("standalone", "true")
 	u.RawQuery = q.Encode()
 	return u, nil
 }
