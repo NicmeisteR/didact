@@ -106,9 +106,12 @@ func (bot *Bot) dashboardURL(dashboardName string, params map[string]string) (*u
 		p = append(p, v)
 		wrappedParams[k] = p
 	}
+	filters := map[string]map[string][]string{
+		"*": wrappedParams,
+	}
 
 	// Marshall params to string
-	jsonBuffer, err := json.Marshal(wrappedParams)
+	jsonBuffer, err := json.Marshal(filters)
 	if err != nil {
 		return nil, err
 	}
@@ -120,7 +123,7 @@ func (bot *Bot) dashboardURL(dashboardName string, params map[string]string) (*u
 	}
 	u.Path += dashboardName
 	q := u.Query()
-	q.Set("preselect_filters", url.QueryEscape(string(jsonBuffer)))
+	q.Set("preselect_filters", string(jsonBuffer))
 	q.Set("standalone", "true")
 	u.RawQuery = q.Encode()
 	return u, nil
