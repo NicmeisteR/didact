@@ -421,7 +421,7 @@ func (bot *Bot) loadMatchEvents(m *discordgo.MessageCreate, args string) {
 	// Get message id
 	mid, err := strconv.Atoi(args)
 	if err != nil {
-		bot.sendResponse(m, fmt.Sprintf("Invalid match id '%d'.", args))
+		bot.sendResponse(m, fmt.Sprintf("The match id **%d** is invalid.", args))
 		return
 	}
 
