@@ -557,6 +557,46 @@ func (ds *DataStore) storeMatch(match *Match) error {
 // Match Events
 // -------------------------------------------------------------------------------------------------------------
 
+// Query player stats
+func (ds *DataStore) getMatchUUID(matchId int) (string, error) {
+	// Query row
+	row := ds.db.QueryRow(`
+		SELECT m_match_uuid
+		FROM match
+		WHERE m_id = $1
+	`, matchId)
+
+	// Scan row
+	var matchUUID string
+	err := row.Scan(&matchUUID)
+
+	// No rows?
+	if err == sql.ErrNoRows {
+		return "", err
+	}
+
+	// Different error?
+	if err != nil {
+		return "", err
+	}
+
+	return matchUUID, nil
+}
+
+// Check if the match events exist
+func (ds *DataStore) matchEventsExist(matchId int) bool {
+	row := ds.db.QueryRow(`
+		SELECT me_match_id FROM match_events WHERE me_match_id = $1
+	`, matchId)
+	var r string
+	switch err := row.Scan(&r); err {
+	case sql.ErrNoRows:
+		return false
+	default:
+		return true
+	}
+}
+
 // Insert match events
 func (ds *DataStore) storeMatchEvents(matchId int, matchEvents *MatchEvents) error {
 	// Create transaction

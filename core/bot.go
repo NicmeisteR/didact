@@ -168,7 +168,7 @@ func (bot *Bot) onMessageCreate(s *discordgo.Session, m *discordgo.MessageCreate
 		// Get channel of message
 		channel, err := s.State.Channel(m.ChannelID)
 		if err != nil {
-			bot.sendResponse(m, fmt.Sprintf("I don't know of channel '%s'.", m.ChannelID))
+			bot.sendResponse(m, fmt.Sprintf("I don't know of channel **%s**.", m.ChannelID))
 			return
 		}
 
@@ -411,4 +411,55 @@ func (bot *Bot) findPlayer(m *discordgo.MessageCreate, args string) {
 	}
 
 	bot.session.ChannelMessageSendEmbed(m.ChannelID, r)
+}
+
+// -------------------------------------------------------------------------------------------------------------
+// Match events
+// -------------------------------------------------------------------------------------------------------------
+
+func (bot *Bot) loadMatchEvents(m *discordgo.MessageCreate, args string) {
+	// Get message id
+	mid, err := strconv.Atoi(args)
+	if err != nil {
+		bot.sendResponse(m, fmt.Sprintf("Invalid match id '%d'.", args))
+		return
+	}
+
+	// Match events already exist?
+	mUUID, err := bot.dataStore.getMatchUUID(mid)
+	if err != nil {
+		bot.sendResponse(m, fmt.Sprintf("I don't know of any match with id **%d**.", args))
+		return
+	}
+	bot.sendResponse(m, fmt.Sprintf("I found match **%d** with uuid **%s**.", mid, mUUID))
+
+	// Load match events
+	mEvents, err := bot.crawler.loadMatchEvents(mUUID)
+
+	// No such match? (404)
+	if err == ErrNotFound {
+		bot.sendResponse(m, fmt.Sprintf("The Halo API does not return any events for the match **%s**.", mUUID))
+		return
+	}
+
+	// Hit the rate limit? (429)
+	if err == ErrRateLimit {
+		bot.sendResponse(m, fmt.Sprintf("I just hit the API rate limit, please request the events again."))
+		return
+	}
+
+	// Try again if there was an unexpected error
+	if err != nil {
+		bot.sendResponse(m, fmt.Sprintf("Ouch! Something went wrong: %v.", err))
+		return
+	}
+
+	// Store match events
+	err = bot.dataStore.storeMatchEvents(mid, mEvents)
+	if err != nil {
+		bot.sendResponse(m, fmt.Sprintf("Ouch! Something went wrong: %v.", err))
+	}
+
+	bot.sendResponse(m, fmt.Sprintf("I stored the events for match **%d**", mid))
+	return
 }
