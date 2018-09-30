@@ -460,6 +460,6 @@ func (bot *Bot) loadMatchEvents(m *discordgo.MessageCreate, args string) {
 		bot.sendResponse(m, fmt.Sprintf("Ouch! Something went wrong: %v.", err))
 	}
 
-	bot.sendResponse(m, fmt.Sprintf("I stored the events for match **%d**", mid))
+	bot.sendResponse(m, fmt.Sprintf("I stored the events for match **%d**.", mid))
 	return
 }
