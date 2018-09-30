@@ -58,7 +58,7 @@ RETURNS TABLE(
                 mp_match_id AS match_id,
                 mp_player_idx AS player_idx,
                 mp_team_id AS team_id,
-                rank() over (partition by mp_match_id, mp_team_id order by mp_player_idx asc) as rank
+                rank() over (partition by mp_match_id, mp_team_id order by p_id asc) as rank
             FROM match_player, player
             WHERE mp_gamertag = p_gamertag
             AND mp_match_id = match_id
@@ -157,7 +157,7 @@ RETURNS VOID AS $$
               mp_match_id AS match_id,
               mp_player_idx AS player_idx,
               mp_team_id AS team_id,
-              rank() over (partition by mp_match_id, mp_team_id order by mp_player_idx asc) as rank
+              rank() over (partition by mp_match_id, mp_team_id order by p_id asc) as rank
           FROM match_player
             LEFT OUTER JOIN team_encounter ON mp_match_id = te_match_id
             INNER JOIN player ON mp_gamertag = p_gamertag
