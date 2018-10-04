@@ -27,7 +27,7 @@ func NewDataStore(config *Config) (*DataStore, error) {
 }
 
 // -------------------------------------------------------------------------------------------------------------
-// Player ID
+// Player ID & Gamertag
 // -------------------------------------------------------------------------------------------------------------
 
 // Query player stats
@@ -54,6 +54,32 @@ func (ds *DataStore) getPlayerID(gamertag string) (int, error) {
 	}
 
 	return playerID, nil
+}
+
+// Query player stats
+func (ds *DataStore) getPlayerGamertag(playerID int) (string, error) {
+	// Query row
+	row := ds.db.QueryRow(`
+		SELECT p_gamertag
+		FROM player
+		WHERE p_id = $1
+	`, playerID)
+
+	// Scan row
+	var gamertag string
+	err := row.Scan(&gamertag)
+
+	// No rows?
+	if err == sql.ErrNoRows {
+		return "", err
+	}
+
+	// Different error?
+	if err != nil {
+		return "", err
+	}
+
+	return gamertag, nil
 }
 
 // -------------------------------------------------------------------------------------------------------------

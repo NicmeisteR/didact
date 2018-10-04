@@ -252,26 +252,31 @@ func (bot *Bot) getProfile(m *discordgo.MessageCreate, args string) {
 // -------------------------------------------------------------------------------------------------------------
 
 func (bot *Bot) scanPlayer(m *discordgo.MessageCreate, args string) {
-	// Get the gamertags
+	// Get the player ids
 	argList := strings.Split(args, ",")
-	gamertags := make([]string, 0)
+	playerIDs := make([]int, 0)
 	for _, a := range argList {
-		gt := strings.Trim(a, " ,\"'")
-		if len(gt) > 0 {
-			gamertags = append(gamertags, gt)
+		pidStr := strings.Trim(a, " ,\"'")
+		if len(pidStr) > 0 {
+			pid, err := strconv.Atoi(pidStr)
+			if err != nil {
+				bot.sendResponse(m, fmt.Sprintf("I don't know of any player with id **%s**.", pidStr))
+				continue
+			}
+			playerIDs = append(playerIDs, pid)
 		}
 	}
 
 	// Find player ids
-	playerIDs := make([]int, len(gamertags))
-	for i, gt := range gamertags {
-		playerID, err := bot.dataStore.getPlayerID(gt)
+	gamertags := make([]string, len(playerIDs))
+	for i, pid := range playerIDs {
+		gamertag, err := bot.dataStore.getPlayerGamertag(pid)
 		if err != nil {
-			bot.sendResponse(m, fmt.Sprintf("I don't know of any player with name **%s**.", gt))
+			bot.sendResponse(m, fmt.Sprintf("I don't know of any player with id **%d**.", pid))
 			return
 		}
-		playerIDs[i] = playerID
-		bot.sendResponse(m, fmt.Sprintf("I found player **%s** with player id **%d**.", gt, playerID))
+		gamertags[i] = gamertag
+		bot.sendResponse(m, fmt.Sprintf("I found player **%d** with gamertag **%s**.", pid, gamertag))
 	}
 
 	// Scan the match histories
