@@ -94,6 +94,12 @@ func (bot *Bot) sendResponse(m *discordgo.MessageCreate, r string) {
 	bot.session.ChannelMessageSend(m.ChannelID, r)
 }
 
+// Mark as typing
+func (bot *Bot) markAsTyping(channel string) {
+	bot.session.ChannelTyping(channel)
+
+}
+
 // -------------------------------------------------------------------------------------------------------------
 // URLs
 // -------------------------------------------------------------------------------------------------------------
@@ -184,6 +190,9 @@ func (bot *Bot) onMessageCreate(s *discordgo.Session, m *discordgo.MessageCreate
 		bot.channels[m.ChannelID] = true
 	}
 
+	// Mark as typing
+	bot.markAsTyping(m.ChannelID)
+
 	// Process the command
 	switch cmd {
 	case "help":
@@ -270,6 +279,8 @@ func (bot *Bot) scanPlayer(m *discordgo.MessageCreate, args string) {
 	// Find player ids
 	gamertags := make([]string, len(playerIDs))
 	for i, pid := range playerIDs {
+		bot.markAsTyping(m.ChannelID)
+
 		gamertag, err := bot.dataStore.getPlayerGamertag(pid)
 		if err != nil {
 			bot.sendResponse(m, fmt.Sprintf("I don't know of any player with id **%d**.", pid))
@@ -291,6 +302,8 @@ func (bot *Bot) scanPlayer(m *discordgo.MessageCreate, args string) {
 
 		bot.sendResponse(m, fmt.Sprintf("I started the match history scan for player **%d**.", playerID))
 		for {
+			bot.markAsTyping(m.ChannelID)
+
 			// Get the match history
 			history, err := bot.crawler.loadMatchHistory(gamertag, offset, count)
 
@@ -359,6 +372,8 @@ func (bot *Bot) scanPlayer(m *discordgo.MessageCreate, args string) {
 // Find a player
 func (bot *Bot) findPlayer(m *discordgo.MessageCreate, args string) {
 	prefix := strings.Trim(args, " ,\"'")
+
+	bot.markAsTyping(m.ChannelID)
 
 	results, err := bot.dataStore.db.Query(`
 		SELECT p_id, p_gamertag
