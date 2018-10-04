@@ -203,16 +203,33 @@ func (bot *Bot) onMessageCreate(s *discordgo.Session, m *discordgo.MessageCreate
 	case "profile":
 		bot.getProfile(m, args)
 		break
+
+	case "s":
+		fallthrough
 	case "sp":
 		fallthrough
 	case "scan-player":
 		bot.scanPlayer(m, args)
 		break
+
+	case "f":
+		fallthrough
 	case "fp":
 		fallthrough
 	case "find-player":
 		bot.findPlayer(m, args)
 		break
+
+	case "t":
+		fallthrough
+	case "pt":
+		fallthrough
+	case "teams":
+		fallthrough
+	case "player-teams":
+		bot.playerTeams(m, args)
+		break
+
 	case "history":
 		break
 	case "match":
@@ -269,7 +286,7 @@ func (bot *Bot) scanPlayer(m *discordgo.MessageCreate, args string) {
 		if len(pidStr) > 0 {
 			pid, err := strconv.Atoi(pidStr)
 			if err != nil {
-				bot.sendResponse(m, fmt.Sprintf("I don't know of any player with id **%s**.", pidStr))
+				bot.sendResponse(m, fmt.Sprintf("**%s** does not seem to be a valid player id.", pidStr))
 				continue
 			}
 			playerIDs = append(playerIDs, pid)
@@ -356,7 +373,7 @@ func (bot *Bot) scanPlayer(m *discordgo.MessageCreate, args string) {
 		if len(newMatches) == 0 {
 			bot.sendResponse(m, fmt.Sprintf("I found no new matches for player **%d**.", playerID))
 		} else if len(newMatches) > 0 {
-			bot.sendResponse(m, fmt.Sprintf("I found **%d** new match(es) for player **%d** and will now load the match result(s).", len(newMatches), playerID))
+			bot.sendResponse(m, fmt.Sprintf("I found **%d** new match(es) for player **%d** and I will now load the match result(s).", len(newMatches), playerID))
 			for _, newMatch := range newMatches {
 				bot.updateMatchResult(m, newMatch)
 			}
@@ -484,4 +501,28 @@ func (bot *Bot) loadMatchEvents(m *discordgo.MessageCreate, args string) {
 
 	bot.sendResponse(m, fmt.Sprintf("I stored the events for match **%d**.", mid))
 	return
+}
+
+// -------------------------------------------------------------------------------------------------------------
+// Player teams
+// -------------------------------------------------------------------------------------------------------------
+
+func (bot *Bot) playerTeams(m *discordgo.MessageCreate, args string) {
+	bot.markAsTyping(m.ChannelID)
+
+	// Get the player id
+	pidStr := strings.Trim(args, " \"'")
+	pid, err := strconv.Atoi(pidStr)
+	if err != nil {
+		bot.sendResponse(m, fmt.Sprintf("**%s** does not seem to be a valid player id.", pidStr))
+		return
+	}
+
+	// Check if the gamertag exists
+	gamertag, err := bot.dataStore.getPlayerGamertag(pid)
+	if err != nil {
+		bot.sendResponse(m, fmt.Sprintf("I don't know of any player with id **%d**.", pid))
+		return
+	}
+	bot.sendResponse(m, fmt.Sprintf("I found player **%d** with gamertag **%s** and will now analyze the team matches of the last **%d** days.\nThis may take a while depending on the length of the match history.", pid, gamertag, 90))
 }
