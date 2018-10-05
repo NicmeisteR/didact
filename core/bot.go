@@ -525,4 +525,79 @@ func (bot *Bot) playerTeams(m *discordgo.MessageCreate, args string) {
 		return
 	}
 	bot.sendResponse(m, fmt.Sprintf("I found player **%d** with gamertag **%s** and will now analyze the team matches of the last **%d** days.\nThis may take a while depending on the length of the match history.", pid, gamertag, 90))
+
+	// Get the player teams
+	results, err := bot.dataStore.db.Query(`
+		WITH history_ AS (
+			SELECT mh.*
+			FROM match_history mh
+			WHERE mh.mh_player_id = $1
+			AND mh.mh_match_start_date > NOW() - INTERVAL '90 days'
+		), matches_ AS (
+			SELECT *
+			FROM history_ h, match m
+			WHERE h.mh_match_uuid = m.m_match_uuid
+		), team_candidates_ AS (
+			SELECT te_t1_id AS tc_id, (CASE WHEN te_match_outcome = 1 THEN 1 ELSE 0 END) as tc_win, te_duration as tc_duration
+			FROM matches_ m, team_encounter te
+			WHERE m.m_id = te.te_match_id
+			
+			UNION ALL
+			
+			SELECT te_t2_id AS tc_id, (CASE WHEN te_match_outcome != 1 THEN 1 ELSE 0 END) as tc_win, te_duration as tc_duration
+			FROM matches_ m, team_encounter te
+			WHERE m.m_id = te.te_match_id
+		), team_stats_ AS (
+			SELECT
+				t.t_id,
+				t.t_p1_id,
+				t.t_p2_id,
+				t.t_p3_id,
+				count(*) AS matches,
+				sum(tc_win) AS wins,
+				round(sum(tc_win) * 1.0 / count(*), 3) as win_ratio,
+				sum(tc_duration) AS duration
+			FROM team_candidates_ tc, team t
+			WHERE t.t_id = tc.tc_id
+			AND (
+				t.t_p1_id = $1
+				OR t.t_p2_id = $1
+				OR t.t_p3_id = $1
+			)
+			GROUP BY t.t_id, t.t_p1_id, t.t_p2_id, t.t_p3_id
+			ORDER BY matches DESC
+			LIMIT 100
+		)
+		SELECT
+			ts.t_id AS team_id,
+			p1.p_gamertag AS player1,
+			p2.p_gamertag AS player2,
+			p3.p_gamertag AS player3,
+			ts.matches,
+			ts.wins,
+			ts.win_ratio,
+			ts.duration
+		FROM team_stats_ ts, player p1, player p2, player p3
+		WHERE ts.t_p1_id = p1.p_id
+		AND ts.t_p2_id = p2.p_id
+		AND ts.t_p3_id = p3.p_id
+	`, pid)
+	if err != nil {
+		bot.sendResponse(m, fmt.Sprintf("Ouch! Something went wrong: %v.", err))
+		return
+	}
+
+	// Iterate over results
+	for results.Next() {
+		var pid int
+		var gamertag string
+		err := results.Scan(&pid, &gamertag)
+		if err != nil {
+			bot.sendResponse(m, fmt.Sprintf("Ouch! Something went wrong: %v.", err))
+			return
+		}
+		pids = append(pids, pid)
+		gamertags = append(gamertags, gamertag)
+	}
+
 }
