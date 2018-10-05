@@ -524,7 +524,7 @@ func (bot *Bot) playerTeams(m *discordgo.MessageCreate, args string) {
 		bot.sendResponse(m, fmt.Sprintf("I don't know of any player with id **%d**.", pid))
 		return
 	}
-	bot.sendResponse(m, fmt.Sprintf("I found player **%d** with gamertag **%s** and will now analyze the team matches of the last **%d** days.\nThis may take a while depending on the length of the match history.", pid, gamertag, 90))
+	bot.sendResponse(m, fmt.Sprintf("I found player **%d** with gamertag **%s** and will now analyze the team matches of the last **%d** days.\nThe duration depends on the length of the match history and may exceed 10 seconds.", pid, gamertag, 90))
 
 	// Get the player teams
 	results, err := bot.dataStore.db.Query(`
