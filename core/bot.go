@@ -620,7 +620,20 @@ func (bot *Bot) playerTeams(m *discordgo.MessageCreate, args string) {
 			name.WriteString(player3)
 		}
 
-		value := fmt.Sprintf("Matches: **%d**\nWin Percentage: **%.2f%%**\nDuration: **%s**", matches, (float64(wins) / float64(max(matches, 1)) * 100.0), fmtSeconds(duration))
+		tidParam := map[string]string{
+			"team_id": strconv.Itoa(teamID),
+		}
+
+		urlDashboard, _ := bot.dashboardURL("hw2-team-profile", tidParam)
+
+		value := fmt.Sprintf(
+			"Team: [%d](%s)\nMatches: **%d**\nDuration: **%s**\nWin Ratio: **%.2f%%**\n",
+			teamID,
+			urlDashboard,
+			matches,
+			fmtSeconds(duration),
+			(float64(wins) / float64(max(matches, 1)) * 100.0),
+		)
 
 		fields = append(fields, &discordgo.MessageEmbedField{
 			Name:   name.String(),
@@ -633,7 +646,7 @@ func (bot *Bot) playerTeams(m *discordgo.MessageCreate, args string) {
 		Title:       "Player Teams",
 		Author:      &discordgo.MessageEmbedAuthor{},
 		Color:       0x010101,
-		Description: fmt.Sprintf("PlayerID: **%d**, Gamertag: **%s**, Interval: **%d days**, Limit: **%d**", pid, gamertag, interval, limit),
+		Description: fmt.Sprintf("PlayerID: **%d** Gamertag: **%s** Interval: **%d days** Limit: **%d**", pid, gamertag, interval, limit),
 		Fields:      fields,
 		Timestamp:   time.Now().Format(time.RFC3339),
 	}
