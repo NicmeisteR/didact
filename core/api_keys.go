@@ -20,10 +20,14 @@ func (p *apiKeyPool) push(key *apiKeyToken) {
 	// Wait the remaining time
 	now := time.Now()
 	delta := key.blockedUntil.Sub(now)
-	if delta > 10*time.Millisecond {
-		time.Sleep(delta)
-	}
 	key.blockedUntil = now.Add(delta + p.blockDuration)
+	if delta > 10*time.Millisecond {
+		go func(p *apiKeyPool, key *apiKeyToken, delta time.Duration) {
+			time.Sleep(delta)
+			p.queue <- key
+		}(p, key, delta)
+		return
+	}
 
 	// Release to pool
 	p.queue <- key
