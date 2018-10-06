@@ -445,7 +445,7 @@ func (bot *Bot) findPlayer(m *discordgo.MessageCreate, args string) {
 		Title:       "Player Search",
 		Author:      &discordgo.MessageEmbedAuthor{},
 		Color:       0x010101,
-		Description: fmt.Sprintf("String: %s, Limit: 10", prefix),
+		Description: fmt.Sprintf("String: **%s**, Limit: **10**", prefix),
 		Fields:      fields,
 		Timestamp:   time.Now().Format(time.RFC3339),
 	}
