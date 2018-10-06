@@ -231,6 +231,12 @@ func (bot *Bot) onMessageCreate(s *discordgo.Session, m *discordgo.MessageCreate
 		bot.playerTeams(m, args)
 		break
 
+	case "pm":
+		fallthrough
+	case "player-matches":
+		bot.playerMatches(m, args)
+		break
+
 	case "history":
 		break
 	case "match":
@@ -376,6 +382,7 @@ func (bot *Bot) scanPlayer(m *discordgo.MessageCreate, args string) {
 		} else if len(newMatches) > 0 {
 			bot.sendResponse(m, fmt.Sprintf("I found **%d** new match(es) for player **%d** and I will now load the match result(s).", len(newMatches), playerID))
 			for _, newMatch := range newMatches {
+				bot.markAsTyping(m.ChannelID)
 				bot.updateMatchResult(m, newMatch)
 			}
 		}
@@ -528,7 +535,7 @@ func (bot *Bot) playerTeams(m *discordgo.MessageCreate, args string) {
 		bot.sendResponse(m, fmt.Sprintf("I don't know of any player with id **%d**.", pid))
 		return
 	}
-	bot.sendResponse(m, fmt.Sprintf("I found player **%d** with gamertag **%s** and will now analyze the team matches of the last **%d** days.\nThis can take a while (> 10s) depending on the length of the match history.", pid, gamertag, interval))
+	bot.sendResponse(m, fmt.Sprintf("I found player **%d** with gamertag **%s** and will now analyze the team matches of the last **%d** days.\nThis can take a while (**> 10s**) depending on the length of the match history.", pid, gamertag, interval))
 	bot.markAsTyping(m.ChannelID)
 
 	// Get the player teams
@@ -574,9 +581,12 @@ func (bot *Bot) playerTeams(m *discordgo.MessageCreate, args string) {
 		)
 		SELECT
 			ts.t_id AS team_id,
-			p1.p_gamertag AS player1,
-			p2.p_gamertag AS player2,
-			p3.p_gamertag AS player3,
+			p1.p_id AS p1ID,
+			p2.p_id AS p2ID,
+			p3.p_id AS p3ID,
+			p1.p_gamertag AS p1GT,
+			p2.p_gamertag AS p2GT,
+			p3.p_gamertag AS p3GT,
 			ts.matches,
 			ts.wins,
 			EXTRACT (EPOCH FROM ts.duration)
@@ -597,47 +607,71 @@ func (bot *Bot) playerTeams(m *discordgo.MessageCreate, args string) {
 	// Iterate over results
 	for results.Next() {
 		var teamID int
-		var player1 string
-		var player2 string
-		var player3 string
+		var p1ID int
+		var p2ID int
+		var p3ID int
+		var p1GT string
+		var p2GT string
+		var p3GT string
 		var matches int
 		var wins int
 		var duration float64
-		err := results.Scan(&teamID, &player1, &player2, &player3, &matches, &wins, &duration)
+		err := results.Scan(&teamID, &p1ID, &p2ID, &p3ID, &p1GT, &p2GT, &p3GT, &matches, &wins, &duration)
+
 		if err != nil {
 			bot.sendResponse(m, fmt.Sprintf("Ouch! Something went wrong: %v.", err))
 			return
 		}
 
-		var name bytes.Buffer
-		name.WriteString(player1)
-		if player2 != "-" {
-			name.WriteString(", ")
-			name.WriteString(player2)
+		// Build title
+		var title bytes.Buffer
+		title.WriteString(p1GT)
+		if p2GT != "-" {
+			title.WriteString(", ")
+			title.WriteString(p2GT)
 		}
-		if player3 != "-" {
-			name.WriteString(", ")
-			name.WriteString(player3)
+		if p3GT != "-" {
+			title.WriteString(", ")
+			title.WriteString(p3GT)
 		}
 
-		tidParam := map[string]string{
+		// Build description
+		teamProfileURL, _ := bot.dashboardURL("hw2-team-profile", map[string]string{
 			"team_id": strconv.Itoa(teamID),
+		})
+
+		var desc bytes.Buffer
+		desc.WriteString(fmt.Sprintf("Team: [%d](%s)", teamID, teamProfileURL))
+		desc.WriteString(" (with ")
+		p1ProfileURL, _ := bot.dashboardURL("hw2-player-profile", map[string]string{
+			"player_id": strconv.Itoa(p1ID),
+		})
+		desc.WriteString(fmt.Sprintf("[%d](%s)", p1ID, p1ProfileURL))
+		if p2GT != "-" {
+			p2ProfileURL, _ := bot.dashboardURL("hw2-player-profile", map[string]string{
+				"player_id": strconv.Itoa(p2ID),
+			})
+			desc.WriteString(fmt.Sprintf(", [%d](%s)", p2ID, p2ProfileURL))
 		}
-
-		urlDashboard, _ := bot.dashboardURL("hw2-team-profile", tidParam)
-
-		value := fmt.Sprintf(
-			"Team: [%d](%s)\nMatches: **%d**\nDuration: **%s**\nWin Ratio: **%.2f%%**\n",
-			teamID,
-			urlDashboard,
-			matches,
-			fmtSeconds(duration),
-			(float64(wins) / float64(max(matches, 1)) * 100.0),
-		)
+		if p3GT != "-" {
+			p3ProfileURL, _ := bot.dashboardURL("hw2-player-profile", map[string]string{
+				"player_id": strconv.Itoa(p3ID),
+			})
+			desc.WriteString(fmt.Sprintf(", [%d](%s)", p3ID, p3ProfileURL))
+		}
+		desc.WriteString(")")
+		desc.WriteString("\n")
+		desc.WriteString("Matches: ")
+		desc.WriteString(fmt.Sprintf("**%d** (**%.2f%%** wins)", matches, (float64(wins) / float64(max(matches, 1)) * 100.0)))
+		desc.WriteString("\n")
+		desc.WriteString("Duration: **")
+		desc.WriteString(fmtSeconds(duration))
+		desc.WriteString("**")
+		desc.WriteString("\n")
 
 		fields = append(fields, &discordgo.MessageEmbedField{
-			Name:   name.String(),
-			Value:  value,
+			Name:   title.String(),
+			Value:  desc.String(),
 			Inline: false,
 		})
 	}
@@ -646,7 +680,237 @@ func (bot *Bot) playerTeams(m *discordgo.MessageCreate, args string) {
 		Title:       "Player Teams",
 		Author:      &discordgo.MessageEmbedAuthor{},
 		Color:       0x010101,
-		Description: fmt.Sprintf("PlayerID: **%d** Gamertag: **%s** Interval: **%d days** Limit: **%d**", pid, gamertag, interval, limit),
+		Description: fmt.Sprintf("Player: **%d** Gamertag: **%s** Interval: **%d days** Limit: **%d**", pid, gamertag, interval, limit),
+		Fields:      fields,
+		Timestamp:   time.Now().Format(time.RFC3339),
+	}
+
+	bot.session.ChannelMessageSendEmbed(m.ChannelID, r)
+}
+
+// -------------------------------------------------------------------------------------------------------------
+// Player matches
+// -------------------------------------------------------------------------------------------------------------
+
+func (bot *Bot) playerMatches(m *discordgo.MessageCreate, args string) {
+	bot.markAsTyping(m.ChannelID)
+
+	limit := 5
+
+	// Get the player id
+	pidStr := strings.Trim(args, " \"'")
+	pid, err := strconv.Atoi(pidStr)
+	if err != nil {
+		bot.sendResponse(m, fmt.Sprintf("**%s** does not seem to be a valid player id.", pidStr))
+		return
+	}
+
+	// Check if the gamertag exists
+	gamertag, err := bot.dataStore.getPlayerGamertag(pid)
+	if err != nil {
+		bot.sendResponse(m, fmt.Sprintf("I don't know of any player with id **%d**.", pid))
+		return
+	}
+	bot.sendResponse(m, fmt.Sprintf("I found player **%d** with gamertag **%s** and will now get the last **%d** matches.", pid, gamertag, limit))
+	bot.markAsTyping(m.ChannelID)
+
+	// Get the player teams
+	results, err := bot.dataStore.db.Query(`
+		WITH history_ AS (
+			SELECT mh.*
+			FROM match_history mh
+			WHERE mh.mh_player_id = $1
+			ORDER BY mh_match_start_date DESC
+			LIMIT $2
+		), matches_ AS (
+			SELECT *
+			FROM history_ h, match m, team_encounter te
+			WHERE h.mh_match_uuid = m.m_match_uuid
+			AND m.m_id = te.te_match_id
+			LIMIT $2
+		), data_ AS (
+			SELECT
+				m.m_id AS match_id,
+				m.m_match_uuid AS match_uuid,
+				m.m_playlist_uuid AS playlist_uuid,
+				EXTRACT(EPOCH FROM m.mh_match_start_date) AS match_start_date,
+				EXTRACT(EPOCH FROM m.m_duration) AS match_duration,
+				m.mh_player_match_outcome AS match_outcome,
+				m.te_t1_id AS team1,
+				m.te_t2_id AS team2,
+				p1.p_gamertag AS player1,
+				p2.p_gamertag AS player2,
+				p3.p_gamertag AS player3,
+				p4.p_gamertag AS player4,
+				p5.p_gamertag AS player5,
+				p6.p_gamertag AS player6,
+				mm.mm_name AS map,
+				ml.ml_name AS leader
+			FROM matches_ m,
+				team t1,
+				team t2,
+				player p1, player p2, player p3,
+				player p4, player p5, player p6,
+				meta_map mm,
+				meta_leader ml
+			WHERE m.te_t1_id = t1.t_id
+			AND m.te_t2_id = t2.t_id
+			AND t1.t_p1_id = p1.p_id
+			AND t1.t_p2_id = p2.p_id
+			AND t1.t_p3_id = p3.p_id
+			AND t2.t_p1_id = p4.p_id
+			AND t2.t_p2_id = p5.p_id
+			AND t2.t_p3_id = p6.p_id
+			AND m.m_map_uuid = mm.mm_uuid
+			AND m.mh_leader_id = ml.ml_id
+		)
+		SELECT
+			d.*,
+			COALESCE(mpl.mpl_game_mode, '-') AS game_mode,
+			COALESCE(mpl.mpl_team_size, '-') AS team_size,
+			COALESCE(mpl.mpl_ranking, '-') AS ranking,
+			COALESCE(mpl.mpl_platform, '-') AS platform
+		FROM data_ d
+			LEFT OUTER JOIN meta_playlist mpl
+			ON d.playlist_uuid = mpl.mpl_uuid
+		ORDER BY d.match_start_date DESC
+		LIMIT $2
+	`, pid, limit)
+	if err != nil {
+		bot.sendResponse(m, fmt.Sprintf("Ouch! Something went wrong: %v.", err))
+		return
+	}
+
+	fields := []*discordgo.MessageEmbedField{}
+
+	// Iterate over results
+	for results.Next() {
+		var matchID int64
+		var matchUUID string
+		var playlistUUID string
+		var matchStartDate float64
+		var matchDuration float64
+		var matchOutcome int
+		var t1ID int
+		var t2ID int
+		var p1Gamertag string
+		var p2Gamertag string
+		var p3Gamertag string
+		var p4Gamertag string
+		var p5Gamertag string
+		var p6Gamertag string
+		var mapName string
+		var leaderName string
+		var gameMode string
+		var teamSize string
+		var ranking string
+		var platform string
+
+		err := results.Scan(
+			&matchID,
+			&matchUUID,
+			&playlistUUID,
+			&matchStartDate,
+			&matchDuration,
+			&matchOutcome,
+			&t1ID,
+			&t2ID,
+			&p1Gamertag,
+			&p2Gamertag,
+			&p3Gamertag,
+			&p4Gamertag,
+			&p5Gamertag,
+			&p6Gamertag,
+			&mapName,
+			&leaderName,
+			&gameMode,
+			&teamSize,
+			&ranking,
+			&platform,
+		)
+		if err != nil {
+			bot.sendResponse(m, fmt.Sprintf("Ouch! Something went wrong: %v.", err))
+			return
+		}
+
+		t1ProfileURL, _ := bot.dashboardURL("hw2-team-profile", map[string]string{
+			"team_id": strconv.Itoa(t1ID),
+		})
+		t2ProfileURL, _ := bot.dashboardURL("hw2-team-profile", map[string]string{
+			"team_id": strconv.Itoa(t2ID),
+		})
+
+		var team1 bytes.Buffer
+		team1.WriteString(p1Gamertag)
+		if p2Gamertag != "-" {
+			team1.WriteString(", ")
+			team1.WriteString(p2Gamertag)
+		}
+		if p3Gamertag != "-" {
+			team1.WriteString(", ")
+			team1.WriteString(p3Gamertag)
+		}
+
+		var team2 bytes.Buffer
+		team2.WriteString(p4Gamertag)
+		if p5Gamertag != "-" {
+			team2.WriteString(", ")
+			team2.WriteString(p5Gamertag)
+		}
+		if p6Gamertag != "-" {
+			team2.WriteString(", ")
+			team2.WriteString(p6Gamertag)
+		}
+
+		var title bytes.Buffer
+		title.WriteString(time.Unix(int64(matchStartDate), 0).Format("2006-01-02 15:04"))
+		title.WriteString(" | ")
+		title.WriteString(fmtSeconds(matchDuration))
+		title.WriteString(" | ")
+		switch matchOutcome {
+		case 1:
+			title.WriteString("WIN")
+		default:
+			title.WriteString("LOSS")
+		}
+
+		var desc bytes.Buffer
+		desc.WriteString(fmt.Sprintf("Match: **%d**", matchID))
+		desc.WriteString("\n")
+		desc.WriteString("Teaser: ")
+		desc.WriteString(leaderName)
+		desc.WriteString(" @ ")
+		desc.WriteString(mapName)
+		desc.WriteString(" in ")
+		switch playlistUUID {
+		case "00000000-0000-0000-0000-000000000000":
+			desc.WriteString("Custom")
+		default:
+			desc.WriteString(gameMode)
+			desc.WriteString("/")
+			desc.WriteString(ranking)
+		}
+		desc.WriteString("\n")
+		desc.WriteString("Team 1: ")
+		desc.WriteString(strings.Replace(team1.String(), gamertag, fmt.Sprintf("**%s**", gamertag), -1))
+		desc.WriteString(fmt.Sprintf(" ([%d](%s))", t1ID, t1ProfileURL))
+		desc.WriteString("\n")
+		desc.WriteString("Team 2: ")
+		desc.WriteString(strings.Replace(team2.String(), gamertag, fmt.Sprintf("**%s**", gamertag), -1))
+		desc.WriteString(fmt.Sprintf(" ([%d](%s))", t2ID, t2ProfileURL))
+
+		fields = append(fields, &discordgo.MessageEmbedField{
+			Name:   title.String(),
+			Value:  desc.String(),
+			Inline: false,
+		})
+	}
+
+	r := &discordgo.MessageEmbed{
+		Title:       "Player Matches",
+		Author:      &discordgo.MessageEmbedAuthor{},
+		Color:       0x010101,
+		Description: fmt.Sprintf("Player: **%d** Gamertag: **%s** Limit: **%d**\n*run **!didact m <Match>** for match statistics*", pid, gamertag, limit),
 		Fields:      fields,
 		Timestamp:   time.Now().Format(time.RFC3339),
 	}
