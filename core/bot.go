@@ -524,7 +524,7 @@ func (bot *Bot) playerTeams(m *discordgo.MessageCreate, args string) {
 		bot.sendResponse(m, fmt.Sprintf("I don't know of any player with id **%d**.", pid))
 		return
 	}
-	bot.sendResponse(m, fmt.Sprintf("I found player **%d** with gamertag **%s** and will now analyze the team matches of the last **%d** days.\nThe duration depends on the length of the match history and may exceed 10 seconds.", pid, gamertag, 90))
+	bot.sendResponse(m, fmt.Sprintf("I found player **%d** with gamertag **%s** and will now analyze the team matches of the last **%d** days.\nI on the length of the match history and may exceed 10 seconds.", pid, gamertag, 90))
 
 	// Get the player teams
 	results, err := bot.dataStore.db.Query(`
@@ -581,6 +581,8 @@ func (bot *Bot) playerTeams(m *discordgo.MessageCreate, args string) {
 		WHERE ts.t_p1_id = p1.p_id
 		AND ts.t_p2_id = p2.p_id
 		AND ts.t_p3_id = p3.p_id
+		ORDER BY matches DESC
+		LIMIT 10
 	`, pid)
 	if err != nil {
 		bot.sendResponse(m, fmt.Sprintf("Ouch! Something went wrong: %v.", err))
@@ -589,15 +591,19 @@ func (bot *Bot) playerTeams(m *discordgo.MessageCreate, args string) {
 
 	// Iterate over results
 	for results.Next() {
-		var pid int
-		var gamertag string
-		err := results.Scan(&pid, &gamertag)
+		var teamID int
+		var player1 string
+		var player2 string
+		var player3 string
+		var matches int
+		var wins int
+		var winRatio int
+		var duration int
+		err := results.Scan(&teamID, &player1, &player2, &player3, &matches, &wins, &winRatio, &duration)
 		if err != nil {
 			bot.sendResponse(m, fmt.Sprintf("Ouch! Something went wrong: %v.", err))
 			return
 		}
-		pids = append(pids, pid)
-		gamertags = append(gamertags, gamertag)
 	}
 
 }
