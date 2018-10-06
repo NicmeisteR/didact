@@ -1,6 +1,7 @@
 package core
 
 import (
+	"bytes"
 	"database/sql"
 	"encoding/json"
 	"fmt"
@@ -510,6 +511,9 @@ func (bot *Bot) loadMatchEvents(m *discordgo.MessageCreate, args string) {
 func (bot *Bot) playerTeams(m *discordgo.MessageCreate, args string) {
 	bot.markAsTyping(m.ChannelID)
 
+	interval := 60
+	limit := 5
+
 	// Get the player id
 	pidStr := strings.Trim(args, " \"'")
 	pid, err := strconv.Atoi(pidStr)
@@ -524,7 +528,8 @@ func (bot *Bot) playerTeams(m *discordgo.MessageCreate, args string) {
 		bot.sendResponse(m, fmt.Sprintf("I don't know of any player with id **%d**.", pid))
 		return
 	}
-	bot.sendResponse(m, fmt.Sprintf("I found player **%d** with gamertag **%s** and will now analyze the team matches of the last **%d** days.\nI on the length of the match history and may exceed 10 seconds.", pid, gamertag, 90))
+	bot.sendResponse(m, fmt.Sprintf("I found player **%d** with gamertag **%s** and will now analyze the team matches of the last **%d** days.\nThis can take a while (> 10s) depending on the length of the match history.", pid, gamertag, interval))
+	bot.markAsTyping(m.ChannelID)
 
 	// Get the player teams
 	results, err := bot.dataStore.db.Query(`
@@ -532,7 +537,7 @@ func (bot *Bot) playerTeams(m *discordgo.MessageCreate, args string) {
 			SELECT mh.*
 			FROM match_history mh
 			WHERE mh.mh_player_id = $1
-			AND mh.mh_match_start_date > NOW() - INTERVAL '90 days'
+			AND mh.mh_match_start_date > NOW() - ($2 || ' days')::interval
 		), matches_ AS (
 			SELECT *
 			FROM history_ h, match m
@@ -555,7 +560,6 @@ func (bot *Bot) playerTeams(m *discordgo.MessageCreate, args string) {
 				t.t_p3_id,
 				count(*) AS matches,
 				sum(tc_win) AS wins,
-				round(sum(tc_win) * 1.0 / count(*), 3) as win_ratio,
 				sum(tc_duration) AS duration
 			FROM team_candidates_ tc, team t
 			WHERE t.t_id = tc.tc_id
@@ -566,7 +570,7 @@ func (bot *Bot) playerTeams(m *discordgo.MessageCreate, args string) {
 			)
 			GROUP BY t.t_id, t.t_p1_id, t.t_p2_id, t.t_p3_id
 			ORDER BY matches DESC
-			LIMIT 100
+			LIMIT $3
 		)
 		SELECT
 			ts.t_id AS team_id,
@@ -575,19 +579,20 @@ func (bot *Bot) playerTeams(m *discordgo.MessageCreate, args string) {
 			p3.p_gamertag AS player3,
 			ts.matches,
 			ts.wins,
-			ts.win_ratio,
-			ts.duration
+			EXTRACT (EPOCH FROM ts.duration)
 		FROM team_stats_ ts, player p1, player p2, player p3
 		WHERE ts.t_p1_id = p1.p_id
 		AND ts.t_p2_id = p2.p_id
 		AND ts.t_p3_id = p3.p_id
 		ORDER BY matches DESC
-		LIMIT 10
-	`, pid)
+		LIMIT $3
+	`, pid, interval, limit)
 	if err != nil {
 		bot.sendResponse(m, fmt.Sprintf("Ouch! Something went wrong: %v.", err))
 		return
 	}
+
+	fields := []*discordgo.MessageEmbedField{}
 
 	// Iterate over results
 	for results.Next() {
@@ -597,13 +602,41 @@ func (bot *Bot) playerTeams(m *discordgo.MessageCreate, args string) {
 		var player3 string
 		var matches int
 		var wins int
-		var winRatio int
-		var duration int
-		err := results.Scan(&teamID, &player1, &player2, &player3, &matches, &wins, &winRatio, &duration)
+		var duration float64
+		err := results.Scan(&teamID, &player1, &player2, &player3, &matches, &wins, &duration)
 		if err != nil {
 			bot.sendResponse(m, fmt.Sprintf("Ouch! Something went wrong: %v.", err))
 			return
 		}
+
+		var name bytes.Buffer
+		name.WriteString(player1)
+		if player2 != "-" {
+			name.WriteString(", ")
+			name.WriteString(player2)
+		}
+		if player3 != "-" {
+			name.WriteString(", ")
+			name.WriteString(player3)
+		}
+
+		value := fmt.Sprintf("Matches: **%d**\nWin Percentage: **%.2f%%**\nDuration: **%s**", matches, (float64(wins) / float64(max(matches, 1)) * 100.0), fmtSeconds(duration))
+
+		fields = append(fields, &discordgo.MessageEmbedField{
+			Name:   name.String(),
+			Value:  value,
+			Inline: false,
+		})
 	}
 
+	r := &discordgo.MessageEmbed{
+		Title:       "Player Teams",
+		Author:      &discordgo.MessageEmbedAuthor{},
+		Color:       0x010101,
+		Description: fmt.Sprintf("PlayerID: **%d**, Gamertag: **%s**, Interval: **%d days**, Limit: **%d**", pid, gamertag, interval, limit),
+		Fields:      fields,
+		Timestamp:   time.Now().Format(time.RFC3339),
+	}
+
+	bot.session.ChannelMessageSendEmbed(m.ChannelID, r)
 }
