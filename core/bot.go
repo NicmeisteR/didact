@@ -547,7 +547,7 @@ func (bot *Bot) playerTeams(m *discordgo.MessageCreate, args string) {
 	fields := []*discordgo.MessageEmbedField{}
 
 	for _, team := range teams {
-		// Build title
+		// Title
 		var title bytes.Buffer
 		title.WriteString("**")
 		title.WriteString(team.player1GT)
@@ -561,7 +561,7 @@ func (bot *Bot) playerTeams(m *discordgo.MessageCreate, args string) {
 		}
 		title.WriteString("**")
 
-		// Build description
+		// Description
 		teamProfileURL, _ := bot.dashboardURL("hw2-team-profile", map[string]string{
 			"team_id": strconv.Itoa(team.teamID),
 		})
@@ -594,6 +594,7 @@ func (bot *Bot) playerTeams(m *discordgo.MessageCreate, args string) {
 		desc.WriteString(fmtDurationHM(team.duration))
 		desc.WriteString("\n")
 
+		// Embedded field
 		fields = append(fields, &discordgo.MessageEmbedField{
 			Name:   title.String(),
 			Value:  desc.String(),
@@ -657,28 +658,70 @@ func (bot *Bot) playerMatches(m *discordgo.MessageCreate, args string) {
 			"team_id": strconv.Itoa(match.team2ID),
 		})
 
+		// Team 1 gamertags
 		var team1 bytes.Buffer
 		team1.WriteString(match.player1GT)
+		team1Size := 1
 		if match.player2ID != 0 {
 			team1.WriteString(", ")
 			team1.WriteString(match.player2GT)
+			team1Size++
 		}
 		if match.player3ID != 0 {
 			team1.WriteString(", ")
 			team1.WriteString(match.player3GT)
+			team1Size++
 		}
 
+		// Team 2 gamertags
 		var team2 bytes.Buffer
-		team2.WriteString(match.player4GT)
+		team2Size := 0
+		if match.player4ID != 0 {
+			team2.WriteString(match.player4GT)
+			team2Size++
+		}
 		if match.player5ID != 0 {
 			team2.WriteString(", ")
 			team2.WriteString(match.player5GT)
+			team2Size++
 		}
 		if match.player6ID != 0 {
 			team2.WriteString(", ")
 			team2.WriteString(match.player6GT)
+			team2Size++
 		}
 
+		// Maximum team size
+		maxTeamSize := max(team1Size, team2Size)
+
+		// Build match link
+		var matchURL *url.URL = nil
+		matchIdParam := map[string]string{
+			"match_id": fmt.Sprintf("%d", match.matchID),
+		}
+		if match.gameMode == "Deathmatch" || match.playlistUUID == "00000000-0000-0000-0000-000000000000" {
+			switch match.teamSize {
+			case "1":
+				matchURL, _ = bot.dashboardURL("hw2-match-dm-1v1", matchIdParam)
+			case "2":
+				matchURL, _ = bot.dashboardURL("hw2-match-dm-2v2", matchIdParam)
+			case "3":
+				matchURL, _ = bot.dashboardURL("hw2-match-dm-3v3", matchIdParam)
+			default:
+				switch maxTeamSize {
+				case 1:
+					matchURL, _ = bot.dashboardURL("hw2-match-dm-1v1", matchIdParam)
+				case 2:
+					matchURL, _ = bot.dashboardURL("hw2-match-dm-2v2", matchIdParam)
+				case 3:
+					matchURL, _ = bot.dashboardURL("hw2-match-dm-3v3", matchIdParam)
+				default:
+					matchURL, _ = bot.dashboardURL("hw2-match-dm-3v3", matchIdParam)
+				}
+			}
+		}
+
+		// Title
 		var title bytes.Buffer
 		title.WriteString("**")
 		title.WriteString(match.matchStartDate.Format("2006-01-02 15:04"))
@@ -693,10 +736,8 @@ func (bot *Bot) playerMatches(m *discordgo.MessageCreate, args string) {
 		}
 		title.WriteString("**")
 
+		// Description
 		var desc bytes.Buffer
-		desc.WriteString(fmt.Sprintf("Match: **%d**", match.matchID))
-		desc.WriteString("\n")
-		desc.WriteString("Short: ")
 		desc.WriteString(match.leaderName)
 		desc.WriteString(" @ ")
 		desc.WriteString(match.mapName)
@@ -710,6 +751,12 @@ func (bot *Bot) playerMatches(m *discordgo.MessageCreate, args string) {
 			desc.WriteString(match.ranking)
 		}
 		desc.WriteString("\n")
+		if matchURL != nil {
+			desc.WriteString(fmt.Sprintf("Match: [%d](%s)", match.matchID, matchURL))
+		} else {
+			desc.WriteString(fmt.Sprintf("Match: %d", match.matchID))
+		}
+		desc.WriteString("\n")
 		desc.WriteString("Team 1: ")
 		desc.WriteString(strings.Replace(team1.String(), gamertag, fmt.Sprintf("**%s**", gamertag), -1))
 		desc.WriteString(fmt.Sprintf(" ([%d](%s))", match.team1ID, t1ProfileURL))
@@ -718,6 +765,7 @@ func (bot *Bot) playerMatches(m *discordgo.MessageCreate, args string) {
 		desc.WriteString(strings.Replace(team2.String(), gamertag, fmt.Sprintf("**%s**", gamertag), -1))
 		desc.WriteString(fmt.Sprintf(" ([%d](%s))", match.team2ID, t2ProfileURL))
 
+		// Embedded field
 		fields = append(fields, &discordgo.MessageEmbedField{
 			Name:   title.String(),
 			Value:  desc.String(),
