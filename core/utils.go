@@ -45,10 +45,10 @@ func fmtSeconds(s float64) string {
 	return fmt.Sprintf("%02dh %02dm", h, m)
 }
 
-func fmtDuration(d time.Duration) string {
+func fmtDurationHM(d time.Duration) string {
 	d = d.Round(time.Minute)
 	h := d / time.Hour
 	d -= h * time.Hour
 	m := d / time.Minute
-	return fmt.Sprintf("%02d:%02d", h, m)
+	return fmt.Sprintf("%02dh %02dm", h, m)
 }
