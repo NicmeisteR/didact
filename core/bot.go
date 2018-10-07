@@ -594,7 +594,7 @@ func (bot *Bot) playerTeams(m *discordgo.MessageCreate, args string) {
 			p3ProfileURL, _ := bot.dashboardURL("hw2-player-profile", map[string]string{
 				"player_id": strconv.Itoa(team.player3ID),
 			})
-			desc.WriteString(fmt.Sprintf(", [%d](%s)", team.player1ID, p3ProfileURL))
+			desc.WriteString(fmt.Sprintf(", [%d](%s)", team.player3ID, p3ProfileURL))
 		}
 		desc.WriteString(")")
 		desc.WriteString("\n")
