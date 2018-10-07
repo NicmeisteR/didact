@@ -145,6 +145,17 @@ func (bot *Bot) waypointProfileURL(gamertag string) (*url.URL, error) {
 	return u, nil
 }
 
+func (bot *Bot) waypointMatchURL(matchUUID string, gamertag string) (*url.URL, error) {
+	u, err := url.Parse("https://www.halowaypoint.com/de-de/games/halo-wars-2/matches/")
+	if err != nil {
+		return nil, err
+	}
+	u.Path += matchUUID
+	u.Path += "/players/"
+	u.Path += gamertag
+	return u, nil
+}
+
 // -------------------------------------------------------------------------------------------------------------
 // Handlers
 // -------------------------------------------------------------------------------------------------------------
@@ -721,6 +732,9 @@ func (bot *Bot) playerMatches(m *discordgo.MessageCreate, args string) {
 			}
 		}
 
+		// Get waypoint link
+		waypointURL, _ := bot.waypointMatchURL(match.matchUUID, gamertag)
+
 		// Title
 		var title bytes.Buffer
 		title.WriteString("**")
@@ -756,7 +770,7 @@ func (bot *Bot) playerMatches(m *discordgo.MessageCreate, args string) {
 		} else {
 			desc.WriteString(fmt.Sprintf("Match: %d", match.matchID))
 		}
-		desc.WriteString("\n")
+		desc.WriteString(fmt.Sprintf(" ([Waypoint](%s))\n", waypointURL))
 		desc.WriteString("Team 1: ")
 		desc.WriteString(strings.Replace(team1.String(), gamertag, fmt.Sprintf("**%s**", gamertag), -1))
 		desc.WriteString(fmt.Sprintf(" ([%d](%s))", match.team1ID, t1ProfileURL))
