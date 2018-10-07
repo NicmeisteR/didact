@@ -549,6 +549,7 @@ func (bot *Bot) playerTeams(m *discordgo.MessageCreate, args string) {
 	for _, team := range teams {
 		// Build title
 		var title bytes.Buffer
+		title.WriteString("**")
 		title.WriteString(team.player1GT)
 		if team.player2ID != 0 {
 			title.WriteString(", ")
@@ -558,6 +559,7 @@ func (bot *Bot) playerTeams(m *discordgo.MessageCreate, args string) {
 			title.WriteString(", ")
 			title.WriteString(team.player3GT)
 		}
+		title.WriteString("**")
 
 		// Build description
 		teamProfileURL, _ := bot.dashboardURL("hw2-team-profile", map[string]string{
@@ -586,11 +588,10 @@ func (bot *Bot) playerTeams(m *discordgo.MessageCreate, args string) {
 		desc.WriteString(")")
 		desc.WriteString("\n")
 		desc.WriteString("Matches: ")
-		desc.WriteString(fmt.Sprintf("**%d** (**%.2f%%** wins)", team.matches, (float64(team.wins) / float64(max(team.matches, 1)) * 100.0)))
+		desc.WriteString(fmt.Sprintf("%d (%.2f%% wins)", team.matches, (float64(team.wins) / float64(max(team.matches, 1)) * 100.0)))
 		desc.WriteString("\n")
-		desc.WriteString("Duration: **")
+		desc.WriteString("Duration: ")
 		desc.WriteString(fmtDurationHM(team.duration))
-		desc.WriteString("**")
 		desc.WriteString("\n")
 
 		fields = append(fields, &discordgo.MessageEmbedField{
@@ -679,6 +680,7 @@ func (bot *Bot) playerMatches(m *discordgo.MessageCreate, args string) {
 		}
 
 		var title bytes.Buffer
+		title.WriteString("**")
 		title.WriteString(match.matchStartDate.Format("2006-01-02 15:04"))
 		title.WriteString(" | ")
 		title.WriteString(fmtDurationHM(match.matchDuration))
@@ -689,6 +691,7 @@ func (bot *Bot) playerMatches(m *discordgo.MessageCreate, args string) {
 		default:
 			title.WriteString("LOSS")
 		}
+		title.WriteString("**")
 
 		var desc bytes.Buffer
 		desc.WriteString(fmt.Sprintf("Match: **%d**", match.matchID))
