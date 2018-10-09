@@ -320,6 +320,7 @@ type MatchEventDeath struct {
 	VictimPlayerIndex  int                                 `json:"VictimPlayerIndex"`
 	VictimObjectTypeId string                              `json:"VictimObjectTypeId"`
 	VictimInstanceId   int                                 `json:"VictimInstanceId"`
+	VictimLocation     MatchEventLocation                  `json:"VictimLocation"`
 	IsSuicide          bool                                `json:"IsSuicide"`
 	Participants       map[int]MatchEventDeathParticipants `json:"Participants"`
 }

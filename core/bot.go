@@ -250,8 +250,10 @@ func (bot *Bot) onMessageCreate(s *discordgo.Session, m *discordgo.MessageCreate
 
 	case "history":
 		break
+	case "m":
+		fallthrough
 	case "match":
-		break
+		bot.loadMatchEvents(m, args)
 	default:
 		bot.sendResponse(m, fmt.Sprintf("'%s' looks like nothing to me.", cmd))
 	}
