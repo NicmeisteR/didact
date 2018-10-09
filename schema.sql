@@ -50,6 +50,13 @@ CREATE TABLE meta_map (
 CREATE UNIQUE INDEX meta_map_uuid_idx
     ON meta_map(mm_uuid);
 
+CREATE TABLE meta_objects (
+    mo_type_id      VARCHAR(255) NOT NULL,
+    mo_name_long    VARCHAR(255) NOT NULL,
+    mo_name_short   VARCHAR(255) NOT NULL,
+    PRIMARY KEY(mo_type_id)
+)
+
 -- ----------------------------------------------------------------------------
 -- PLAYER
 -- ----------------------------------------------------------------------------
