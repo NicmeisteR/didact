@@ -1,0 +1,158 @@
+<div>
+    <style type="text/css" scoped>
+        .didact-bo {
+            width: 100%;
+            display: grid;
+            grid-template-columns: 48px calc(50% - 24px) calc(50% - 24px);
+        }
+        .didact-bo-sidebar {
+            position: relative;
+            width: 48px;
+            margin-top: 32px;
+        }
+        .didact-bo-sidebar-step {
+            position: absolute;
+            margin-top: -6px;
+            height: 12px;
+            width: 100%;
+            font-size: 8px;
+            font-weight: 800;
+            background: rgb(0, 0, 0);
+            color: white;
+            border-radius: 8px;
+            text-align: center;
+        }
+        .didact-bo-team {
+            display: flex;
+            flex-direction: row;
+            padding-left: 32px;
+            padding-right: 32px;
+            justify-content: space-between;
+        }
+        .didact-bo-player {
+            flex: 1 1 0;
+            position: relative;
+            padding-left: 8px;
+            padding-right: 8px;
+            min-width: 0;
+            text-align: center;
+        }
+        .didact-bo-player-idx {
+            font-weight: 800;
+        }
+        .didact-bo-events {
+            position: absolute;
+            min-width: 0;
+            top: 32px;
+            left: 8px;
+            right: 8px;
+        }
+        .didact-bo-event-timeline {
+            position: absolute;
+            min-width: 0;
+            top: 32px;
+            left: 8px;
+            right: 8px;
+        }
+        .didact-bo-event-timeline-line {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            margin-left: -1px;
+            width: 2px;
+            background: rgba(0, 0, 0, 0.1);
+            z-index: -100;
+        }
+        .didact-bo-event-timeline-step {
+            position: absolute;
+            left: 50%;
+            width: 16px;
+            margin-top: -1px;
+            margin-left: -8px;
+            height: 2px;
+            background: rgba(0, 0, 0, 0.1);
+            z-index: -100;
+        }
+        .didact-bo-event {
+            position: absolute;
+            left: 50%;
+            margin-left: -48px;
+            word-wrap: nowrap;
+            overflow: hidden;
+            height: 12px;
+            width: 96px;
+            font-size: 8px;
+            font-weight: 800;
+            background: rgb(89, 37, 98);
+            color: white;
+            border-radius: 8px;
+        }
+    </style>
+
+    {% set vars = {'lastevent': 0} %}
+    {% set duration = df['time_since_start'].max().seconds %}
+    {% set secpx = 12 %}
+
+    <div
+        class="didact-bo"
+        style="height: {{duration * secpx + 64}}px "
+    >
+
+        <div class="didact-bo-sidebar">
+            {% for n in range(1, (duration / 5)|int) %}
+            <div
+                class="didact-bo-sidebar-step"
+                style="
+                    top: {{n * 5 * secpx}}px;
+                "
+            >
+                {{'%02d' | format((n * 5) / 60)}}:{{'%02d' | format((n * 5) % 60)}} 
+            </div>
+            {% endfor %}
+        </div>
+
+        {% for team_id, team_events in df.groupby('team_id', sort=True) %}
+        <div class="didact-bo-team">
+            {% for player_idx, player_events in team_events.groupby('player_idx', sort=True) %}
+            <div class="didact-bo-player">
+                <div class="didact-bo-player-idx">
+                    {{ player_idx }}
+                </div>
+
+                <div class="didact-bo-events">
+                    {% if vars.update({'lastevent': 0}) %} {% endif %}
+
+                    {% for event_index, event in player_events.sort_values('time_since_start', ascending=True).iterrows() %}
+                    {% if vars.update({'lastevent': (event['time_since_start'].seconds if ((event['time_since_start'].seconds - vars.lastevent) > 1) else (vars.lastevent + 1))}) %} {% endif %}
+                    <div
+                        class="didact-bo-event"
+                        style="
+                            top: {{vars.lastevent * secpx}}px;
+                            background: {{ 'rgb(89, 37, 98)' if team_id == 1 else 'rgb(52, 139, 150)' }};
+                        "
+                    >
+                        {{ event['target'] }}
+                    </div>
+
+                    {% endfor %}
+                </div>
+
+                <div class="didact-bo-event-timeline">
+                    {% for n in range(1, (duration / 5)|int) %}
+                    <div
+                        class="didact-bo-event-timeline-step"
+                        style="
+                            top: {{n * 5 * secpx}}px;
+                        "
+                    >
+                    </div>
+                    {% endfor %}
+                    <div class="didact-bo-event-timeline-line" style="height: {{duration * secpx + 16 }}px"></div>
+                </div>
+
+            </div>
+            {% endfor %}
+        </div>
+        {% endfor %}
+    </div>
+</div>

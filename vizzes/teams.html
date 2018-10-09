@@ -1,0 +1,91 @@
+<div>
+    <style type="text/css" scoped>
+        .didact-match-teams {
+            display: flex;
+            flex-direction: row;
+            flex-grow: 1;
+            justify-content: space-evenly;
+        }
+        .didact-match-vs {
+            display: flex;
+            flex-direction: column;
+            align-content: center;
+            justify-content: center;
+            text-align: center;
+            font-weight: 800;
+            width: 80px;
+        }
+        .didact-match-team {
+            display: flex;
+            flex-direction: column;
+        }
+        .didact-match-player {
+            display: flex;
+            flex-direction: column;
+            margin: 4px;
+        }
+        .didact-match-player-title {
+            display: flex;
+            flex-direction: row;
+        } 
+        .didact-match-player-idx {
+            width: 20px;
+            font-weight: 800;
+        } 
+        .didact-match-player-gamertag {
+            font-weight: 800;
+            margin-right: 4px;
+        } 
+        .didact-match-player-leader {
+            font-weight: 800;
+        }
+        .didact-match-player-stats {
+            display: flex;
+            flex-direction: row;
+            margin-left: 20px;
+        }
+        .didact-match-player-stats-csr {
+            margin-right: 8px;
+        }
+        .didact-match-player-stats-mmr {
+            margin-right: 8px;
+        } 
+    </style>
+
+    <div class="didact-match-teams">
+        {% set cnt = [0] %}
+        {% for _, group in df.groupby('team_id', sort=True) %}
+        {% if cnt[0] != 0 %}
+        <div class="didact-match-vs">
+            vs.
+        </div>
+        {% endif %}
+        {% if cnt.append(cnt.pop() + 1) %}{% endif %}
+        <div class="didact-match-team">
+        {% for _, row in group.head(2).iterrows() %}
+            <div class="didact-match-player">
+                <div class="didact-match-player-title">
+                    <div class="didact-match-player-idx">
+                        {{ row['player_idx'] }}
+                    </div>
+                    <div class="didact-match-player-gamertag">
+                        {{ row['gamertag'] }}
+                    </div>
+                    <div class="didact-match-player-leader">
+                        | {{ row['leader'] }}
+                    </div>
+                </div>
+                <div class="didact-match-player-stats">
+                    <div class="didact-match-player-stats-csr">
+                        CSR: {{ row['csr_prev_raw'] }} ({{'%+d'| format(row['csr_delta']|int)}})
+                    </div>
+                    <div class="didact-match-player-stats-mmr">
+                        MMR: {{'%0.3f'| format(row['mmr_prev_rating']|float)}} ({{'%+0.3f'| format(row['mmr_delta']|float)}})
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+        </div>
+        {% endfor %}
+    </div>
+</div>
