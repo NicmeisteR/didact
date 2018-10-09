@@ -51,10 +51,9 @@ CREATE UNIQUE INDEX meta_map_uuid_idx
     ON meta_map(mm_uuid);
 
 CREATE TABLE meta_object (
-    mo_type_id      VARCHAR(255) NOT NULL,
-    mo_name_long    VARCHAR(255) NOT NULL,
-    mo_name_short   VARCHAR(255) NOT NULL,
-    PRIMARY KEY(mo_type_id)
+    mo_id       VARCHAR(255) NOT NULL,
+    mo_name     VARCHAR(255),
+    PRIMARY KEY(mo_id)
 );
 
 -- ----------------------------------------------------------------------------
