@@ -774,8 +774,9 @@ func (crawler *Crawler) loadPlayerStats(gamertag string) (*PlayerStats, error) {
 }
 
 func (crawler *Crawler) updatePlayerStats(task *Task) error {
+	// Gamertag invalid
 	if len(task.Data.Gamertag) == 0 || task.Data.Gamertag == "-" {
-		return nil
+		return crawler.dataStore.finishTask(task)
 	}
 
 	// Get the player stats
