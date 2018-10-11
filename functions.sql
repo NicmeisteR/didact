@@ -100,11 +100,11 @@ RETURNS VOID AS $$
                 mt.team_idx AS team_idx,
                 COALESCE(it.t_id, st.t_id, 0) AS team_id
             FROM match_teams_ mt
-                LEFT JOIN inserted_teams_ it
+                LEFT OUTER JOIN inserted_teams_ it
                     ON it.t_p1_id = mt.player_1
                     AND it.t_p2_id = mt.player_2
                     AND it.t_p3_id = mt.player_3
-                LEFT JOIN team st
+                LEFT OUTER JOIN team st
                     ON st.t_p1_id = mt.player_1
                     AND st.t_p2_id = mt.player_2
                     AND st.t_p3_id = mt.player_3
@@ -191,11 +191,11 @@ RETURNS VOID AS $$
               mt.team_idx AS team_idx,
               COALESCE(it.t_id, st.t_id, 0) AS team_id
           FROM match_teams_ mt
-              LEFT JOIN inserted_teams_ it
+              LEFT OUTER JOIN inserted_teams_ it
                   ON it.t_p1_id = mt.player_1
                   AND it.t_p2_id = mt.player_2
                   AND it.t_p3_id = mt.player_3
-              LEFT JOIN team st
+              LEFT OUTER JOIN team st
                   ON st.t_p1_id = mt.player_1
                   AND st.t_p2_id = mt.player_2
                   AND st.t_p3_id = mt.player_3
