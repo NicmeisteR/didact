@@ -352,6 +352,36 @@ RETURNS INTEGER AS $$
     END
 $$ LANGUAGE plpgsql;
 
+CREATE OR REPLACE FUNCTION didact_init_active_player_stat_scan(i INTERVAL)
+RETURNS INTEGER AS $$
+    DECLARE
+        t TIMESTAMP := clock_timestamp();
+    BEGIN
+        RAISE NOTICE 'Initiate player statistic scans';
+        INSERT INTO task (t_type, t_updated, t_status, t_priority, t_data)
+            SELECT
+                1,      -- TaskPlayerStatsUpdate
+                now(),  -- Updated
+                0,      -- TaskQueued
+                0,      -- Priority
+                json_build_object(
+                    'PlayerID', p_id,
+                    'Gamertag', p_gamertag
+                )
+            FROM
+                player,
+                (
+                    SELECT DISTINCT mp_gamertag AS mp_gamertag
+                    FROM match, match_player
+                    WHERE m_id = mp_match_id
+                    AND m_start_date > (now() - i)
+                ) recent_gamertags
+            WHERE p_gamertag = mp_gamertag;
+        RAISE NOTICE 'Duration=%', clock_timestamp() - t;
+        RETURN 1;
+    END
+$$ LANGUAGE plpgsql;
+
 CREATE OR REPLACE FUNCTION didact_init_match_update()
 RETURNS INTEGER AS $$
     DECLARE
