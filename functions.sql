@@ -28,12 +28,11 @@ DECLARE
 BEGIN
     IF (SELECT COUNT(*) FROM task) > 0 THEN
         RAISE NOTICE 'Crawler is not idle.';
-        RETURN 0;
     ELSE
         EXECUTE didact_init_active_player_stat_scan(INTERVAL '30 days');
-        RAISE NOTICE 'Duration=%', clock_timestamp() - t;
-        RETURN 1;
     END IF;
+    RAISE NOTICE 'Duration=%', clock_timestamp() - t;
+    RETURN 1;
 END
 $$ LANGUAGE plpgsql;
 
