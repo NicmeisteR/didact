@@ -420,7 +420,7 @@ RETURNS INTEGER AS $$
                 (
                     SELECT DISTINCT(mh_match_uuid) as match_uuid
                     FROM
-                        match_history LEFT JOIN match
+                        match_history LEFT OUTER JOIN match
                         ON mh_match_uuid = m_match_uuid
                     WHERE m_id IS NULL
                 ) m;
