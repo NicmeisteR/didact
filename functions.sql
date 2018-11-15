@@ -723,6 +723,7 @@ RETURNS INTEGER AS $$
     DECLARE
         community_id INTEGER := 0;
         league_id INTEGER := 0;
+        league_size INTEGER := 0;
         player_id INTEGER := 0;
         team_id INTEGER := 0;
     BEGIN
@@ -732,9 +733,13 @@ RETURNS INTEGER AS $$
             RETURN -1;
         END IF;
 
-        SELECT cl_id INTO league_id FROM community_league WHERE cl_community_id = community_id AND cl_name = l;
+        SELECT cl_id, cl_team_size INTO league_id, league_size FROM community_league WHERE cl_community_id = community_id AND cl_name = l;
         IF NOT FOUND THEN
             RAISE NOTICE 'league % not found', l;
+            RETURN -1;
+        END IF;
+        IF league_size <> 1 THEN
+            RAISE NOTICE 'league % is not a 1v1 league', l;
             RETURN -1;
         END IF;
 
@@ -759,6 +764,127 @@ RETURNS INTEGER AS $$
             ON CONFLICT DO NOTHING;
 
         RAISE NOTICE 'added team % of player % to league % of community %', team_id, gt, l, c;
+        RETURN 1;
+    END
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION didact_community_join_league_2v2(c VARCHAR, l VARCHAR, gt1 VARCHAR, gt2 VARCHAR)
+RETURNS INTEGER AS $$
+    DECLARE
+        community_id INTEGER := 0;
+        league_id INTEGER := 0;
+        league_size INTEGER := 0;
+        player1_id INTEGER := 0;
+        player2_id INTEGER := 0;
+        team_id INTEGER := 0;
+    BEGIN
+        SELECT c_id INTO community_id FROM community WHERE c_name = c;
+        IF NOT FOUND THEN
+            RAISE NOTICE 'community % not found', c;
+            RETURN -1;
+        END IF;
+
+        SELECT cl_id, cl_team_size INTO league_id, league_size FROM community_league WHERE cl_community_id = community_id AND cl_name = l;
+        IF NOT FOUND THEN
+            RAISE NOTICE 'league % not found', l;
+            RETURN -1;
+        END IF;
+        IF league_size <> 2 THEN
+            RAISE NOTICE 'league % is not a 2v2 league', l;
+            RETURN -1;
+        END IF;
+
+        SELECT p_id INTO player1_id FROM player WHERE p_gamertag = gt1;
+        IF NOT FOUND THEN
+            RAISE NOTICE 'player1 % not found', gt1;
+            RETURN -1;
+        END IF;
+
+        SELECT p_id INTO player2_id FROM player WHERE p_gamertag = gt2;
+        IF NOT FOUND THEN
+            RAISE NOTICE 'player2 % not found', gt2;
+            RETURN -1;
+        END IF;
+
+        SELECT t_id INTO team_id FROM team WHERE t_p1_id = player1_id AND t_p2_id = player2_id;
+        IF NOT FOUND THEN
+            RAISE NOTICE 'team for player1 % and player2 % not found', gt1, gt2;
+            RETURN -1;
+        END IF;
+
+        INSERT INTO community_member(cm_community_id, cm_player_id, cm_joined_at)
+            VALUES (community_id, player1_id, now()), (community_id, player2_id, now())
+            ON CONFLICT DO NOTHING;
+
+        INSERT INTO community_league_team(clp_community_id, clp_league_id, clp_team_id, clp_joined_at)
+            VALUES (community_id, league_id, team_id, now())
+            ON CONFLICT DO NOTHING;
+
+        RAISE NOTICE 'added team % to league % of community %', team_id, l, c;
+        RETURN 1;
+    END
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION didact_community_join_league_3v3(c VARCHAR, l VARCHAR, gt1 VARCHAR, gt2 VARCHAR, gt3 VARCHAR)
+RETURNS INTEGER AS $$
+    DECLARE
+        community_id INTEGER := 0;
+        league_id INTEGER := 0;
+        league_size INTEGER := 0;
+        player1_id INTEGER := 0;
+        player2_id INTEGER := 0;
+        player3_id INTEGER := 0;
+        team_id INTEGER := 0;
+    BEGIN
+        SELECT c_id INTO community_id FROM community WHERE c_name = c;
+        IF NOT FOUND THEN
+            RAISE NOTICE 'community % not found', c;
+            RETURN -1;
+        END IF;
+
+        SELECT cl_id, cl_team_size INTO league_id, league_size FROM community_league WHERE cl_community_id = community_id AND cl_name = l;
+        IF NOT FOUND THEN
+            RAISE NOTICE 'league % not found', l;
+            RETURN -1;
+        END IF;
+        IF league_size <> 3 THEN
+            RAISE NOTICE 'league % is not a 3v3 league', l;
+            RETURN -1;
+        END IF;
+
+        SELECT p_id INTO player1_id FROM player WHERE p_gamertag = gt1;
+        IF NOT FOUND THEN
+            RAISE NOTICE 'player1 % not found', gt1;
+            RETURN -1;
+        END IF;
+
+        SELECT p_id INTO player2_id FROM player WHERE p_gamertag = gt2;
+        IF NOT FOUND THEN
+            RAISE NOTICE 'player2 % not found', gt2;
+            RETURN -1;
+        END IF;
+
+        SELECT p_id INTO player3_id FROM player WHERE p_gamertag = gt3;
+        IF NOT FOUND THEN
+            RAISE NOTICE 'player3 % not found', gt3;
+            RETURN -1;
+        END IF;
+
+        SELECT t_id INTO team_id FROM team WHERE t_p1_id = player1_id AND t_p2_id = player2_id AND t_p3_id = player3_id;
+        IF NOT FOUND THEN
+            RAISE NOTICE 'team for player1 %, player2 % and player3 % not found', gt1, gt2, gt3;
+            RETURN -1;
+        END IF;
+
+        INSERT INTO community_member(cm_community_id, cm_player_id, cm_joined_at)
+            VALUES (community_id, player1_id, now()), (community_id, player2_id, now()), (community_id, player3_id, now())
+            ON CONFLICT DO NOTHING;
+
+        INSERT INTO community_league_team(clp_community_id, clp_league_id, clp_team_id, clp_joined_at)
+            VALUES (community_id, league_id, team_id, now())
+            ON CONFLICT DO NOTHING;
+
+        RAISE NOTICE 'added team % to league % of community %', team_id, l, c;
         RETURN 1;
     END
 $$ LANGUAGE plpgsql;
