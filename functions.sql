@@ -905,7 +905,8 @@ RETURNS TABLE(
 ) AS $$
     SELECT te_match_id, t1.clp_team_id, t2.clp_team_id
     FROM community_league_team t1, community_league_team t2, team_encounter te
-    WHERE t1.clp_league_id = t2.clp_league_id
+    WHERE t1.clp_league_id = league_id
+    AND t1.clp_league_id = t2.clp_league_id
     AND t1.clp_team_id <> t2.clp_team_id
     AND te.te_t1_id = t1.clp_team_id
     AND te.te_t2_id = t2.clp_team_id
