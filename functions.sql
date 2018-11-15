@@ -806,7 +806,9 @@ RETURNS INTEGER AS $$
             RETURN -1;
         END IF;
 
-        SELECT t_id INTO team_id FROM team WHERE t_p1_id = player1_id AND t_p2_id = player2_id;
+        SELECT t_id INTO team_id FROM team
+            WHERE t_p1_id = player1_id AND t_p2_id = player2_id
+            OR t_p1_id = player2_id AND t_p2_id = player1_id;
         IF NOT FOUND THEN
             RAISE NOTICE 'team for player1 % and player2 % not found', gt1, gt2;
             RETURN -1;
@@ -870,7 +872,13 @@ RETURNS INTEGER AS $$
             RETURN -1;
         END IF;
 
-        SELECT t_id INTO team_id FROM team WHERE t_p1_id = player1_id AND t_p2_id = player2_id AND t_p3_id = player3_id;
+        SELECT t_id INTO team_id FROM team
+            WHERE (t_p1_id = player1_id AND t_p2_id = player2_id AND t_p3_id = player3_id)
+            OR (t_p1_id = player2_id AND t_p2_id = player1_id AND t_p3_id = player3_id)
+            OR (t_p1_id = player2_id AND t_p2_id = player3_id AND t_p3_id = player1_id)
+            OR (t_p1_id = player3_id AND t_p2_id = player2_id AND t_p3_id = player1_id)
+            OR (t_p1_id = player3_id AND t_p2_id = player1_id AND t_p3_id = player2_id)
+            OR (t_p1_id = player1_id AND t_p2_id = player3_id AND t_p3_id = player2_id);
         IF NOT FOUND THEN
             RAISE NOTICE 'team for player1 %, player2 % and player3 % not found', gt1, gt2, gt3;
             RETURN -1;
