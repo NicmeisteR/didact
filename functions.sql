@@ -888,3 +888,16 @@ RETURNS INTEGER AS $$
         RETURN 1;
     END
 $$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION didact_community_league_matches(IN league_id INTEGER, IN interval_ INTERVAL)
+RETURNS TABLE(
+    m_id INTEGER
+) AS $$
+    SELECT te_match_id
+    FROM community_league_team t1, community_league_team t2, team_encounter te
+    WHERE t1.clp_league_id = t2.clp_league_id
+    AND t1.clp_team_id <> t2.clp_team_id
+    AND te.te_t1_id = t1.clp_team_id
+    AND te.te_t2_id = t2.clp_team_id
+    AND te.te_start_date > now() - interval_
+$$ LANGUAGE sql;

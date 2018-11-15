@@ -473,6 +473,10 @@ CREATE INDEX team_encounter_map_idx
     ON team_encounter
     USING BTREE(te_map_uuid, te_start_date);
 
+CREATE INDEX team_encounter_start_date_idx
+    ON team_encounter
+    USING BTREE(te_start_date);
+
 -- ----------------------------------------------------------------------------
 -- Community Leagues
 -- ----------------------------------------------------------------------------
@@ -533,7 +537,7 @@ CREATE TABLE community_league_team (
         REFERENCES team(t_id)
         ON DELETE CASCADE,
 
-    PRIMARY KEY (clp_community_id, clp_team_id)
+    PRIMARY KEY (clp_community_id, clp_league_id, clp_team_id)
 );
 
 CREATE INDEX community_league_community_id_idx
