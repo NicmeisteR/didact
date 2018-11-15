@@ -686,3 +686,79 @@ RETURNS TABLE (
             "CommandXP" INTEGER
         )
 $$ LANGUAGE sql STABLE;
+
+-- ----------------------------------------------------------------------------
+-- COMMUNITIES
+-- ----------------------------------------------------------------------------
+
+CREATE OR REPLACE FUNCTION didact_community_join(c VARCHAR, gt VARCHAR)
+RETURNS INTEGER AS $$
+    DECLARE
+        player_id INTEGER := 0;
+        community_id INTEGER := 0;
+    BEGIN
+        SELECT c_id INTO community_id FROM community WHERE c_name = c;
+        IF NOT FOUND THEN
+            RAISE NOTICE 'community % not found', c;
+            RETURN -1;
+        END IF;
+
+        SELECT p_id INTO player_id FROM player WHERE p_gamertag = gt;
+        IF NOT FOUND THEN
+            RAISE NOTICE 'player % not found', gt;
+            RETURN -1;
+        END IF;
+
+        INSERT INTO community_member(cm_community_id, cm_player_id, cm_joined_at)
+            VALUES (community_id, player_id, now())
+            ON CONFLICT DO NOTHING;
+
+        RAISE NOTICE 'added player % to community %', gt, c;
+        RETURN 1;
+    END
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION didact_community_join_league_1v1(c VARCHAR, l VARCHAR, gt VARCHAR)
+RETURNS INTEGER AS $$
+    DECLARE
+        community_id INTEGER := 0;
+        league_id INTEGER := 0;
+        player_id INTEGER := 0;
+        team_id INTEGER := 0;
+    BEGIN
+        SELECT c_id INTO community_id FROM community WHERE c_name = c;
+        IF NOT FOUND THEN
+            RAISE NOTICE 'community % not found', c;
+            RETURN -1;
+        END IF;
+
+        SELECT cl_id INTO league_id FROM community_league WHERE cl_community_id = community_id AND cl_name = l;
+        IF NOT FOUND THEN
+            RAISE NOTICE 'league % not found', l;
+            RETURN -1;
+        END IF;
+
+        SELECT p_id INTO player_id FROM player WHERE p_gamertag = gt;
+        IF NOT FOUND THEN
+            RAISE NOTICE 'player % not found', gt;
+            RETURN -1;
+        END IF;
+
+        SELECT t_id INTO team_id FROM team WHERE t_p1_id = player_id;
+        IF NOT FOUND THEN
+            RAISE NOTICE 'team for player % not found', gt;
+            RETURN -1;
+        END IF;
+
+        INSERT INTO community_member(cm_community_id, cm_player_id, cm_joined_at)
+            VALUES (community_id, player_id, now())
+            ON CONFLICT DO NOTHING;
+
+        INSERT INTO community_league_team(clp_community_id, clp_league_id, clp_team_id, clp_joined_at)
+            VALUES (community_id, league_id, team_id, now())
+            ON CONFLICT DO NOTHING;
+
+        RAISE NOTICE 'added team % of player % to league % of community %', team_id, gt, l, c;
+        RETURN 1;
+    END
+$$ LANGUAGE plpgsql;

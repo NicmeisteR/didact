@@ -478,15 +478,22 @@ CREATE INDEX team_encounter_map_idx
 -- ----------------------------------------------------------------------------
 
 CREATE TABLE community (
-    c_id INTEGER NOT NULL,
+    c_id SERIAL NOT NULL,
     c_name VARCHAR(255) NOT NULL,
 
     PRIMARY KEY (c_id)
 );
 
 CREATE TABLE community_league (
-    cl_id INTEGER NOT NULL,
+    cl_id SERIAL NOT NULL,
+    cl_community_id INTEGER NOT NULL,
     cl_name VARCHAR(255) NOT NULL,
+
+    cl_team_size INTEGER NOT NULL,
+
+    FOREIGN KEY (cl_community_id)
+        REFERENCES community(c_id)
+        ON DELETE CASCADE,
 
     PRIMARY KEY (cl_id)
 );
@@ -528,6 +535,10 @@ CREATE TABLE community_league_team (
 
     PRIMARY KEY (clp_community_id, clp_team_id)
 );
+
+CREATE INDEX community_league_community_id_idx
+    ON community_league
+    USING BTREE(cl_community_id);
 
 CREATE INDEX community_league_team_community_id_idx
     ON community_league_team
