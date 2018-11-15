@@ -759,8 +759,8 @@ RETURNS INTEGER AS $$
             VALUES (community_id, player_id, now())
             ON CONFLICT DO NOTHING;
 
-        INSERT INTO community_league_team(clp_community_id, clp_league_id, clp_team_id, clp_joined_at)
-            VALUES (community_id, league_id, team_id, now())
+        INSERT INTO community_league_team(clp_league_id, clp_team_id, clp_joined_at)
+            VALUES (league_id, team_id, now())
             ON CONFLICT DO NOTHING;
 
         RAISE NOTICE 'added team % of player % to league % of community %', team_id, gt, l, c;
@@ -816,8 +816,8 @@ RETURNS INTEGER AS $$
             VALUES (community_id, player1_id, now()), (community_id, player2_id, now())
             ON CONFLICT DO NOTHING;
 
-        INSERT INTO community_league_team(clp_community_id, clp_league_id, clp_team_id, clp_joined_at)
-            VALUES (community_id, league_id, team_id, now())
+        INSERT INTO community_league_team(clp_league_id, clp_team_id, clp_joined_at)
+            VALUES (league_id, team_id, now())
             ON CONFLICT DO NOTHING;
 
         RAISE NOTICE 'added team % to league % of community %', team_id, l, c;
@@ -880,8 +880,8 @@ RETURNS INTEGER AS $$
             VALUES (community_id, player1_id, now()), (community_id, player2_id, now()), (community_id, player3_id, now())
             ON CONFLICT DO NOTHING;
 
-        INSERT INTO community_league_team(clp_community_id, clp_league_id, clp_team_id, clp_joined_at)
-            VALUES (community_id, league_id, team_id, now())
+        INSERT INTO community_league_team(clp_league_id, clp_team_id, clp_joined_at)
+            VALUES (league_id, team_id, now())
             ON CONFLICT DO NOTHING;
 
         RAISE NOTICE 'added team % to league % of community %', team_id, l, c;
@@ -891,9 +891,11 @@ $$ LANGUAGE plpgsql;
 
 CREATE OR REPLACE FUNCTION didact_community_league_matches(IN league_id INTEGER, IN interval_ INTERVAL)
 RETURNS TABLE(
-    m_id INTEGER
+    m_id INTEGER,
+    t1_id INTEGER,
+    t2_id INTEGER
 ) AS $$
-    SELECT te_match_id
+    SELECT te_match_id, t1.clp_team_id, t2.clp_team_id
     FROM community_league_team t1, community_league_team t2, team_encounter te
     WHERE t1.clp_league_id = t2.clp_league_id
     AND t1.clp_team_id <> t2.clp_team_id

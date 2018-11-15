@@ -519,15 +519,10 @@ CREATE TABLE community_member (
 );
 
 CREATE TABLE community_league_team (
-    clp_community_id INTEGER NOT NULL,
     clp_league_id INTEGER NOT NULL,
     clp_team_id INTEGER NOT NULL,
 
     clp_joined_at TIMESTAMP NOT NULL,
-
-    FOREIGN KEY (clp_community_id)
-        REFERENCES community(c_id)
-        ON DELETE CASCADE,
 
     FOREIGN KEY (clp_league_id)
         REFERENCES community_league(cl_id)
@@ -537,12 +532,8 @@ CREATE TABLE community_league_team (
         REFERENCES team(t_id)
         ON DELETE CASCADE,
 
-    PRIMARY KEY (clp_community_id, clp_league_id, clp_team_id)
+    PRIMARY KEY (clp_league_id, clp_team_id)
 );
-
-CREATE INDEX community_league_community_id_idx
-    ON community_league
-    USING BTREE(cl_community_id);
 
 CREATE INDEX community_league_team_community_id_idx
     ON community_league_team
