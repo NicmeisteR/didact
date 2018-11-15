@@ -550,3 +550,18 @@ CREATE INDEX community_member_community_id_idx
 CREATE INDEX community_member_player_id_idx
     ON community_member
     USING BTREE(cm_player_id);
+
+-- ----------------------------------------------------------------------------
+-- DSR
+-- ----------------------------------------------------------------------------
+
+CREATE MATERIALIZED VIEW dsr AS
+    SELECT p_id AS dsr_player_id, MAX(mp_mmr_new_rating) AS dsr_value
+    FROM match, match_player, player
+    WHERE m_start_date > now() - INTERVAL '100 days'
+    AND m_id = mp_match_id
+    AND mp_gamertag = p_gamertag
+    GROUP BY p_id
+    WITH NO DATA;
+
+CREATE UNIQUE INDEX dsr_player_idx ON dsr(dsr_player_id);
