@@ -472,3 +472,75 @@ CREATE INDEX team_encounter_playlist_idx
 CREATE INDEX team_encounter_map_idx
     ON team_encounter
     USING BTREE(te_map_uuid, te_start_date);
+
+-- ----------------------------------------------------------------------------
+-- Community Leagues
+-- ----------------------------------------------------------------------------
+
+CREATE TABLE community (
+    c_id INTEGER NOT NULL,
+    c_name VARCHAR(255) NOT NULL,
+
+    PRIMARY KEY (c_id)
+);
+
+CREATE TABLE community_league (
+    cl_id INTEGER NOT NULL,
+    cl_name VARCHAR(255) NOT NULL,
+
+    PRIMARY KEY (cl_id)
+);
+
+CREATE TABLE community_member (
+    cm_community_id INTEGER NOT NULL,
+    cm_player_id INTEGER NOT NULL,
+    cm_joined_at TIMESTAMP NOT NULL,
+
+    FOREIGN KEY (cm_community_id)
+        REFERENCES community(c_id)
+        ON DELETE CASCADE,
+
+    FOREIGN KEY (cm_player_id)
+        REFERENCES player(p_id)
+        ON DELETE CASCADE,
+
+    PRIMARY KEY (cm_community_id, cm_player_id)
+);
+
+CREATE TABLE community_league_team (
+    clp_community_id INTEGER NOT NULL,
+    clp_league_id INTEGER NOT NULL,
+    clp_team_id INTEGER NOT NULL,
+
+    clp_joined_at TIMESTAMP NOT NULL,
+
+    FOREIGN KEY (clp_community_id)
+        REFERENCES community(c_id)
+        ON DELETE CASCADE,
+
+    FOREIGN KEY (clp_league_id)
+        REFERENCES community_league(cl_id)
+        ON DELETE CASCADE,
+
+    FOREIGN KEY (clp_team_id)
+        REFERENCES team(t_id)
+        ON DELETE CASCADE,
+
+    PRIMARY KEY (clp_community_id, clp_team_id)
+);
+
+CREATE INDEX community_league_team_community_id_idx
+    ON community_league_team
+    USING BTREE(clp_community_id);
+
+CREATE INDEX community_league_team_team_id_idx
+    ON community_league_team
+    USING BTREE(clp_team_id);
+
+CREATE INDEX community_member_community_id_idx
+    ON community_member
+    USING BTREE(cm_community_id);
+
+CREATE INDEX community_member_player_id_idx
+    ON community_member
+    USING BTREE(cm_player_id);
