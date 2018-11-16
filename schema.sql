@@ -412,7 +412,8 @@ CREATE TABLE match_events (
 -- TEAM
 -- ----------------------------------------------------------------------------
 
-CREATE MATERIALIZED VIEW team_encounter_prep AS (
+-- The team snapshot table is used to find missing team encounters and recompute the DSR table.
+CREATE MATERIALIZED VIEW team_snapshot AS (
     WITH x_ AS (
         SELECT
             p_id AS player_id,
@@ -424,11 +425,11 @@ CREATE MATERIALIZED VIEW team_encounter_prep AS (
         WHERE mp_gamertag = p_gamertag
     )
     SELECT
-        m1.match_id AS tep_match_id,
-        m1.team_id AS tep_team_id,
-        m1.player_id AS tep_player_1,
-        COALESCE(m2.player_id, 0) AS tep_player_2,
-        COALESCE(m3.player_id, 0) AS tep_player_3
+        m1.match_id AS ts_match_id,
+        m1.team_id AS ts_team_id,
+        m1.player_id AS ts_p1_id,
+        COALESCE(m2.player_id, 0) AS ts_p2_id,
+        COALESCE(m3.player_id, 0) AS ts_p3_id
     FROM x_ m1
         LEFT OUTER JOIN x_ m2
             ON m1.match_id = m2.match_id
@@ -441,6 +442,9 @@ CREATE MATERIALIZED VIEW team_encounter_prep AS (
     WHERE m1.rank = 1
 ) WITH NO DATA;
 
+-- The team encounter table is maintained by the crawler and allows a retreival of
+-- recent games without scanning the matches of all team members.
+-- It has a lot of indexes as it is the main table for match discovery.
 CREATE TABLE team_encounter (
     te_match_id         INTEGER NOT NULL,
 
@@ -507,22 +511,24 @@ CREATE INDEX team_encounter_t2_p3_idx
     ON team_encounter
     USING BTREE(te_t2_p3_id, te_start_date);
 
-CREATE INDEX team_encounter_playlist_idx
-    ON team_encounter
-    USING BTREE(te_playlist_uuid, te_start_date);
-
-CREATE INDEX team_encounter_map_idx
-    ON team_encounter
-    USING BTREE(te_map_uuid, te_start_date);
-
-CREATE INDEX team_encounter_start_date_idx
-    ON team_encounter
-    USING BTREE(te_start_date);
+-- TODO delete
+-- CREATE INDEX team_encounter_playlist_idx
+--     ON team_encounter
+--     USING BTREE(te_playlist_uuid, te_start_date);
+-- 
+-- CREATE INDEX team_encounter_map_idx
+--     ON team_encounter
+--     USING BTREE(te_map_uuid, te_start_date);
+-- 
+-- CREATE INDEX team_encounter_start_date_idx
+--     ON team_encounter
+--     USING BTREE(te_start_date);
 
 -- ----------------------------------------------------------------------------
 -- Community Leagues
 -- ----------------------------------------------------------------------------
 
+-- A community
 CREATE TABLE community (
     c_id SERIAL NOT NULL,
     c_name VARCHAR(255) NOT NULL,
@@ -530,6 +536,7 @@ CREATE TABLE community (
     PRIMARY KEY (c_id)
 );
 
+-- A community league. The team size is checked when adding teams to a league.
 CREATE TABLE community_league (
     cl_id SERIAL NOT NULL,
     cl_community_id INTEGER NOT NULL,
@@ -544,6 +551,7 @@ CREATE TABLE community_league (
     PRIMARY KEY (cl_id)
 );
 
+-- A community member.
 CREATE TABLE community_member (
     cm_community_id INTEGER NOT NULL,
     cm_player_id INTEGER NOT NULL,
@@ -568,6 +576,7 @@ CREATE INDEX community_member_player_id_idx
     ON community_member
     USING BTREE(cm_player_id);
 
+-- A community league team.
 CREATE TABLE community_league_team (
     clp_league_id INTEGER NOT NULL,
 
@@ -605,9 +614,7 @@ CREATE MATERIALIZED VIEW dsr AS (
         AND mp_gamertag = p_gamertag
         GROUP BY p_id
     ), team_(p1_id, p2_id, p3_id) AS (
-        SELECT te_t1_p1_id, te_t1_p2_id, te_t1_p3_id FROM team_encounter
-        UNION
-        SELECT te_t2_p1_id, te_t2_p2_id, te_t2_p3_id FROM team_encounter
+        SELECT DISTINCT ts_player_1, ts_player_2, ts_player_3 FROM team_snapshot ts
     ), comp_ AS (
         SELECT
             t.p1_id, t.p2_id, t.p3_id,
