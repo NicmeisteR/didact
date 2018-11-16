@@ -106,12 +106,20 @@ RETURNS TABLE(
     END
 $$ LANGUAGE plpgsql;
 
-CREATE OR REPLACE FUNCTION didact_insert_prepped_team_encounters()
+CREATE OR REPLACE FUNCTION didact_sync_team_encounters()
 RETURNS VOID AS $$
     DECLARE
         t TIMESTAMP := clock_timestamp();
     BEGIN
-        RAISE NOTICE 'Bulk inserting team encounters using prep table';
+        RAISE NOTICE 'Bulk syncing team encounters using snapshot';
+
+        WITH snapshot_diff AS (
+            SELECT ts.*
+            FROM team_snapshot ts
+                LEFT OUTER JOIN team_encounter te
+                ON te.te_match_id = ts.ts_match_id
+            WHERE te.te_t1_p1_id IS NULL
+        )
         INSERT INTO team_encounter(
                 te_match_id,
                 te_t1_p1_id,
@@ -130,12 +138,12 @@ RETURNS VOID AS $$
         )
         SELECT
                 m.m_id,
-                t1.tep_player_1,
-                t1.tep_player_2,
-                t1.tep_player_3,
-                t2.tep_player_1,
-                t2.tep_player_2,
-                t2.tep_player_3,
+                t1.ts_p1_id,
+                t1.ts_p2_id,
+                t1.ts_p3_id,
+                t2.ts_p1_id,
+                t2.ts_p2_id,
+                t2.ts_p3_id,
                 m.m_start_date,
                 m.m_duration,
                 mt.mt_match_outcome,
@@ -143,12 +151,12 @@ RETURNS VOID AS $$
                 m.m_match_uuid,
                 m.m_playlist_uuid,
                 m.m_season_uuid
-        FROM match m, team_encounter_prep t1, team_encounter_prep t2, match_team mt
-        WHERE t1.tep_match_id = m.m_id
-        AND t2.tep_match_id = m.m_id
+        FROM match m, snapshot_diff t1, snapshot_diff t2, match_team mt
+        WHERE t1.ts_match_id = m.m_id
+        AND t2.ts_match_id = m.m_id
         -- Team id predicates let the postgres estimate fail miserably.
         -- The < prevents the nested loop join and gives hash joins instead
-        AND t1.tep_team_id < t2.tep_team_id
+        AND t1.ts_team_id < t2.ts_team_id
         AND mt.mt_match_id = m.m_id
         AND mt.mt_team_id = 1
         ON CONFLICT DO NOTHING;
