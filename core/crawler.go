@@ -136,10 +136,12 @@ func (crawler *Crawler) Start() {
 					err = crawler.scanMatchHistory(task)
 				case TaskPlayerStatsUpdate:
 					err = crawler.updatePlayerStats(task)
-				case TaskMatchResultUpdate:
-					err = crawler.updateMatchResult(task)
-				case TaskMatchEventsUpdate:
-					err = crawler.updateMatchEvents(task)
+				case TaskMatchResultInsert:
+					err = crawler.storeMatchResult(task)
+				case TaskTeamEncounterInsert:
+					err = crawler.storeTeamEncounter(task)
+				case TaskMatchEventsInsert:
+					err = crawler.storeMatchEvents(task)
 				default:
 					log.Printf("unknown task type: %d\n", task.ID)
 				}
@@ -204,7 +206,7 @@ func (crawler *Crawler) loadMatch(matchId string) (*Match, error) {
 	return match, nil
 }
 
-func (crawler *Crawler) updateMatchResult(task *Task) error {
+func (crawler *Crawler) storeMatchResult(task *Task) error {
 	// The match exists already?
 	if crawler.dataStore.matchExists(task.Data.MatchUUID) {
 		log.Printf("[match %s] already exists", task.Data.MatchUUID)
@@ -234,7 +236,7 @@ func (crawler *Crawler) updateMatchResult(task *Task) error {
 	}
 
 	// Insert match
-	err = crawler.dataStore.storeMatch(match)
+	matchID, err := crawler.dataStore.storeMatch(match)
 	if err == ErrMetadataIncomplete {
 		log.Printf("[match %s] incomplete metadata", task.Data.MatchUUID)
 		return crawler.dataStore.blockTask(task)
@@ -246,7 +248,29 @@ func (crawler *Crawler) updateMatchResult(task *Task) error {
 
 	log.Printf("[match %s] updated match", task.Data.MatchUUID)
 	crawler.dataStore.finishTask(task)
+
+	// Init team encounter insert
+	var task Task
+	task.Data.matchID = matchID
+	task.Type = TaskMatchTeamEncounter
+	task.Updated = time.Now()
+	task.Status = TaskQueued
+	task.Priority = 30
+	err = crawler.dataStore.postTask(&task)
+	if err != nil {
+		log.Printf("[match %s] failed to initialize team encounter update: %v", task.Data.MatchUUID, err)
+	}
+
 	return nil
+}
+
+func (crawler *Crawler) storeTeamEncounter(task *Task) error {
+	err := crawler.dataStore.storeTeamEncounter(task.Data.MatchID)
+	if err != nil {
+		log.Printf("[match %s] failed to store team encounter: %v", task.Data.MatchID, err)
+		return crawler.dataStore.blockTask(task)
+	}
+	crawler.dataStore.finishTask(task)
 }
 
 func (bot *Bot) updateMatchResult(msg *discordgo.MessageCreate, matchUUID string) {
@@ -538,7 +562,7 @@ func (crawler *Crawler) loadMatchEvents(matchUUID string) (*MatchEvents, error) 
 	return events, nil
 }
 
-func (crawler *Crawler) updateMatchEvents(task *Task) error {
+func (crawler *Crawler) storeMatchEvents(task *Task) error {
 	// Get the match events
 	matchEvents, err := crawler.loadMatchEvents(task.Data.MatchUUID)
 

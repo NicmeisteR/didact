@@ -464,6 +464,30 @@ CREATE INDEX team_encounter_t1_t2_idx
         te_t2_p1_id, te_t2_p1_id, te_t2_p1_id,
         te_start_date);
 
+CREATE INDEX team_encounter_t1_p1_idx
+    ON team_encounter
+    USING BTREE(te_t1_p1_id, te_start_date);
+
+CREATE INDEX team_encounter_t1_p2_idx
+    ON team_encounter
+    USING BTREE(te_t1_p2_id, te_start_date);
+
+CREATE INDEX team_encounter_t1_p3_idx
+    ON team_encounter
+    USING BTREE(te_t1_p3_id, te_start_date);
+
+CREATE INDEX team_encounter_t2_p1_idx
+    ON team_encounter
+    USING BTREE(te_t2_p1_id, te_start_date);
+
+CREATE INDEX team_encounter_t2_p2_idx
+    ON team_encounter
+    USING BTREE(te_t2_p2_id, te_start_date);
+
+CREATE INDEX team_encounter_t2_p3_idx
+    ON team_encounter
+    USING BTREE(te_t2_p3_id, te_start_date);
+
 CREATE INDEX team_encounter_playlist_idx
     ON team_encounter
     USING BTREE(te_playlist_uuid, te_start_date);

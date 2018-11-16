@@ -14,8 +14,9 @@ type ScanDirection int
 const (
 	TaskMatchHistoryScan TaskType = iota
 	TaskPlayerStatsUpdate
-	TaskMatchResultUpdate
-	TaskMatchEventsUpdate
+	TaskMatchResultInsert
+	TaskMatchEventsInsert
+	TaskTeamEncounterInsert
 )
 
 const (
@@ -156,6 +157,7 @@ func (ds *DataStore) updateTask(task *Task) (err error) {
 		return err
 	}
 
+func (crawler *Crawler) storeMatchResult(task *Task) error {
 	defer func() {
 		if err == nil {
 			tx.Commit()

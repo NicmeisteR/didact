@@ -205,7 +205,7 @@ func (ds *DataStore) matchExists(matchUUID string) bool {
 }
 
 // Insert a match
-func (ds *DataStore) storeMatch(match *Match) error {
+func (ds *DataStore) storeMatch(match *Match) (int, error) {
 	// Create transaction
 	ctx := context.Background()
 	txOpts := new(sql.TxOptions)
@@ -225,7 +225,7 @@ func (ds *DataStore) storeMatch(match *Match) error {
 	`, match.MatchId)
 
 	if err != nil {
-		return err
+		return 0, err
 	}
 
 	// Get map uuids
@@ -271,7 +271,7 @@ func (ds *DataStore) storeMatch(match *Match) error {
 	var matchId int
 	err = result.Scan(&matchId)
 	if err != nil {
-		return err
+		return 0, err
 	}
 
 	// Insert teams
@@ -292,7 +292,7 @@ func (ds *DataStore) storeMatch(match *Match) error {
 		`, matchId, teamId, team.TeamSize, team.MatchOutcome, team.ObjectiveScore)
 
 		if err != nil {
-			return err
+			return 0, err
 		}
 	}
 
@@ -387,7 +387,7 @@ func (ds *DataStore) storeMatch(match *Match) error {
 		)
 
 		if err != nil {
-			return err
+			return 0, err
 		}
 
 		// Insert point stats
@@ -413,7 +413,7 @@ func (ds *DataStore) storeMatch(match *Match) error {
 			err = result.Scan(&pointId)
 			if err != nil {
 				log.Printf("Failed to insert point '%s': %v", pointName, err)
-				return err
+				return 0, err
 			}
 
 			// Insert point stats
@@ -438,7 +438,7 @@ func (ds *DataStore) storeMatch(match *Match) error {
 			)
 
 			if err != nil {
-				return err
+				return 0, err
 			}
 		}
 
@@ -474,7 +474,7 @@ func (ds *DataStore) storeMatch(match *Match) error {
 			)
 
 			if err != nil {
-				return err
+				return 0, err
 			}
 		}
 
@@ -500,7 +500,7 @@ func (ds *DataStore) storeMatch(match *Match) error {
 				cardStats.TotalPlays,
 			)
 			if err != nil {
-				return err
+				return 0, err
 			}
 		}
 
@@ -527,7 +527,7 @@ func (ds *DataStore) storeMatch(match *Match) error {
 			)
 
 			if err != nil {
-				return err
+				return 0, err
 			}
 		}
 
@@ -559,7 +559,7 @@ func (ds *DataStore) storeMatch(match *Match) error {
 			)
 
 			if err != nil {
-				return err
+				return 0, err
 			}
 		}
 	}
@@ -571,12 +571,76 @@ func (ds *DataStore) storeMatch(match *Match) error {
 		}
 		_, err = tx.Exec(`SELECT didact_upsert_player($1)`, player.PlayerId.Gamertag)
 		if err != nil {
-			return err
+			return 0, err
 		}
 	}
 
+	return matchID, nil
+}
+
+// -------------------------------------------------------------------------------------------------------------
+// Team Encounter
+// -------------------------------------------------------------------------------------------------------------
+
+func (ds *DataStore) storeTeamEncounter(matchID int) error {
+	// Create transaction
+	ctx := context.Background()
+	txOpts := new(sql.TxOptions)
+	tx, err := ds.db.BeginTx(ctx, txOpts)
+	defer func() {
+		if err == nil {
+			tx.Commit()
+			return
+		}
+		tx.Rollback()
+	}()
+
 	// Store team encounter
-	_, err = tx.Exec(`SELECT didact_store_team_encounter($1)`, matchId)
+	_, err = tx.Exec(`
+        WITH t_ AS (
+            SELECT player_1, player_2, player_3
+            FROM didact_match_teams($1)
+        )
+        INSERT INTO team_encounter(
+            te_match_id,
+            te_t1_p1_id,
+            te_t1_p2_id,
+            te_t1_p3_id,
+            te_t2_p1_id,
+            te_t2_p2_id,
+            te_t2_p3_id,
+            te_start_date,
+            te_duration,
+            te_match_outcome,
+            te_map_uuid,
+            te_match_uuid,
+            te_playlist_uuid,
+            te_season_uuid
+        )
+        SELECT
+            m.m_id,
+            t1.player_1,
+            t1.player_2,
+            t1.player_3,
+            t2.player_1,
+            t2.player_2,
+            t2.player_3,
+            m.m_start_date,
+            m.m_duration,
+            mt.mt_match_outcome,
+            m.m_map_uuid,
+            m.m_match_uuid,
+            m.m_playlist_uuid,
+            m.m_season_uuid
+        FROM match m, match_team mt, t_ t1, t_ t2
+        WHERE m.m_id = $1
+        AND mt.mt_match_id = $1
+        AND mt.mt_team_id = 1
+        AND t1.team_id = 1
+        AND t2.team_id = 2
+        ON CONFLICT DO NOTHING;
+	`, matchId)
+
 	return err
 }
 
