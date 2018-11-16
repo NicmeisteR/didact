@@ -412,6 +412,35 @@ CREATE TABLE match_events (
 -- TEAM
 -- ----------------------------------------------------------------------------
 
+CREATE MATERIALIZED VIEW team_encounter_prep AS (
+    WITH x_ AS (
+        SELECT
+            p_id AS player_id,
+            mp_match_id AS match_id,
+            mp_player_idx AS player_idx,
+            mp_team_id AS team_id,
+            rank() over (partition by mp_match_id, mp_team_id order by p_id asc) as rank
+        FROM match_player, player
+        WHERE mp_gamertag = p_gamertag
+    )
+    SELECT
+        m1.match_id AS tep_match_id,
+        m1.team_id AS tep_team_id,
+        m1.player_id AS tep_player_1,
+        COALESCE(m2.player_id, 0) AS tep_player_2,
+        COALESCE(m3.player_id, 0) AS tep_player_3
+    FROM x_ m1
+        LEFT OUTER JOIN x_ m2
+            ON m1.match_id = m2.match_id
+            AND m1.team_id = m2.team_id
+            AND m2.rank = 2
+        LEFT OUTER JOIN x_ m3
+            ON m1.match_id = m3.match_id
+            AND m1.team_id = m3.team_id
+            AND m3.rank = 3
+    WHERE m1.rank = 1
+) WITH NO DATA;
+
 CREATE TABLE team_encounter (
     te_match_id         INTEGER NOT NULL,
 
