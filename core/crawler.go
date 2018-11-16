@@ -250,15 +250,15 @@ func (crawler *Crawler) storeMatchResult(task *Task) error {
 	crawler.dataStore.finishTask(task)
 
 	// Init team encounter insert
-	var task Task
-	task.Data.matchID = matchID
-	task.Type = TaskMatchTeamEncounter
-	task.Updated = time.Now()
-	task.Status = TaskQueued
-	task.Priority = 30
-	err = crawler.dataStore.postTask(&task)
+	var encounterInsert Task
+	encounterInsert.Data.MatchID = matchID
+	encounterInsert.Type = TaskTeamEncounterInsert
+	encounterInsert.Updated = time.Now()
+	encounterInsert.Status = TaskQueued
+	encounterInsert.Priority = 30
+	err = crawler.dataStore.postTask(&encounterInsert)
 	if err != nil {
-		log.Printf("[match %s] failed to initialize team encounter update: %v", task.Data.MatchUUID, err)
+		log.Printf("[match %s] failed to initialize team encounter update: %v", encounterInsert.Data.MatchUUID, err)
 	}
 
 	return nil
@@ -267,10 +267,11 @@ func (crawler *Crawler) storeMatchResult(task *Task) error {
 func (crawler *Crawler) storeTeamEncounter(task *Task) error {
 	err := crawler.dataStore.storeTeamEncounter(task.Data.MatchID)
 	if err != nil {
-		log.Printf("[match %s] failed to store team encounter: %v", task.Data.MatchID, err)
+		log.Printf("[team_encounter %s] failed to store encounter for match: %v", task.Data.MatchID, err)
 		return crawler.dataStore.blockTask(task)
 	}
 	crawler.dataStore.finishTask(task)
+	return nil
 }
 
 func (bot *Bot) updateMatchResult(msg *discordgo.MessageCreate, matchUUID string) {
@@ -302,7 +303,7 @@ func (bot *Bot) updateMatchResult(msg *discordgo.MessageCreate, matchUUID string
 	}
 
 	// Insert match
-	err = bot.dataStore.storeMatch(match)
+	_, err = bot.dataStore.storeMatch(match)
 	if err == ErrMetadataIncomplete {
 		bot.sendResponse(msg, fmt.Sprintf("It seems like this match has metadata that I don't understand: **%s**.", matchUUID))
 		return
@@ -706,7 +707,7 @@ func (crawler *Crawler) scanMatchHistory(task *Task) error {
 	for i := range newMatches {
 		var task Task
 		task.Data.MatchUUID = newMatches[i]
-		task.Type = TaskMatchResultUpdate
+		task.Type = TaskMatchResultInsert
 		task.Updated = time.Now()
 		task.Status = TaskQueued
 		task.Priority = 20

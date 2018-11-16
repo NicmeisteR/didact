@@ -232,7 +232,7 @@ func (ds *DataStore) storeMatch(match *Match) (int, error) {
 	mapUUID, ok := MapUUIDs[match.MapId]
 	if !ok {
 		log.Printf("Unknown map: %s\n", mapUUID)
-		return ErrMetadataIncomplete
+		return 0, ErrMetadataIncomplete
 	}
 
 	// Create new match
@@ -447,7 +447,7 @@ func (ds *DataStore) storeMatch(match *Match) (int, error) {
 			unitUUID, ok := GameObjectUUIDs[strings.ToLower(unitName)]
 			if !ok {
 				log.Printf("Unknown unit: %s\n", unitName)
-				return ErrMetadataIncomplete
+				return 0, ErrMetadataIncomplete
 			}
 			_, err = tx.Exec(`
 				INSERT INTO match_player_unit (
@@ -536,7 +536,7 @@ func (ds *DataStore) storeMatch(match *Match) (int, error) {
 			leaderPowerUUID, ok := LeaderPowerUUIDs[leaderPowerName]
 			if !ok {
 				log.Printf("Unknown leader power: %s\n", leaderPowerName)
-				return ErrMetadataIncomplete
+				return 0, ErrMetadataIncomplete
 			}
 			_, err = tx.Exec(`
 				INSERT INTO match_player_leader_power (
@@ -575,7 +575,7 @@ func (ds *DataStore) storeMatch(match *Match) (int, error) {
 		}
 	}
 
-	return matchID, nil
+	return matchId, nil
 }
 
 // -------------------------------------------------------------------------------------------------------------
@@ -639,7 +639,7 @@ func (ds *DataStore) storeTeamEncounter(matchID int) error {
         AND t1.team_id = 1
         AND t2.team_id = 2
         ON CONFLICT DO NOTHING;
-	`, matchId)
+	`, matchID)
 
 	return err
 }

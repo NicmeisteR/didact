@@ -156,8 +156,6 @@ func (ds *DataStore) updateTask(task *Task) (err error) {
 	if err != nil {
 		return err
 	}
-
-func (crawler *Crawler) storeMatchResult(task *Task) error {
 	defer func() {
 		if err == nil {
 			tx.Commit()
