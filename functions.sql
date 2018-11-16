@@ -151,7 +151,7 @@ RETURNS VOID AS $$
     END
 $$ LANGUAGE plpgsql;
 
-CREATE OR REPLACE FUNCTION didact_store_team_encounters()
+CREATE OR REPLACE FUNCTION didact_build_team_encounters()
 RETURNS VOID AS $$
     DECLARE
         t TIMESTAMP := clock_timestamp();
@@ -164,17 +164,20 @@ RETURNS VOID AS $$
                 mp_player_idx AS player_idx,
                 mp_team_id AS team_id,
                 mt_team_size AS team_size,
+                mt_match_outcome AS team_outcome,
                 rank() over (partition by mp_match_id, mp_team_id order by p_id asc) as rank
-            FROM match_player, player, match_team
-            WHERE mp_gamertag = p_gamertag
-            AND mt_team_id = mp_team_id
+            FROM match_player, match_team, player
+            WHERE mp_match_id = mt_match_id
+            AND mp_team_id = mt_team_id
+            AND mp_gamertag = p_gamertag
         ), t_ AS (
             SELECT
                 m1.match_id AS match_id,
                 m1.team_id AS team_id,
                 m1.player_id AS player_1,
                 COALESCE(m2.player_id, 0) AS player_2,
-                COALESCE(m3.player_id, 0) AS player_3
+                COALESCE(m3.player_id, 0) AS player_3,
+                m1.team_outcome AS match_outcome
             FROM x_ m1
                 LEFT OUTER JOIN x_ m2
                     ON m1.match_id = m2.match_id
@@ -212,15 +215,13 @@ RETURNS VOID AS $$
                 t2.player_3,
                 m.m_start_date,
                 m.m_duration,
-                mt.mt_match_outcome,
+                t1.match_outcome,
                 m.m_map_uuid,
                 m.m_match_uuid,
                 m.m_playlist_uuid,
                 m.m_season_uuid
-        FROM match m, match_team mt, t_ t1, t_ t2
-        WHERE m.m_id = mt.mt_match_id
-        AND mt.mt_team_id = 1
-        AND t1.match_id = m.m_id
+        FROM match m, t_ t1, t_ t2
+        WHERE t1.match_id = m.m_id
         AND t2.match_id = m.m_id
         AND t1.team_id = 1
         AND t2.team_id = 2
