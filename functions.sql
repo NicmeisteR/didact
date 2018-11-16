@@ -88,8 +88,8 @@ RETURNS TABLE(
         SELECT
             m1.team_id AS team_id,
             m1.player_id AS player_1,
-            COALESCE(m2.player_id, -m1.team_size) AS player_2,
-            COALESCE(m3.player_id, -m1.team_size) AS player_3
+            COALESCE(m2.player_id, 0) AS player_2,
+            COALESCE(m3.player_id, 0) AS player_3
         FROM x m1
             LEFT OUTER JOIN x m2
                 ON m1.match_id = m2.match_id
@@ -173,8 +173,8 @@ RETURNS VOID AS $$
                 m1.match_id AS match_id,
                 m1.team_id AS team_id,
                 m1.player_id AS player_1,
-                COALESCE(m2.player_id, -m1.team_size) AS player_2,
-                COALESCE(m3.player_id, -m1.team_size) AS player_3
+                COALESCE(m2.player_id, 0) AS player_2,
+                COALESCE(m3.player_id, 0) AS player_3
             FROM x_ m1
                 LEFT OUTER JOIN x_ m2
                     ON m1.match_id = m2.match_id
