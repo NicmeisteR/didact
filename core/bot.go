@@ -220,6 +220,8 @@ func (bot *Bot) onMessageCreate(s *discordgo.Session, m *discordgo.MessageCreate
 		fallthrough
 	case "sp":
 		fallthrough
+	case "scan":
+		fallthrough
 	case "scan-player":
 		bot.scanPlayer(m, args)
 		break
