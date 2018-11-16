@@ -598,7 +598,7 @@ func (ds *DataStore) storeTeamEncounter(matchID int) error {
 	// Store team encounter
 	_, err = tx.Exec(`
         WITH t_ AS (
-            SELECT player_1, player_2, player_3
+            SELECT team_id, player_1, player_2, player_3, match_outcome
             FROM didact_match_teams($1)
         )
         INSERT INTO team_encounter(
@@ -627,15 +627,13 @@ func (ds *DataStore) storeTeamEncounter(matchID int) error {
             t2.player_3,
             m.m_start_date,
             m.m_duration,
-            mt.mt_match_outcome,
+            t1.match_outcome,
             m.m_map_uuid,
             m.m_match_uuid,
             m.m_playlist_uuid,
             m.m_season_uuid
-        FROM match m, match_team mt, t_ t1, t_ t2
+        FROM match m, t_ t1, t_ t2
         WHERE m.m_id = $1
-        AND mt.mt_match_id = $1
-        AND mt.mt_team_id = 1
         AND t1.team_id = 1
         AND t2.team_id = 2
         ON CONFLICT DO NOTHING;

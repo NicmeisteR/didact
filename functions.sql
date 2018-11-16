@@ -67,7 +67,8 @@ RETURNS TABLE(
     team_id INTEGER,
     player_1 INTEGER,
     player_2 INTEGER,
-    player_3 INTEGER
+    player_3 INTEGER,
+    match_outcome INTEGER
 ) AS $$
     BEGIN
         RETURN QUERY
@@ -78,18 +79,20 @@ RETURNS TABLE(
                 mp_player_idx AS player_idx,
                 mp_team_id AS team_id,
                 mt_team_size AS team_size,
+                mt_match_outcome AS team_outcome,
                 rank() over (partition by mp_match_id, mp_team_id order by p_id asc) as rank
-            FROM match_player, player, match_team
-            WHERE mp_gamertag = p_gamertag
-            AND mp_match_id = match_id
+            FROM match_player, match_team, player
+            WHERE mp_match_id = match_id
             AND mt_match_id = match_id
             AND mt_team_id = mp_team_id
+            AND mp_gamertag = p_gamertag
         )
         SELECT
             m1.team_id AS team_id,
             m1.player_id AS player_1,
             COALESCE(m2.player_id, 0) AS player_2,
-            COALESCE(m3.player_id, 0) AS player_3
+            COALESCE(m3.player_id, 0) AS player_3,
+            m1.team_outcome AS match_outcome
         FROM x m1
             LEFT OUTER JOIN x m2
                 ON m1.match_id = m2.match_id
@@ -100,54 +103,6 @@ RETURNS TABLE(
                 AND m1.team_id = m3.team_id
                 AND m3.rank = 3
         WHERE m1.rank = 1;
-    END
-$$ LANGUAGE plpgsql;
-
-CREATE OR REPLACE FUNCTION didact_store_team_encounter(match_id INTEGER)
-RETURNS VOID AS $$
-    BEGIN
-        WITH t_ AS (
-            SELECT player_1, player_2, player_3
-            FROM didact_match_teams(match_id)
-        )
-        INSERT INTO team_encounter(
-            te_match_id,
-            te_t1_p1_id,
-            te_t1_p2_id,
-            te_t1_p3_id,
-            te_t2_p1_id,
-            te_t2_p2_id,
-            te_t2_p3_id,
-            te_start_date,
-            te_duration,
-            te_match_outcome,
-            te_map_uuid,
-            te_match_uuid,
-            te_playlist_uuid,
-            te_season_uuid
-        )
-        SELECT
-            m.m_id,
-            t1.player_1,
-            t1.player_2,
-            t1.player_3,
-            t2.player_1,
-            t2.player_2,
-            t2.player_3,
-            m.m_start_date,
-            m.m_duration,
-            mt.mt_match_outcome,
-            m.m_map_uuid,
-            m.m_match_uuid,
-            m.m_playlist_uuid,
-            m.m_season_uuid
-        FROM match m, match_team mt, t_ t1, t_ t2
-        WHERE m.m_id = match_id
-        AND mt.mt_match_id = match_id
-        AND mt.mt_team_id = 1
-        AND t1.team_id = 1
-        AND t2.team_id = 2
-        ON CONFLICT DO NOTHING;
     END
 $$ LANGUAGE plpgsql;
 
