@@ -173,8 +173,8 @@ RETURNS VOID AS $$
         FROM match m, t_ t1, t_ t2, match_team mt
         WHERE t1.match_id = m.m_id
         AND t2.match_id = m.m_id
-        -- Forcing the team ids to 1 and 2 lets the postgres estimate fail miserably.
-        -- The < prevents the nested loop join.
+        -- Team id predicates let the postgres estimate fail miserably.
+        -- The < prevents the nested loop join and gives hash joins instead
         AND t1.team_id < t2.team_id
         AND mt.mt_match_id = m.m_id
         AND mt.mt_team_id = 1
