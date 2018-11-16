@@ -412,16 +412,6 @@ CREATE TABLE match_events (
 -- TEAM
 -- ----------------------------------------------------------------------------
 
-CREATE TABLE team_dsr (
-    t_p1_id INTEGER NOT NULL,
-    t_p2_id INTEGER NOT NULL,
-    t_p3_id INTEGER NOT NULL,
-
-    t_dsr DECIMAL(9, 6) NOT NULL,
-
-    PRIMARY KEY (t_p1_id, t_p2_id, t_p3_id)
-);
-
 CREATE TABLE team_encounter (
     te_match_id         INTEGER NOT NULL,
 
@@ -577,13 +567,42 @@ CREATE INDEX community_league_team_team_id_idx
 -- DSR
 -- ----------------------------------------------------------------------------
 
-CREATE MATERIALIZED VIEW dsr AS
-    SELECT p_id AS dsr_player_id, MAX(mp_mmr_new_rating) AS dsr_value
-    FROM match, match_player, player
-    WHERE m_start_date > now() - INTERVAL '100 days'
-    AND m_id = mp_match_id
-    AND mp_gamertag = p_gamertag
-    GROUP BY p_id
-    WITH NO DATA;
+CREATE MATERIALIZED VIEW dsr AS (
+    WITH dsr_(p_id, val) AS (
+        SELECT p_id, MAX(mp_mmr_new_rating)
+        FROM match, match_player, player
+        WHERE m_start_date > now() - INTERVAL '90 days'
+        AND m_id = mp_match_id
+        AND mp_gamertag = p_gamertag
+        GROUP BY p_id
+    ), team_(p1_id, p2_id, p3_id) AS (
+        SELECT te_t1_p1_id, te_t1_p2_id, te_t1_p3_id FROM team_encounter
+        UNION
+        SELECT te_t2_p1_id, te_t2_p2_id, te_t2_p3_id FROM team_encounter
+    ), comp_ AS (
+        SELECT
+            t.p1_id, t.p2_id, t.p3_id,
+            COALESCE(r1.val, 0) AS r1,
+            COALESCE(r2.val, 0) AS r2,
+            COALESCE(r3.val, 0) AS r3,
+            pow(2,
+                (COALESCE(r1.val, 0) >= COALESCE(r2.val, 0))::INT +
+                (COALESCE(r1.val, 0) >= COALESCE(r3.val, 0))::INT) AS w1,
+            pow(2,
+                (COALESCE(r2.val, 0) >= COALESCE(r1.val, 0))::INT +
+                (COALESCE(r2.val, 0) >= COALESCE(r3.val, 0))::INT) AS w2,
+            pow(2,
+                (COALESCE(r3.val, 0) >= COALESCE(r1.val, 0))::INT +
+                (COALESCE(r3.val, 0) >= COALESCE(r2.val, 0))::INT) AS w3
+        FROM team_ t
+            LEFT OUTER JOIN dsr_ r1 ON t.p1_id = r1.p_id
+            LEFT OUTER JOIN dsr_ r2 ON t.p2_id = r2.p_id
+            LEFT OUTER JOIN dsr_ r3 ON t.p3_id = r3.p_id
+    )
+    SELECT
+        p1_id AS r_p1_id, p2_id AS r_p2_id, p3_id AS r_p3_id,
+        (((r1 * w1) + (r2 * w2) + (r3 * w3)) / (w1 + w2 + w3)) AS r_value
+    FROM comp_
+) WITH NO DATA;
 
-CREATE UNIQUE INDEX dsr_player_idx ON dsr(dsr_player_id);
+CREATE UNIQUE INDEX dsr_team_idx ON dsr(r_p1_id, r_p2_id, r_p3_id);
