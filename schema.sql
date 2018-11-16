@@ -412,24 +412,26 @@ CREATE TABLE match_events (
 -- TEAM
 -- ----------------------------------------------------------------------------
 
-CREATE TABLE team (
-    t_id            SERIAL NOT NULL,
-    t_p1_id         INTEGER NOT NULL,
-    t_p2_id         INTEGER NOT NULL,
-    t_p3_id         INTEGER NOT NULL,
+CREATE TABLE team_dsr (
+    t_p1_id INTEGER NOT NULL,
+    t_p2_id INTEGER NOT NULL,
+    t_p3_id INTEGER NOT NULL,
 
-    PRIMARY KEY (t_id)
+    t_dsr DECIMAL(9, 6) NOT NULL,
+
+    PRIMARY KEY (t_p1_id, t_p2_id, t_p3_id)
 );
-
-CREATE UNIQUE INDEX team_idx ON team(t_p1_id, t_p2_id, t_p3_id);
-CREATE INDEX team_p1_idx ON team(t_p1_id);
-CREATE INDEX team_p2_idx ON team(t_p2_id);
-CREATE INDEX team_p3_idx ON team(t_p3_id);
 
 CREATE TABLE team_encounter (
     te_match_id         INTEGER NOT NULL,
-    te_t1_id            INTEGER NOT NULL,
-    te_t2_id            INTEGER NOT NULL,
+
+    te_t1_p1_id         INTEGER NOT NULL,
+    te_t1_p2_id         INTEGER NOT NULL,
+    te_t1_p3_id         INTEGER NOT NULL,
+
+    te_t2_p1_id         INTEGER NOT NULL,
+    te_t2_p2_id         INTEGER NOT NULL,
+    te_t2_p3_id         INTEGER NOT NULL,
 
     te_start_date       TIMESTAMP NOT NULL,
     te_duration         INTERVAL,
@@ -440,12 +442,6 @@ CREATE TABLE team_encounter (
     te_playlist_uuid    UUID,
     te_season_uuid      UUID,
 
-    FOREIGN KEY (te_t1_id)
-        REFERENCES team(t_id)
-        ON DELETE CASCADE,
-    FOREIGN KEY (te_t2_id)
-        REFERENCES team(t_id)
-        ON DELETE CASCADE,
     FOREIGN KEY (te_match_id)
         REFERENCES match(m_id)
         ON DELETE CASCADE,
@@ -455,15 +451,18 @@ CREATE TABLE team_encounter (
 
 CREATE INDEX team_encounter_t1_idx
     ON team_encounter
-    USING BTREE(te_t1_id, te_start_date);
+    USING BTREE(te_t1_p1_id, te_t2_p1_id, te_t3_p1_id, te_start_date);
 
 CREATE INDEX team_encounter_t2_idx
     ON team_encounter
-    USING BTREE(te_t2_id, te_start_date);
+    USING BTREE(te_t2_p1_id, te_t2_p1_id, te_t2_p1_id, te_start_date);
 
 CREATE INDEX team_encounter_t1_t2_idx
     ON team_encounter
-    USING BTREE(te_t1_id, te_t2_id, te_start_date);
+    USING BTREE(
+        te_t1_p1_id, te_t2_p1_id, te_t3_p1_id,
+        te_t2_p1_id, te_t2_p1_id, te_t2_p1_id,
+        te_start_date);
 
 CREATE INDEX team_encounter_playlist_idx
     ON team_encounter
@@ -518,9 +517,20 @@ CREATE TABLE community_member (
     PRIMARY KEY (cm_community_id, cm_player_id)
 );
 
+CREATE INDEX community_member_community_id_idx
+    ON community_member
+    USING BTREE(cm_community_id);
+
+CREATE INDEX community_member_player_id_idx
+    ON community_member
+    USING BTREE(cm_player_id);
+
 CREATE TABLE community_league_team (
     clp_league_id INTEGER NOT NULL,
-    clp_team_id INTEGER NOT NULL,
+
+    clp_team_p1_id INTEGER NOT NULL,
+    clp_team_p2_id INTEGER NOT NULL,
+    clp_team_p3_id INTEGER NOT NULL,
 
     clp_joined_at TIMESTAMP NOT NULL,
 
@@ -528,11 +538,7 @@ CREATE TABLE community_league_team (
         REFERENCES community_league(cl_id)
         ON DELETE CASCADE,
 
-    FOREIGN KEY (clp_team_id)
-        REFERENCES team(t_id)
-        ON DELETE CASCADE,
-
-    PRIMARY KEY (clp_league_id, clp_team_id)
+    PRIMARY KEY (clp_league_id, clp_team_p1_id, clp_team_p2_id, clp_team_p3_id)
 );
 
 CREATE INDEX community_league_team_community_id_idx
@@ -541,15 +547,7 @@ CREATE INDEX community_league_team_community_id_idx
 
 CREATE INDEX community_league_team_team_id_idx
     ON community_league_team
-    USING BTREE(clp_team_id);
-
-CREATE INDEX community_member_community_id_idx
-    ON community_member
-    USING BTREE(cm_community_id);
-
-CREATE INDEX community_member_player_id_idx
-    ON community_member
-    USING BTREE(cm_player_id);
+    USING BTREE(clp_team_p1_id, clp_team_p2_id, clp_team_p3_id);
 
 -- ----------------------------------------------------------------------------
 -- DSR

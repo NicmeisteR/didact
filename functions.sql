@@ -64,7 +64,7 @@ $$ LANGUAGE sql;
 
 CREATE OR REPLACE FUNCTION didact_match_teams(match_id INTEGER)
 RETURNS TABLE(
-    team_idx INTEGER,
+    team_id INTEGER,
     player_1 INTEGER,
     player_2 INTEGER,
     player_3 INTEGER
@@ -77,16 +77,19 @@ RETURNS TABLE(
                 mp_match_id AS match_id,
                 mp_player_idx AS player_idx,
                 mp_team_id AS team_id,
+                mt_team_size AS team_size,
                 rank() over (partition by mp_match_id, mp_team_id order by p_id asc) as rank
-            FROM match_player, player
+            FROM match_player, player, match_team
             WHERE mp_gamertag = p_gamertag
             AND mp_match_id = match_id
+            AND mt_match_id = match_id
+            AND mt_team_id = mp_team_id
         )
         SELECT
-            m1.team_id AS team_idx,
-            COALESCE(m1.player_id, 0) AS player_1,
-            COALESCE(m2.player_id, 0) AS player_2,
-            COALESCE(m3.player_id, 0) AS player_3
+            m1.team_id AS team_id,
+            m1.player_id AS player_1,
+            COALESCE(m2.player_id, -m1.team_size) AS player_2,
+            COALESCE(m3.player_id, -m1.team_size) AS player_3
         FROM x m1
             LEFT OUTER JOIN x m2
                 ON m1.match_id = m2.match_id
@@ -103,36 +106,18 @@ $$ LANGUAGE plpgsql;
 CREATE OR REPLACE FUNCTION didact_store_team_encounter(match_id INTEGER)
 RETURNS VOID AS $$
     BEGIN
-        WITH match_teams_ AS (
-            SELECT *
-            FROM didact_match_teams(match_id)
-            LIMIT 2
-        ), inserted_teams_ AS (
-            INSERT INTO team(t_p1_id, t_p2_id, t_p3_id)
+        WITH t_ AS (
             SELECT player_1, player_2, player_3
-            FROM match_teams_
-            ON CONFLICT DO NOTHING
-            RETURNING t_id, t_p1_id, t_p2_id, t_p3_id
-        ), team_ids_ AS (
-            SELECT
-                match_id AS mid,
-                mt.team_idx AS team_idx,
-                COALESCE(it.t_id, st.t_id, 0) AS team_id
-            FROM match_teams_ mt
-                LEFT OUTER JOIN inserted_teams_ it
-                    ON it.t_p1_id = mt.player_1
-                    AND it.t_p2_id = mt.player_2
-                    AND it.t_p3_id = mt.player_3
-                LEFT OUTER JOIN team st
-                    ON st.t_p1_id = mt.player_1
-                    AND st.t_p2_id = mt.player_2
-                    AND st.t_p3_id = mt.player_3
-            LIMIT 2
+            FROM didact_match_teams(match_id)
         )
         INSERT INTO team_encounter(
-            te_t1_id,
-            te_t2_id,
             te_match_id,
+            te_t1_p1_id,
+            te_t1_p2_id,
+            te_t1_p3_id,
+            te_t2_p1_id,
+            te_t2_p2_id,
+            te_t2_p3_id,
             te_start_date,
             te_duration,
             te_match_outcome,
@@ -142,9 +127,13 @@ RETURNS VOID AS $$
             te_season_uuid
         )
         SELECT
-            t1.team_id,
-            t2.team_id,
             m.m_id,
+            t1.player_1,
+            t1.player_2,
+            t1.player_3,
+            t2.player_1,
+            t2.player_2,
+            t2.player_3,
             m.m_start_date,
             m.m_duration,
             mt.mt_match_outcome,
@@ -152,197 +141,93 @@ RETURNS VOID AS $$
             m.m_match_uuid,
             m.m_playlist_uuid,
             m.m_season_uuid
-        FROM match m, match_team mt, team_ids_ t1, team_ids_ t2
+        FROM match m, match_team mt, t_ t1, t_ t2
         WHERE m.m_id = match_id
         AND mt.mt_match_id = match_id
         AND mt.mt_team_id = 1
-        AND t1.mid = match_id
-        AND t2.mid = match_id
-        AND t1.team_idx = 1
-        AND t2.team_idx = 2
+        AND t1.team_id = 1
+        AND t2.team_id = 2
         ON CONFLICT DO NOTHING;
     END
 $$ LANGUAGE plpgsql;
 
 CREATE OR REPLACE FUNCTION didact_store_team_encounters()
 RETURNS VOID AS $$
-  DECLARE
-      t TIMESTAMP := clock_timestamp();
-  BEGIN
-      RAISE NOTICE 'Storing team encounters';
-      WITH match_player_ AS (
-          SELECT
-              p_id AS player_id,
-              mp_match_id AS match_id,
-              mp_player_idx AS player_idx,
-              mp_team_id AS team_id,
-              rank() over (partition by mp_match_id, mp_team_id order by p_id asc) as rank
-          FROM match_player
-            LEFT OUTER JOIN team_encounter ON mp_match_id = te_match_id
-            INNER JOIN player ON mp_gamertag = p_gamertag
-            WHERE te_match_id IS NULL
-      ), match_teams_ AS (
-          SELECT
-              m1.match_id AS match_id,
-              m1.team_id AS team_idx,
-              COALESCE(m1.player_id, 0) AS player_1,
-              COALESCE(m2.player_id, 0) AS player_2,
-              COALESCE(m3.player_id, 0) AS player_3
-          FROM match_player_ m1
-              LEFT OUTER JOIN match_player_ m2
-                  ON m1.match_id = m2.match_id
-                  AND m1.team_id = m2.team_id
-                  AND m2.rank = 2
-              LEFT OUTER JOIN match_player_ m3
-                  ON m1.match_id = m3.match_id
-                  AND m1.team_id = m3.team_id
-                  AND m3.rank = 3
-          WHERE m1.rank = 1
-      ), inserted_teams_ AS (
-          INSERT INTO team(t_p1_id, t_p2_id, t_p3_id)
-          SELECT player_1, player_2, player_3
-          FROM match_teams_
-          ON CONFLICT DO NOTHING
-          RETURNING t_id, t_p1_id, t_p2_id, t_p3_id
-      ), team_ids_ AS (
-          SELECT
-              mt.match_id AS mid,
-              mt.team_idx AS team_idx,
-              COALESCE(it.t_id, st.t_id, 0) AS team_id
-          FROM match_teams_ mt
-              LEFT OUTER JOIN inserted_teams_ it
-                  ON it.t_p1_id = mt.player_1
-                  AND it.t_p2_id = mt.player_2
-                  AND it.t_p3_id = mt.player_3
-              LEFT OUTER JOIN team st
-                  ON st.t_p1_id = mt.player_1
-                  AND st.t_p2_id = mt.player_2
-                  AND st.t_p3_id = mt.player_3
-      )
-      INSERT INTO team_encounter(
-          te_t1_id,
-          te_t2_id,
-          te_match_id,
-          te_start_date,
-          te_duration,
-          te_match_outcome,
-          te_map_uuid,
-          te_match_uuid,
-          te_playlist_uuid,
-          te_season_uuid
-      )
-      SELECT
-          t1.team_id,
-          t2.team_id,
-          m.m_id,
-          m.m_start_date,
-          m.m_duration,
-          mt.mt_match_outcome,
-          m.m_map_uuid,
-          m.m_match_uuid,
-          m.m_playlist_uuid,
-          m.m_season_uuid
-      FROM match m, match_team mt, team_ids_ t1, team_ids_ t2
-      WHERE m.m_id = mt.mt_match_id
-      AND mt.mt_team_id = 1
-      AND t1.mid = m.m_id
-      AND t2.mid = m.m_id
-      AND t1.team_idx = 1
-      AND t2.team_idx = 2
-      ON CONFLICT DO NOTHING;
-      RAISE NOTICE 'Duration=%', clock_timestamp() - t;
-    END
-$$ LANGUAGE plpgsql;
+    DECLARE
+        t TIMESTAMP := clock_timestamp();
+    BEGIN
+        RAISE NOTICE 'Storing team encounters';
+        WITH x_ AS (
+            SELECT
+                p_id AS player_id,
+                mp_match_id AS match_id,
+                mp_player_idx AS player_idx,
+                mp_team_id AS team_id,
+                mt_team_size AS team_size,
+                rank() over (partition by mp_match_id, mp_team_id order by p_id asc) as rank
+            FROM match_player, player, match_team
+            WHERE mp_gamertag = p_gamertag
+            AND mt_team_id = mp_team_id
+        ), t_ AS (
+            SELECT
+                m1.match_id AS match_id,
+                m1.team_id AS team_id,
+                m1.player_id AS player_1,
+                COALESCE(m2.player_id, -m1.team_size) AS player_2,
+                COALESCE(m3.player_id, -m1.team_size) AS player_3
+            FROM x_ m1
+                LEFT OUTER JOIN x_ m2
+                    ON m1.match_id = m2.match_id
+                    AND m1.team_id = m2.team_id
+                    AND m2.rank = 2
+                LEFT OUTER JOIN x_ m3
+                    ON m1.match_id = m3.match_id
+                    AND m1.team_id = m3.team_id
+                    AND m3.rank = 3
+            WHERE m1.rank = 1
+        )
+        INSERT INTO team_encounter(
+                te_match_id,
+                te_t1_p1_id,
+                te_t1_p2_id,
+                te_t1_p3_id,
+                te_t2_p1_id,
+                te_t2_p2_id,
+                te_t2_p3_id,
+                te_start_date,
+                te_duration,
+                te_match_outcome,
+                te_map_uuid,
+                te_match_uuid,
+                te_playlist_uuid,
+                te_season_uuid
+        )
+        SELECT
+                m.m_id,
+                t1.player_1,
+                t1.player_2,
+                t1.player_3,
+                t2.player_1,
+                t2.player_2,
+                t2.player_3,
+                m.m_start_date,
+                m.m_duration,
+                mt.mt_match_outcome,
+                m.m_map_uuid,
+                m.m_match_uuid,
+                m.m_playlist_uuid,
+                m.m_season_uuid
+        FROM match m, match_team mt, t_ t1, t_ t2
+        WHERE m.m_id = mt.mt_match_id
+        AND mt.mt_team_id = 1
+        AND t1.match_id = m.m_id
+        AND t2.match_id = m.m_id
+        AND t1.team_id = 1
+        AND t2.team_id = 2
+        ON CONFLICT DO NOTHING;
 
-CREATE OR REPLACE FUNCTION didact_store_player_team_encounters(player_id INTEGER)
-RETURNS VOID AS $$
-  DECLARE
-      t TIMESTAMP := clock_timestamp();
-  BEGIN
-      RAISE NOTICE 'Storing player team encounters';
-      WITH match_player_ AS (
-          SELECT
-              p_id AS player_id,
-              mp_match_id AS match_id,
-              mp_player_idx AS player_idx,
-              mp_team_id AS team_id,
-              rank() over (partition by mp_match_id, mp_team_id order by p_id asc) as rank
-          FROM match_player
-            LEFT OUTER JOIN team_encounter ON mp_match_id = te_match_id
-            INNER JOIN player ON mp_gamertag = p_gamertag
-          WHERE te_match_id IS NULL
-          AND p_id = player_id
-      ), match_teams_ AS (
-          SELECT
-              m1.match_id AS match_id,
-              m1.team_id AS team_idx,
-              COALESCE(m1.player_id, 0) AS player_1,
-              COALESCE(m2.player_id, 0) AS player_2,
-              COALESCE(m3.player_id, 0) AS player_3
-          FROM match_player_ m1
-              LEFT OUTER JOIN match_player_ m2
-                  ON m1.match_id = m2.match_id
-                  AND m1.team_id = m2.team_id
-                  AND m2.rank = 2
-              LEFT OUTER JOIN match_player_ m3
-                  ON m1.match_id = m3.match_id
-                  AND m1.team_id = m3.team_id
-                  AND m3.rank = 3
-          WHERE m1.rank = 1
-      ), inserted_teams_ AS (
-          INSERT INTO team(t_p1_id, t_p2_id, t_p3_id)
-          SELECT player_1, player_2, player_3
-          FROM match_teams_
-          ON CONFLICT DO NOTHING
-          RETURNING t_id, t_p1_id, t_p2_id, t_p3_id
-      ), team_ids_ AS (
-          SELECT
-              mt.match_id AS mid,
-              mt.team_idx AS team_idx,
-              COALESCE(it.t_id, st.t_id, 0) AS team_id
-          FROM match_teams_ mt
-              LEFT JOIN inserted_teams_ it
-                  ON it.t_p1_id = mt.player_1
-                  AND it.t_p2_id = mt.player_2
-                  AND it.t_p3_id = mt.player_3
-              LEFT JOIN team st
-                  ON st.t_p1_id = mt.player_1
-                  AND st.t_p2_id = mt.player_2
-                  AND st.t_p3_id = mt.player_3
-      )
-      INSERT INTO team_encounter(
-          te_t1_id,
-          te_t2_id,
-          te_match_id,
-          te_start_date,
-          te_duration,
-          te_match_outcome,
-          te_map_uuid,
-          te_match_uuid,
-          te_playlist_uuid,
-          te_season_uuid
-      )
-      SELECT
-          t1.team_id,
-          t2.team_id,
-          m.m_id,
-          m.m_start_date,
-          m.m_duration,
-          mt.mt_match_outcome,
-          m.m_map_uuid,
-          m.m_match_uuid,
-          m.m_playlist_uuid,
-          m.m_season_uuid
-      FROM match m, match_team mt, team_ids_ t1, team_ids_ t2
-      WHERE m.m_id = mt.mt_match_id
-      AND mt.mt_team_id = 1
-      AND t1.mid = m.m_id
-      AND t2.mid = m.m_id
-      AND t1.team_idx = 1
-      AND t2.team_idx = 2
-      ON CONFLICT DO NOTHING;
-      RAISE NOTICE 'Duration=%', clock_timestamp() - t;
-    END
+        RAISE NOTICE 'Duration=%', clock_timestamp() - t;
+        END
 $$ LANGUAGE plpgsql;
 
 -- ----------------------------------------------------------------------------
@@ -460,44 +345,6 @@ RETURNS INT AS $$
             EXECUTE 'REFRESH MATERIALIZED VIEW CONCURRENTLY ' || schema_arg || '.' || r.matviewname;
         END LOOP;
 
-        RETURN 1;
-    END
-$$ LANGUAGE plpgsql;
-
--- ----------------------------------------------------------------------------
--- REFRESH SPECIFIC MATERIALIZED VIEWS
--- ----------------------------------------------------------------------------
-
-CREATE OR REPLACE FUNCTION didact_update_leaderboard()
-RETURNS INT AS $$
-    DECLARE
-        t TIMESTAMP := clock_timestamp();
-    BEGIN
-        RAISE NOTICE 'Refreshing public.mv_leaderboard';
-        EXECUTE 'REFRESH MATERIALIZED VIEW CONCURRENTLY public.mv_leaderboard';
-        RAISE NOTICE 'Duration=%', clock_timestamp() - t;
-        RETURN 1;
-    END
-$$ LANGUAGE plpgsql;
-
-CREATE OR REPLACE FUNCTION didact_data_maintenance()
-RETURNS INT AS $$
-    DECLARE
-        t TIMESTAMP := clock_timestamp();
-    BEGIN
-        RAISE NOTICE 'Refreshing public.mv_player_to_match_player';
-        EXECUTE 'REFRESH MATERIALIZED VIEW CONCURRENTLY public.mv_player_to_match_player';
-        RAISE NOTICE 'Duration=%', clock_timestamp() - t;
-
-        t := clock_timestamp();
-        RAISE NOTICE 'Refreshing public.mv_player_encounters';
-        EXECUTE 'REFRESH MATERIALIZED VIEW CONCURRENTLY public.mv_player_encounters';
-        RAISE NOTICE 'Duration=%', clock_timestamp() - t;
-
-        t := clock_timestamp();
-        RAISE NOTICE 'Refreshing public.mv_team_gamertags';
-        EXECUTE 'REFRESH MATERIALIZED VIEW CONCURRENTLY public.mv_team_gamertags';
-        RAISE NOTICE 'Duration=%', clock_timestamp() - t;
         RETURN 1;
     END
 $$ LANGUAGE plpgsql;
