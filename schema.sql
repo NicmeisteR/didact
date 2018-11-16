@@ -2,6 +2,7 @@
 -- TASK
 -- ----------------------------------------------------------------------------
 
+-- A task. This serves as task queue for the crawler.
 CREATE TABLE task (
     t_id        SERIAL NOT NULL,
     t_status    INTEGER NOT NULL,
@@ -20,6 +21,7 @@ CREATE INDEX task_queue_idx
 -- META DATA
 -- ----------------------------------------------------------------------------
 
+-- Playlist metadata.
 CREATE TABLE meta_playlist (
     mpl_uuid        UUID NOT NULL,
     mpl_game_mode   VARCHAR(255) NOT NULL,
@@ -32,6 +34,7 @@ CREATE TABLE meta_playlist (
 CREATE UNIQUE INDEX meta_playlist_uuid_idx
     ON meta_playlist(mpl_uuid);
 
+-- Leader metadata.
 CREATE TABLE meta_leader (
     ml_id       INTEGER NOT NULL,
     ml_name     VARCHAR(255) NOT NULL,
@@ -41,6 +44,7 @@ CREATE TABLE meta_leader (
 CREATE UNIQUE INDEX meta_leader_id_idx
     ON meta_leader(ml_id);
 
+-- Map metadata.
 CREATE TABLE meta_map (
     mm_uuid     UUID NOT NULL,
     mm_name     VARCHAR(255) NOT NULL,
@@ -50,6 +54,7 @@ CREATE TABLE meta_map (
 CREATE UNIQUE INDEX meta_map_uuid_idx
     ON meta_map(mm_uuid);
 
+-- Object metadata.
 CREATE TABLE meta_object (
     mo_id       VARCHAR(255) NOT NULL,
     mo_name     VARCHAR(255),
@@ -60,6 +65,7 @@ CREATE TABLE meta_object (
 -- PLAYER
 -- ----------------------------------------------------------------------------
 
+-- A player.
 CREATE TABLE player (
     p_id        SERIAL NOT NULL,
     p_gamertag  VARCHAR(255) NOT NULL,
@@ -78,6 +84,8 @@ CREATE INDEX player_gamertag_gin_idx
 -- MATCH HISTORY
 -- ----------------------------------------------------------------------------
 
+-- A player match history.
+-- Our primary table to crawl match results.
 CREATE TABLE match_history (
     mh_id                       SERIAL NOT NULL,
     mh_player_id                INTEGER NOT NULL,
@@ -116,6 +124,8 @@ CREATE INDEX match_history_match_uuid_idx
 -- PLAYER STATS
 -- ----------------------------------------------------------------------------
 
+-- Player statistics.
+-- This table is used by the crawler to discover stale match histories.
 CREATE TABLE player_stats (
     ps_id                       SERIAL NOT NULL,
 
@@ -154,6 +164,7 @@ CREATE TABLE player_stats (
 CREATE INDEX player_stats_player_id_idx
     ON player_stats(ps_player_id);
 
+-- Player leader statistics
 CREATE TABLE player_leader_stats (
     pls_stats_id            INTEGER NOT NULL,
     pls_leader_id           INTEGER NOT NULL,
@@ -178,6 +189,7 @@ CREATE INDEX player_leader_stats_id_idx
 -- MAP CAPTURE POINTS
 -- ----------------------------------------------------------------------------
 
+-- A capture point
 CREATE TABLE map_capture_point (
     mcp_id          SERIAL NOT NULL,
 
@@ -194,6 +206,8 @@ CREATE UNIQUE INDEX map_capture_point_point_name_idx
 -- MATCH
 -- ----------------------------------------------------------------------------
 
+-- The match is probably the most interesting table.
+-- We use a star schema to link additional match information from the API.
 CREATE TABLE match (
     m_id                SERIAL NOT NULL,
 
@@ -218,6 +232,7 @@ CREATE UNIQUE INDEX match_match_uuid_idx
 CREATE INDEX match_start_date_idx
     ON match(m_start_date);
 
+-- A match team
 CREATE table match_team (
     mt_match_id         INTEGER NOT NULL,
     mt_team_id          INTEGER NOT NULL,
@@ -232,6 +247,10 @@ CREATE table match_team (
     PRIMARY KEY (mt_match_id, mt_team_id)
 );
 
+-- A match player.
+-- When crawling matches, we don't have a player yet.
+-- The match_player therefore has no foreign key to the player table.
+-- (Having this FK would make many things simpler though...)
 CREATE TABLE match_player (
     mp_match_id                 INTEGER NOT NULL,
     mp_player_idx               INTEGER NOT NULL,
@@ -284,6 +303,7 @@ CREATE INDEX match_player_match_idx
 CREATE INDEX match_player_gamertag_idx
     ON match_player(mp_gamertag);
 
+-- Capture point info
 CREATE TABLE match_player_point (
     mpp_match_id    INTEGER NOT NULL,
     mpp_player_idx  INTEGER NOT NULL,
@@ -300,6 +320,7 @@ CREATE TABLE match_player_point (
 CREATE INDEX match_player_point_match_idx
     ON match_player_point(mpp_match_id, mpp_player_idx);
 
+-- Unit info
 CREATE TABLE match_player_unit (
     mpu_match_id            INTEGER NOT NULL,
     mpu_player_idx          INTEGER NOT NULL,
@@ -318,6 +339,7 @@ CREATE TABLE match_player_unit (
 CREATE INDEX match_player_unit_match_idx
     ON match_player_unit(mpu_match_id, mpu_player_idx);
 
+-- Car info
 CREATE TABLE match_player_card (
     mpc_match_id            INTEGER NOT NULL,
     mpc_player_idx          INTEGER NOT NULL,
@@ -334,6 +356,7 @@ CREATE TABLE match_player_card (
 CREATE INDEX match_player_card_match_idx
     ON match_player_card(mpc_match_id, mpc_player_idx);
 
+-- Wave info
 CREATE TABLE match_player_wave (
     mpw_match_id            INTEGER NOT NULL,
     mpw_player_idx          INTEGER NOT NULL,
@@ -350,6 +373,7 @@ CREATE TABLE match_player_wave (
 CREATE INDEX match_player_wave_match_idx
     ON match_player_wave(mpw_match_id, mpw_player_idx);
 
+-- Leader power
 CREATE TABLE match_player_leader_power (
     mplp_match_id           INTEGER NOT NULL,
     mplp_player_idx         INTEGER NOT NULL,
@@ -370,6 +394,7 @@ CREATE INDEX match_player_leader_power_match_idx
 -- MATCH EVENTS
 -- ----------------------------------------------------------------------------
 
+-- We store the match events as raw jsonb as there are a lot of them
 CREATE TABLE match_events (
     me_match_id           INTEGER NOT NULL,
     me_complete_set       BOOLEAN NOT NULL,
@@ -605,6 +630,9 @@ CREATE INDEX community_league_team_team_id_idx
 -- DSR
 -- ----------------------------------------------------------------------------
 
+-- The skill rank table.
+-- It's used for all the community dashboards and therefore should be materialized.
+-- The MMR should be quite stable anyway. New players could complain..
 CREATE MATERIALIZED VIEW dsr AS (
     WITH dsr_(p_id, val) AS (
         SELECT p_id, MAX(mp_mmr_new_rating)
@@ -614,7 +642,7 @@ CREATE MATERIALIZED VIEW dsr AS (
         AND mp_gamertag = p_gamertag
         GROUP BY p_id
     ), team_(p1_id, p2_id, p3_id) AS (
-        SELECT DISTINCT ts_player_1, ts_player_2, ts_player_3 FROM team_snapshot ts
+        SELECT DISTINCT ts_p1_id, ts_p2_id, ts_p3_id FROM team_snapshot ts
     ), comp_ AS (
         SELECT
             t.p1_id, t.p2_id, t.p3_id,
