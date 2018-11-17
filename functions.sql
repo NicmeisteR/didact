@@ -17,6 +17,38 @@ RETURNS TABLE(
     END
 $$ LANGUAGE plpgsql;
 
+CREATE OR REPLACE FUNCTION encode_uri(input text)
+  RETURNS text
+  IMMUTABLE STRICT
+AS $$
+    DECLARE
+    parsed text;
+    safePattern text;
+    BEGIN
+    safePattern = 'a-zA-Z0-9_~/\-\.';
+    IF input ~ ('[^' || safePattern || ']') THEN
+        SELECT STRING_AGG(fragment, '')
+        INTO parsed
+        FROM (
+            SELECT prefix || encoded AS fragment
+            FROM (
+                SELECT COALESCE(match[1], '') AS prefix,
+                    COALESCE('%' || encode(match[2]::bytea, 'hex'), '') AS encoded
+                FROM (
+                SELECT regexp_matches(
+                    input,
+                    '([' || safePattern || ']*)([^' || safePattern || '])?',
+                    'g') AS match
+                ) matches
+            ) parsed
+        ) fragments;
+        RETURN parsed;
+    ELSE
+        RETURN input;
+    END IF;
+    END
+$$ LANGUAGE plpgsql;
+
 -- ----------------------------------------------------------------------------
 -- UTILS
 -- ----------------------------------------------------------------------------
@@ -747,8 +779,8 @@ RETURNS TABLE(
 ) AS $$
     SELECT
         te.te_match_id,
-        t1.clp_team_p1_id, t1.clp_team_p2_id, t1.clp_team_p2_id,
-        t2.clp_team_p1_id, t2.clp_team_p2_id, t2.clp_team_p2_id,
+        t1.clp_team_p1_id, t1.clp_team_p2_id, t1.clp_team_p3_id,
+        t2.clp_team_p1_id, t2.clp_team_p2_id, t2.clp_team_p3_id,
         te.te_start_date,
         te.te_duration,
         te.te_match_outcome,
