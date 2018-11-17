@@ -653,3 +653,14 @@ CREATE MATERIALIZED VIEW team_dsr AS (
 ) WITH NO DATA;
 
 CREATE UNIQUE INDEX team_dsr_idx ON team_dsr(r_p1_id, r_p2_id, r_p3_id);
+
+-- ----------------------------------------------------------------------------
+-- TEAM ENCOUNTER POINTS
+-- ----------------------------------------------------------------------------
+
+CREATE TABLE team_encounter_points (
+    tep_match_id        INTEGER NOT NULL,
+    tep_value           INTEGER NOT NULL,
+
+    PRIMARY KEY(tep_match_id)
+);

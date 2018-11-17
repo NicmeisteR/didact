@@ -187,6 +187,55 @@ RETURNS VOID AS $$
         END
 $$ LANGUAGE plpgsql;
 
+CREATE OR REPLACE FUNCTION didact_sync_team_encounter_points()
+RETURNS VOID AS $$
+    DECLARE
+        t TIMESTAMP := clock_timestamp();
+    BEGIN
+        RAISE NOTICE 'Synchronizing team encounter points';
+
+        INSERT INTO team_encounter_points(tep_match_id, tep_value)
+        SELECT
+            te.te_match_id AS match_id,
+            (abs(r1.r_value - r2.r_value) * 100)::INTEGER AS value
+        FROM team_encounter te, team_dsr r1, team_dsr r2
+        WHERE te.te_t1_p1_id = r1.r_p1_id
+        AND te.te_t1_p2_id = r1.r_p2_id
+        AND te.te_t1_p3_id = r1.r_p3_id
+        AND te.te_t2_p1_id = r2.r_p1_id
+        AND te.te_t2_p2_id = r2.r_p2_id
+        AND te.te_t2_p3_id = r2.r_p3_id
+        ON CONFLICT(tep_match_id) DO UPDATE SET tep_value = EXCLUDED.tep_value;
+
+        RAISE NOTICE 'Duration=%', clock_timestamp() - t;
+        END
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION didact_sync_team_encounter_points_1(match_id INTEGER)
+RETURNS VOID AS $$
+    DECLARE
+        t TIMESTAMP := clock_timestamp();
+    BEGIN
+        RAISE NOTICE 'Synchronizing team encounter points of match %', match_id;
+
+        INSERT INTO team_encounter_points(tep_match_id, tep_value)
+        SELECT
+            te.te_match_id AS match_id,
+            (abs(r1.r_value - r2.r_value) * 100)::INTEGER AS value
+        FROM team_encounter te, team_dsr r1, team_dsr r2
+        WHERE te.te_match_id = match_id
+        AND te.te_t1_p1_id = r1.r_p1_id
+        AND te.te_t1_p2_id = r1.r_p2_id
+        AND te.te_t1_p3_id = r1.r_p3_id
+        AND te.te_t2_p1_id = r2.r_p1_id
+        AND te.te_t2_p2_id = r2.r_p2_id
+        AND te.te_t2_p3_id = r2.r_p3_id
+        ON CONFLICT(tep_match_id) DO UPDATE SET tep_value = EXCLUDED.tep_value;
+
+        RAISE NOTICE 'Duration=%', clock_timestamp() - t;
+        END
+$$ LANGUAGE plpgsql;
+
 -- ----------------------------------------------------------------------------
 -- TASKS
 -- ----------------------------------------------------------------------------
