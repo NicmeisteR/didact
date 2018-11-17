@@ -153,9 +153,8 @@ RETURNS VOID AS $$
                 m.m_season_uuid
         FROM match m, snapshot_diff t1, snapshot_diff t2, match_team mt
         WHERE t1.ts_match_id = m.m_id
-        AND t2.ts_match_id = m.m_id
-        -- Team id predicates let the postgres estimate fail miserably.
-        -- The < prevents the nested loop join and gives hash joins instead
+        AND t1.ts_match_id = t2.ts_match_id
+        -- The < predicate prevents the nested loop join (estimates are far off here)
         AND t1.ts_team_id < t2.ts_team_id
         AND mt.mt_match_id = m.m_id
         AND mt.mt_team_id = 1
