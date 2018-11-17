@@ -437,36 +437,6 @@ CREATE TABLE match_events (
 -- TEAM
 -- ----------------------------------------------------------------------------
 
--- The team snapshot table is used to find missing team encounters and recompute the DSR table.
-CREATE MATERIALIZED VIEW team_snapshot AS (
-    WITH x_ AS (
-        SELECT
-            p_id AS player_id,
-            mp_match_id AS match_id,
-            mp_player_idx AS player_idx,
-            mp_team_id AS team_id,
-            rank() over (partition by mp_match_id, mp_team_id order by p_id asc) as rank
-        FROM match_player, player
-        WHERE mp_gamertag = p_gamertag
-    )
-    SELECT
-        m1.match_id AS ts_match_id,
-        m1.team_id AS ts_team_id,
-        m1.player_id AS ts_p1_id,
-        COALESCE(m2.player_id, 0) AS ts_p2_id,
-        COALESCE(m3.player_id, 0) AS ts_p3_id
-    FROM x_ m1
-        LEFT OUTER JOIN x_ m2
-            ON m1.match_id = m2.match_id
-            AND m1.team_id = m2.team_id
-            AND m2.rank = 2
-        LEFT OUTER JOIN x_ m3
-            ON m1.match_id = m3.match_id
-            AND m1.team_id = m3.team_id
-            AND m3.rank = 3
-    WHERE m1.rank = 1
-) WITH NO DATA;
-
 -- The team encounter table is maintained by the crawler and allows a retreival of
 -- recent games without scanning the matches of all team members.
 -- It has a lot of indexes as it is the main table for match discovery.
@@ -614,22 +584,48 @@ CREATE INDEX community_league_team_team_id_idx
     USING BTREE(clp_team_p1_id, clp_team_p2_id, clp_team_p3_id);
 
 -- ----------------------------------------------------------------------------
--- DSR
+-- TEAM DSR
 -- ----------------------------------------------------------------------------
 
 -- The skill rank table.
 -- It's used for all the community dashboards and therefore should be materialized.
 -- The MMR should be quite stable anyway. New players could complain..
-CREATE MATERIALIZED VIEW dsr AS (
-    WITH dsr_(p_id, val) AS (
+CREATE MATERIALIZED VIEW team_dsr AS (
+    WITH x_ AS (
+        SELECT
+            p_id AS player_id,
+            mp_match_id AS match_id,
+            mp_player_idx AS player_idx,
+            mp_team_id AS team_id,
+            rank() over (partition by mp_match_id, mp_team_id order by p_id asc) as rank
+        FROM match_player, player
+        WHERE mp_gamertag = p_gamertag
+    ), t_ AS (
+        SELECT
+            m1.match_id AS match_id,
+            m1.team_id AS team_id,
+            m1.player_id AS p1_id,
+            COALESCE(m2.player_id, 0) AS p2_id,
+            COALESCE(m3.player_id, 0) AS p3_id
+        FROM x_ m1
+            LEFT OUTER JOIN x_ m2
+                ON m1.match_id = m2.match_id
+                AND m1.team_id = m2.team_id
+                AND m2.rank = 2
+            LEFT OUTER JOIN x_ m3
+                ON m1.match_id = m3.match_id
+                AND m1.team_id = m3.team_id
+                AND m3.rank = 3
+        WHERE m1.rank = 1
+    ), td_(p1_id, p2_id, p3_id) AS (
+        SELECT DISTINCT p1_id, p2_id, p3_id FROM t_ t
+    ), dsr_(p_id, val) AS (
         SELECT p_id, MAX(mp_mmr_new_rating)
         FROM match, match_player, player
         WHERE m_start_date > now() - INTERVAL '90 days'
         AND m_id = mp_match_id
         AND mp_gamertag = p_gamertag
         GROUP BY p_id
-    ), team_(p1_id, p2_id, p3_id) AS (
-        SELECT DISTINCT ts_p1_id, ts_p2_id, ts_p3_id FROM team_snapshot ts
     ), comp_ AS (
         SELECT
             t.p1_id, t.p2_id, t.p3_id,
@@ -645,7 +641,7 @@ CREATE MATERIALIZED VIEW dsr AS (
             pow(2,
                 (COALESCE(r3.val, 0) >= COALESCE(r1.val, 0))::INT +
                 (COALESCE(r3.val, 0) >= COALESCE(r2.val, 0))::INT) AS w3
-        FROM team_ t
+        FROM td_ t
             LEFT OUTER JOIN dsr_ r1 ON t.p1_id = r1.p_id
             LEFT OUTER JOIN dsr_ r2 ON t.p2_id = r2.p_id
             LEFT OUTER JOIN dsr_ r3 ON t.p3_id = r3.p_id
@@ -656,4 +652,4 @@ CREATE MATERIALIZED VIEW dsr AS (
     FROM comp_
 ) WITH NO DATA;
 
-CREATE UNIQUE INDEX dsr_team_idx ON dsr(r_p1_id, r_p2_id, r_p3_id);
+CREATE UNIQUE INDEX team_dsr_idx ON team_dsr(r_p1_id, r_p2_id, r_p3_id);
