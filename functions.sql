@@ -740,8 +740,7 @@ RETURNS INTEGER AS $$
         END IF;
 
         -- Sort player ids
-        SELECT array_agg(x) INTO player_ids
-            FROM (SELECT unnest(player_ids) AS x ORDER BY x) d;
+        SELECT array_agg(x) INTO player_ids FROM (SELECT unnest(player_ids) AS x ORDER BY x) d;
 
         -- Add community member
         INSERT INTO community_member(cm_community_id, cm_player_id, cm_joined_at)
@@ -799,3 +798,191 @@ RETURNS TABLE(
     AND t2.clp_league_id = league_id
     AND te.te_start_date > now() - interval_
 $$ LANGUAGE sql;
+
+-- Get team encounter matches in an interval
+CREATE OR REPLACE FUNCTION didact_find_team_encounters(
+    team1 VARCHAR[] DEFAULT Array[]::VARCHAR[],
+    team2 VARCHAR[] DEFAULT Array[]::VARCHAR[],
+    interval_ INTERVAL DEFAULT INTERVAL '30 days',
+    community_ VARCHAR DEFAULT '',
+    league_ VARCHAR DEFAULT '')
+RETURNS TABLE(
+    match_id INTEGER,
+    t1_p1_id INTEGER, t1_p2_id INTEGER, t1_p3_id INTEGER,
+    t2_p1_id INTEGER, t2_p2_id INTEGER, t2_p3_id INTEGER,
+    start_date TIMESTAMP,
+    duration INTERVAL,
+    outcome INTEGER,
+    map_uuid UUID,
+    match_uuid UUID,
+    playlist_uuid UUID,
+    season_uuid UUID
+) AS $$
+    DECLARE
+        community_id INTEGER := 0;
+        league_id INTEGER := 0;
+        player_id INTEGER := 0;
+        gamertag VARCHAR := '';
+        team1_gts VARCHAR[] := Array[]::VARCHAR[];
+        team2_gts VARCHAR[] := Array[]::VARCHAR[];
+        team1_ids INTEGER[] := Array[]::INTEGER[];
+        team2_ids INTEGER[] := Array[]::INTEGER[];
+    BEGIN
+        -- Remove empty gamertags
+        SELECT COALESCE(array_agg(x), array[]::varchar[])
+            INTO team1_gts FROM unnest(team1) AS x WHERE x <> '';
+        SELECT COALESCE(array_agg(x), array[]::varchar[])
+            INTO team2_gts FROM unnest(team2) AS x WHERE x <> '';
+
+        -- Get player ids of team 1
+        FOREACH gamertag IN ARRAY team1_gts
+        LOOP
+            SELECT p_id INTO player_id
+                FROM player
+                WHERE p_gamertag = gamertag;
+            IF NOT FOUND THEN
+                RAISE NOTICE 'Could not find player %', gamertag;
+                RETURN;
+            END IF;
+            team1_ids := array_append(team1_ids, player_id);
+        END LOOP;
+
+        -- Get player ids of team 2
+        FOREACH gamertag IN ARRAY team2_gts
+        LOOP
+            SELECT p_id INTO player_id
+                FROM player
+                WHERE p_gamertag = gamertag;
+            IF NOT FOUND THEN
+                RAISE NOTICE 'Could not find player %', gamertag;
+                RETURN;
+            END IF;
+            team2_ids := array_append(team2_ids, player_id);
+        END LOOP;
+
+        -- Sort player ids
+        SELECT array_agg(x) INTO team1_ids FROM (SELECT unnest(team1_ids) AS x ORDER BY x) d;
+        SELECT array_agg(x) INTO team2_ids FROM (SELECT unnest(team2_ids) AS x ORDER BY x) d;
+
+        -- Team 2 size invalid?
+        IF array_length(team2_ids, 1) > 0 AND array_length(team2_ids, 1) <> array_length(team1_ids, 1) THEN
+            RAISE NOTICE 'Size of team 2 invalid';
+            RETURN;
+        END IF;
+
+        IF array_length(team2_ids, 1) IS NULL THEN
+            -- Versus everyone
+
+            -- Pad team ids
+            team1_ids := array_append(team1_ids, 0);
+            team1_ids := array_append(team1_ids, 0);
+            team1_ids := array_append(team1_ids, 0);
+            team2_ids := array_append(team2_ids, 0);
+            team2_ids := array_append(team2_ids, 0);
+            team2_ids := array_append(team2_ids, 0);
+
+            IF league_ = '' THEN
+                RAISE NOTICE 'Querying matches of team [%, %, %]',
+                    team1_ids[1], team1_ids[2], team1_ids[3];
+
+                -- Everywhere
+                RETURN QUERY
+                (
+                    SELECT * FROM team_encounter
+                        WHERE te_start_date > NOW() - interval_
+                        AND te_t1_p1_id = team1_ids[1]
+                        AND te_t1_p2_id = team1_ids[2]
+                        AND te_t1_p3_id = team1_ids[3]
+                    UNION ALL
+                    SELECT * FROM team_encounter
+                        WHERE te_start_date > NOW() - interval_
+                        AND te_t1_p1_id = team2_ids[1]
+                        AND te_t1_p2_id = team2_ids[2]
+                        AND te_t1_p3_id = team2_ids[3]
+                );
+            ELSE
+                -- In league
+
+                -- Get community
+                SELECT c_id INTO community_id FROM community WHERE c_name = community_;
+                IF NOT FOUND THEN
+                    RAISE NOTICE 'Could not find community %', community_;
+                    RETURN;
+                END IF;
+
+                -- Get league
+                SELECT cl_id INTO league_id
+                    FROM community_league
+                    WHERE cl_community_id = community_id
+                    AND cl_name = league_;
+                IF NOT FOUND THEN
+                    RAISE NOTICE 'Could not find league % of community %', league_, community_ ;
+                    RETURN;
+                END IF;
+
+                RAISE NOTICE 'Querying matches of team [%, %, %] in league % of community %',
+                    team1_ids[1], team1_ids[2], team1_ids[3], league_id, community_id;
+
+                -- Run query
+                RETURN QUERY
+                (
+                    SELECT te.*
+                        FROM team_encounter te, community_league_team clp
+                        WHERE te_start_date > NOW() - interval_
+                        AND te_t1_p1_id = team1_ids[1]
+                        AND te_t1_p2_id = team1_ids[2]
+                        AND te_t1_p3_id = team1_ids[3]
+                        AND te_t2_p1_id = clp.clp_team_p1_id
+                        AND te_t2_p2_id = clp.clp_team_p2_id
+                        AND te_t2_p3_id = clp.clp_team_p3_id
+                    UNION ALL
+                    SELECT te.*
+                        FROM team_encounter te, community_league_team clp
+                        WHERE te_start_date > NOW() - interval_
+                        AND te_t2_p1_id = team1_ids[1]
+                        AND te_t2_p2_id = team1_ids[2]
+                        AND te_t2_p3_id = team1_ids[3]
+                        AND te_t1_p1_id = clp.clp_team_p1_id
+                        AND te_t1_p2_id = clp.clp_team_p2_id
+                        AND te_t1_p3_id = clp.clp_team_p3_id
+                );
+            END IF;
+        ELSE
+            -- Versus team
+
+            -- Pad team ids
+            team1_ids := array_append(team1_ids, 0);
+            team1_ids := array_append(team1_ids, 0);
+            team1_ids := array_append(team1_ids, 0);
+            team2_ids := array_append(team2_ids, 0);
+            team2_ids := array_append(team2_ids, 0);
+            team2_ids := array_append(team2_ids, 0);
+
+            RAISE NOTICE 'Querying matches of team [%, %, %] vs team [%, %, %]',
+                team1_ids[1], team1_ids[2], team1_ids[3],
+                team2_ids[1], team2_ids[2], team2_ids[3];
+
+            -- Run query
+            RETURN QUERY
+            (
+                SELECT * FROM team_encounter
+                    WHERE te_start_date > NOW() - interval_
+                    AND te_t1_p1_id = team1_ids[1]
+                    AND te_t1_p2_id = team1_ids[2]
+                    AND te_t1_p3_id = team1_ids[3]
+                    AND te_t2_p1_id = team2_ids[1]
+                    AND te_t2_p2_id = team2_ids[2]
+                    AND te_t2_p3_id = team2_ids[3]
+                UNION ALL
+                SELECT * FROM team_encounter
+                    WHERE te_start_date > NOW() - interval_
+                    AND te_t1_p1_id = team2_ids[1]
+                    AND te_t1_p2_id = team2_ids[2]
+                    AND te_t1_p3_id = team2_ids[3]
+                    AND te_t2_p1_id = team1_ids[1]
+                    AND te_t2_p2_id = team1_ids[2]
+                    AND te_t2_p3_id = team1_ids[3]
+            );
+        END IF;
+    END
+$$ LANGUAGE plpgsql;
