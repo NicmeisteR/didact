@@ -626,30 +626,37 @@ CREATE MATERIALIZED VIEW team_dsr AS (
         AND m_id = mp_match_id
         AND mp_gamertag = p_gamertag
         GROUP BY p_id
-    ), comp_ AS (
+    ), comp1_ AS (
         SELECT
             t.p1_id, t.p2_id, t.p3_id,
-            COALESCE(r1.val, 0) AS r1,
-            COALESCE(r2.val, 0) AS r2,
-            COALESCE(r3.val, 0) AS r3,
+            COALESCE(r1.val, 0.0) AS r1,
+            COALESCE(r2.val, 0.0) AS r2,
+            COALESCE(r3.val, 0.0) AS r3,
             pow(2,
-                (COALESCE(r1.val, 0) >= COALESCE(r2.val, 0))::INT +
-                (COALESCE(r1.val, 0) >= COALESCE(r3.val, 0))::INT) AS w1,
+                (COALESCE(r1.val, 0.0) > COALESCE(r2.val, 0.0))::INT +
+                (COALESCE(r1.val, 0.0) > COALESCE(r3.val, 0.0))::INT) AS w1,
             pow(2,
-                (COALESCE(r2.val, 0) >= COALESCE(r1.val, 0))::INT +
-                (COALESCE(r2.val, 0) >= COALESCE(r3.val, 0))::INT) AS w2,
+                (COALESCE(r2.val, 0.0) > COALESCE(r1.val, 0.0))::INT +
+                (COALESCE(r2.val, 0.0) > COALESCE(r3.val, 0.0))::INT) AS w2,
             pow(2,
-                (COALESCE(r3.val, 0) >= COALESCE(r1.val, 0))::INT +
-                (COALESCE(r3.val, 0) >= COALESCE(r2.val, 0))::INT) AS w3
+                (COALESCE(r3.val, 0.0) > COALESCE(r1.val, 0.0))::INT +
+                (COALESCE(r3.val, 0.0) > COALESCE(r2.val, 0.0))::INT) AS w3
         FROM td_ t
             LEFT OUTER JOIN dsr_ r1 ON t.p1_id = r1.p_id
             LEFT OUTER JOIN dsr_ r2 ON t.p2_id = r2.p_id
             LEFT OUTER JOIN dsr_ r3 ON t.p3_id = r3.p_id
+    ), comp2_ AS (
+        SELECT
+            c.*,
+            ((CASE c.r1::INTEGER WHEN 0 THEN 1 ELSE 0 END) * c.w1) +
+            ((CASE c.r2::INTEGER WHEN 0 THEN 1 ELSE 0 END) * c.w2) +
+            ((CASE c.r3::INTEGER WHEN 0 THEN 1 ELSE 0 END) * c.w3) AS weightsum
+        FROM comp1_ c
     )
     SELECT
         p1_id AS r_p1_id, p2_id AS r_p2_id, p3_id AS r_p3_id,
-        (((r1 * w1) + (r2 * w2) + (r3 * w3)) / (w1 + w2 + w3)) AS r_value
-    FROM comp_
+        (((r1 * w1) + (r2 * w2) + (r3 * w3)) / weightsum) AS r_value
+    FROM comp2_
 ) WITH NO DATA;
 
 CREATE UNIQUE INDEX team_dsr_idx ON team_dsr(r_p1_id, r_p2_id, r_p3_id);
