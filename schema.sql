@@ -655,7 +655,7 @@ CREATE MATERIALIZED VIEW team_dsr AS (
     )
     SELECT
         p1_id AS r_p1_id, p2_id AS r_p2_id, p3_id AS r_p3_id,
-        (((r1 * w1) + (r2 * w2) + (r3 * w3)) / weightsum) AS r_value
+        (((r1 * w1) + (r2 * w2) + (r3 * w3)) / (CASE WHEN weightsum = 0 THEN 1 ELSE weightsum END)) AS r_value
     FROM comp2_
 ) WITH NO DATA;
 
