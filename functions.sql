@@ -731,18 +731,39 @@ RETURNS INTEGER AS $$
     END
 $$ LANGUAGE plpgsql;
 
-CREATE OR REPLACE FUNCTION didact_community_league_matches(IN league_id INTEGER, IN interval_ INTERVAL)
+-- Get community league matches in an interval
+CREATE OR REPLACE FUNCTION didact_community_league_matches(league_id INTEGER, interval_ INTERVAL)
 RETURNS TABLE(
-    m_id INTEGER,
-    t1_id INTEGER,
-    t2_id INTEGER
+    match_id INTEGER,
+    t1_p1_id INTEGER, t1_p2_id INTEGER, t1_p3_id INTEGER,
+    t2_p1_id INTEGER, t2_p2_id INTEGER, t2_p3_id INTEGER,
+    start_date TIMESTAMP,
+    duration INTERVAL,
+    outcome INTEGER,
+    map_uuid UUID,
+    match_uuid UUID,
+    playlist_uuid UUID,
+    season_uuid UUID
 ) AS $$
-    SELECT te_match_id, t1.clp_team_id, t2.clp_team_id
+    SELECT
+        te.te_match_id,
+        t1.clp_team_p1_id, t1.clp_team_p2_id, t1.clp_team_p2_id,
+        t2.clp_team_p1_id, t2.clp_team_p2_id, t2.clp_team_p2_id,
+        te.te_start_date,
+        te.te_duration,
+        te.te_match_outcome,
+        te.te_map_uuid,
+        te.te_match_uuid,
+        te.te_playlist_uuid,
+        te.te_season_uuid
     FROM community_league_team t1, community_league_team t2, team_encounter te
     WHERE t1.clp_league_id = league_id
-    AND t1.clp_league_id = t2.clp_league_id
-    AND t1.clp_team_id <> t2.clp_team_id
-    AND te.te_t1_id = t1.clp_team_id
-    AND te.te_t2_id = t2.clp_team_id
+    AND te.te_t1_p1_id = t1.clp_team_p1_id
+    AND te.te_t1_p2_id = t1.clp_team_p2_id
+    AND te.te_t1_p3_id = t1.clp_team_p3_id
+    AND te.te_t2_p1_id = t2.clp_team_p1_id
+    AND te.te_t2_p2_id = t2.clp_team_p2_id
+    AND te.te_t2_p3_id = t2.clp_team_p3_id
+    AND t2.clp_league_id = league_id
     AND te.te_start_date > now() - interval_
 $$ LANGUAGE sql;
