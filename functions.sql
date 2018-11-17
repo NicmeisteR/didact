@@ -106,6 +106,10 @@ RETURNS TABLE(
     END
 $$ LANGUAGE plpgsql;
 
+-- ----------------------------------------------------------------------------
+-- TEAM ENCOUNTER
+-- ----------------------------------------------------------------------------
+
 -- Bulk load team encounter.
 -- This will attempt to insert the encounters of all existing matches.
 -- (~ 2 hours)
@@ -264,12 +268,17 @@ RETURNS VOID AS $$
         END
 $$ LANGUAGE plpgsql;
 
-CREATE OR REPLACE FUNCTION didact_sync_team_encounter_points()
+-- ----------------------------------------------------------------------------
+-- TEAM ENCOUNTER POINTS
+-- ----------------------------------------------------------------------------
+
+-- Compute all team encounter points.
+CREATE OR REPLACE FUNCTION didact_recompute_team_encounter_points()
 RETURNS VOID AS $$
     DECLARE
         t TIMESTAMP := clock_timestamp();
     BEGIN
-        RAISE NOTICE 'Synchronizing team encounter points';
+        RAISE NOTICE 'Bulk loading team encounter points';
 
         INSERT INTO team_encounter_points(tep_match_id, tep_value)
         SELECT
@@ -288,12 +297,13 @@ RETURNS VOID AS $$
         END
 $$ LANGUAGE plpgsql;
 
-CREATE OR REPLACE FUNCTION didact_sync_team_encounter_points_1(match_id INTEGER)
+-- Compute team encounter points for a match.
+CREATE OR REPLACE FUNCTION didact_compute_team_encounter_points(match_id INTEGER)
 RETURNS VOID AS $$
     DECLARE
         t TIMESTAMP := clock_timestamp();
     BEGIN
-        RAISE NOTICE 'Synchronizing team encounter points of match %', match_id;
+        RAISE NOTICE 'Computing team encounter points of match %', match_id;
 
         INSERT INTO team_encounter_points(tep_match_id, tep_value)
         SELECT
