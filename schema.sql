@@ -633,17 +633,17 @@ CREATE MATERIALIZED VIEW team_dsr AS (
             COALESCE(r2.val, 0) AS r2,
             COALESCE(r3.val, 0) AS r3,
             (
-                (COALESCE(r1.val, 0) > COALESCE(r2.val, 0))::INT +
-                (COALESCE(r1.val, 0) > COALESCE(r3.val, 0))::INT
-            ) AS f1,
+                (COALESCE(r1.val, 0) >= COALESCE(r2.val, 0))::INT +
+                (COALESCE(r1.val, 0) >= COALESCE(r3.val, 0))::INT
+            ) AS pos1,
             (
-                (COALESCE(r2.val, 0) > COALESCE(r1.val, 0))::INT +
-                (COALESCE(r2.val, 0) > COALESCE(r3.val, 0))::INT
-            ) AS f2,
+                (COALESCE(r2.val, 0) >= COALESCE(r1.val, 0))::INT +
+                (COALESCE(r2.val, 0) >= COALESCE(r3.val, 0))::INT
+            ) AS pos2,
             (
-                (COALESCE(r3.val, 0) > COALESCE(r1.val, 0))::INT +
-                (COALESCE(r3.val, 0) > COALESCE(r2.val, 0))::INT
-            ) AS f3,
+                (COALESCE(r3.val, 0) >= COALESCE(r1.val, 0))::INT +
+                (COALESCE(r3.val, 0) >= COALESCE(r2.val, 0))::INT
+            ) AS pos3,
             (
                 (COALESCE(r1.val, 0) = 0)::INT +
                 (COALESCE(r2.val, 0) = 0)::INT +
@@ -656,12 +656,12 @@ CREATE MATERIALIZED VIEW team_dsr AS (
     ), comp2_ AS (
         SELECT
             c.*,
-            pow(1.25, f1 - zeros) AS w1,
-            pow(1.25, f2 - zeros) AS w2,
-            pow(1.25, f3 - zeros) AS w3,
-            ((CASE c.r1 WHEN 0 THEN 1 ELSE 0 END) * pow(1.25, f1 - zeros)) +
-            ((CASE c.r2 WHEN 0 THEN 1 ELSE 0 END) * pow(1.25, f2 - zeros)) +
-            ((CASE c.r3 WHEN 0 THEN 1 ELSE 0 END) * pow(1.25, f3 - zeros)) AS wsum
+            pow(1.25, pos1 - zeros) AS w1,
+            pow(1.25, pos2 - zeros) AS w2,
+            pow(1.25, pos3 - zeros) AS w3,
+            ((c.r1 <> 0)::INT * pow(1.25, pos1 - zeros)) +
+            ((c.r2 <> 0)::INT * pow(1.25, pos2 - zeros)) +
+            ((c.r3 <> 0)::INT * pow(1.25, pos3 - zeros)) AS wsum
         FROM comp1_ c
     )
     SELECT

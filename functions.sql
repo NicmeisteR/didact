@@ -830,9 +830,9 @@ RETURNS TABLE(
     BEGIN
         -- Remove empty gamertags
         SELECT COALESCE(array_agg(x), array[]::varchar[])
-            INTO team1_gts FROM unnest(team1) AS x WHERE x <> '';
+            INTO team1_gts FROM unnest(team1) AS x WHERE x <> '' AND x <> '-' AND x <> '_';
         SELECT COALESCE(array_agg(x), array[]::varchar[])
-            INTO team2_gts FROM unnest(team2) AS x WHERE x <> '';
+            INTO team2_gts FROM unnest(team2) AS x WHERE x <> '' AND x <> '-' AND x <> '_';
 
         -- Get player ids of team 1
         FOREACH gamertag IN ARRAY team1_gts
@@ -881,7 +881,7 @@ RETURNS TABLE(
             team2_ids := array_append(team2_ids, 0);
             team2_ids := array_append(team2_ids, 0);
 
-            IF league_ = '' THEN
+            IF league_ = '' OR league_ = '-' OR league_ = '_' THEN
                 RAISE NOTICE 'Querying matches of team [%, %, %]',
                     team1_ids[1], team1_ids[2], team1_ids[3];
 
