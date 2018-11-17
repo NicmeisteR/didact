@@ -536,19 +536,6 @@ CREATE INDEX team_encounter_t2_p3_idx
     ON team_encounter
     USING BTREE(te_t2_p3_id, te_start_date);
 
--- TODO delete
--- CREATE INDEX team_encounter_playlist_idx
---     ON team_encounter
---     USING BTREE(te_playlist_uuid, te_start_date);
--- 
--- CREATE INDEX team_encounter_map_idx
---     ON team_encounter
---     USING BTREE(te_map_uuid, te_start_date);
--- 
--- CREATE INDEX team_encounter_start_date_idx
---     ON team_encounter
---     USING BTREE(te_start_date);
-
 -- ----------------------------------------------------------------------------
 -- Community Leagues
 -- ----------------------------------------------------------------------------
