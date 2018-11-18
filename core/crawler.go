@@ -303,7 +303,7 @@ func (bot *Bot) updateMatchResult(msg *discordgo.MessageCreate, matchUUID string
 	}
 
 	// Insert match
-	_, err = bot.dataStore.storeMatch(match)
+	matchID, err := bot.dataStore.storeMatch(match)
 	if err == ErrMetadataIncomplete {
 		bot.sendResponse(msg, fmt.Sprintf("It seems like this match has metadata that I don't understand: **%s**.", matchUUID))
 		return
@@ -312,7 +312,12 @@ func (bot *Bot) updateMatchResult(msg *discordgo.MessageCreate, matchUUID string
 		bot.sendResponse(msg, fmt.Sprintf("Ouch! Something went wrong storing the match results: %v.", err))
 		return
 	}
-	return
+
+	err = bot.dataStore.storeTeamEncounter(matchID)
+	if err != nil {
+		bot.sendResponse(msg, fmt.Sprintf("Ouch! Something went wrong storing the team encounter: %v.", err))
+		return
+	}
 }
 
 // -------------------------------------------------------------------------------------------------------------
