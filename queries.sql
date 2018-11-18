@@ -66,49 +66,49 @@ FROM frame_data_
 -- UNIT KD
 
 WITH death_events AS (
-	SELECT
-		(d.death->>'VictimPlayerIndex')::INTEGER AS victim_player_idx,
-		d.death->>'VictimInstanceId' AS victim_instance_id,
-		d.death->>'VictimObjectTypeId' AS victim_object_type_id,
-		p.key::INTEGER AS participant_player_idx,
-		op.key AS participant_object_type_id
-	FROM
-		(
-			SELECT jsonb_array_elements(me_death) death
-			FROM match_events
-			WHERE me_match_id = {{filter_values("match_id", 17167115)[0]}}
-		) d,
-		jsonb_each(d.death->'Participants') p,
-		jsonb_each(p.value->'ObjectParticipants') op,
-		jsonb_each(op.value->'CombatStats') cs
-	GROUP BY
-		victim_player_idx,
-		victim_instance_id,
-		victim_object_type_id,
-		participant_player_idx,
-		participant_object_type_id
+    SELECT
+        (d.death->>'VictimPlayerIndex')::INTEGER AS victim_player_idx,
+        d.death->>'VictimInstanceId' AS victim_instance_id,
+        d.death->>'VictimObjectTypeId' AS victim_object_type_id,
+        p.key::INTEGER AS participant_player_idx,
+        op.key AS participant_object_type_id
+    FROM
+        (
+            SELECT jsonb_array_elements(me_death) death
+            FROM match_events
+            WHERE me_match_id = {{filter_values("match_id", 17167115)[0]}}
+        ) d,
+        jsonb_each(d.death->'Participants') p,
+        jsonb_each(p.value->'ObjectParticipants') op,
+        jsonb_each(op.value->'CombatStats') cs
+    GROUP BY
+        victim_player_idx,
+        victim_instance_id,
+        victim_object_type_id,
+        participant_player_idx,
+        participant_object_type_id
 ), unit_trained AS (
-	SELECT
-		t."TimeSinceStartMilliseconds" AS time_since_start,
-		t."PlayerIndex" AS player_idx,
-		t."InstanceId" AS instance_id,
-		t."SquadId" AS squad_id,
-		t."SupplyCost" AS supply_cost,
-		t."EnergyCost" AS energy_cost
-	FROM
-		(
-			SELECT me_unit_trained
-			FROM match_events
-			WHERE me_match_id = {{filter_values("match_id", 17167115)[0]}}
-		) d,
-		jsonb_to_recordset(d.me_unit_trained) AS t(
-			"TimeSinceStartMilliseconds" INTEGER,
-			"PlayerIndex" INTEGER,
-			"InstanceId" INTEGER,
-			"SquadId" VARCHAR,
-			"SupplyCost" INTEGER,
-			"EnergyCost" INTEGER
-		)
+    SELECT
+        t."TimeSinceStartMilliseconds" AS time_since_start,
+        t."PlayerIndex" AS player_idx,
+        t."InstanceId" AS instance_id,
+        t."SquadId" AS squad_id,
+        t."SupplyCost" AS supply_cost,
+        t."EnergyCost" AS energy_cost
+    FROM
+        (
+            SELECT me_unit_trained
+            FROM match_events
+            WHERE me_match_id = {{filter_values("match_id", 17167115)[0]}}
+        ) d,
+        jsonb_to_recordset(d.me_unit_trained) AS t(
+            "TimeSinceStartMilliseconds" INTEGER,
+            "PlayerIndex" INTEGER,
+            "InstanceId" INTEGER,
+            "SquadId" VARCHAR,
+            "SupplyCost" INTEGER,
+            "EnergyCost" INTEGER
+        )
 ), death_type_participations AS (
     SELECT
         participant_player_idx AS player_idx,
@@ -354,3 +354,94 @@ SELECT
 FROM data_ d
     LEFT OUTER JOIN meta_playlist mpl
     ON d.playlist_uuid = mpl.mpl_uuid
+
+-- KD
+
+WITH player_ AS (
+    SELECT
+        mp_player_idx as player_idx,
+        concat('T', mp_team_id, 'P', rank() over (partition by mp_team_id order by mp_player_idx)) as player_tag
+    FROM match_player
+    WHERE mp_match_id = {{match_id}}
+    AND mp_team_id = {{team_id}}
+), death_events AS (
+    SELECT
+        (d.death->>'VictimPlayerIndex')::INTEGER AS victim_player_idx,
+        d.death->>'VictimInstanceId' AS victim_instance_id,
+        d.death->>'VictimObjectTypeId' AS victim_object_type_id,
+        p.key::INTEGER AS participant_player_idx,
+        op.key AS participant_object_type_id
+    FROM
+        (
+            SELECT jsonb_array_elements(me_death) death
+            FROM match_events
+            WHERE me_match_id = {{match_id}}
+        ) d,
+        jsonb_each(d.death->'Participants') p,
+        jsonb_each(p.value->'ObjectParticipants') op,
+        jsonb_each(op.value->'CombatStats') cs
+    GROUP BY
+        victim_player_idx,
+        victim_instance_id,
+        victim_object_type_id,
+        participant_player_idx,
+        participant_object_type_id
+), unit_trained AS (
+    SELECT
+        t."TimeSinceStartMilliseconds" AS time_since_start,
+        t."PlayerIndex" AS player_idx,
+        t."InstanceId" AS instance_id,
+        t."SquadId" AS squad_id,
+        t."SupplyCost" AS supply_cost,
+        t."EnergyCost" AS energy_cost
+    FROM
+        (
+            SELECT me_unit_trained
+            FROM match_events
+            WHERE me_match_id = {{match_id}}
+        ) d,
+        jsonb_to_recordset(d.me_unit_trained) AS t(
+            "TimeSinceStartMilliseconds" INTEGER,
+            "PlayerIndex" INTEGER,
+            "InstanceId" INTEGER,
+            "SquadId" VARCHAR,
+            "SupplyCost" INTEGER,
+            "EnergyCost" INTEGER
+        )
+), death_type_participations AS (
+    SELECT
+        participant_player_idx AS player_idx,
+        participant_object_type_id AS object_type_id,
+        COUNT(*) AS participations
+    FROM death_events
+    GROUP BY participant_player_idx, participant_object_type_id
+), unit_type_built AS (
+    SELECT
+        player_idx,
+        squad_id AS object_type_id,
+        COUNT(*) AS built,
+        SUM(supply_cost) AS supply,
+        SUM(energy_cost) AS energy
+    FROM unit_trained
+    GROUP BY player_idx, squad_id
+), unit_kd AS (
+    SELECT
+        p.player_tag,
+        COALESCE(mo.mo_name, u.object_type_id) AS object_type_id,
+        u.built AS built,
+        u.supply AS supply,
+        u.energy AS energy,
+        COALESCE(d.participations, 0) as attacks
+    FROM unit_type_built u
+    LEFT OUTER JOIN death_type_participations d
+        ON u.player_idx = d.player_idx
+        AND u.object_type_id = d.object_type_id
+    INNER JOIN player_ p
+        ON p.player_idx = u.player_idx
+    LEFT OUTER JOIN meta_object mo
+        ON mo.mo_id = lower(u.object_type_id)
+    WHERE mo.mo_name != 'Scatter Bomb'
+)
+SELECT * FROM unit_kd
+ORDER BY built DESC, supply DESC, energy DESC;
+

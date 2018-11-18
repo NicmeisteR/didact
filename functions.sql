@@ -897,9 +897,9 @@ RETURNS TABLE(
                     UNION ALL
                     SELECT *, TRUE FROM team_encounter
                         WHERE te_start_date > NOW() - interval_
-                        AND te_t1_p1_id = team2_ids[1]
-                        AND te_t1_p2_id = team2_ids[2]
-                        AND te_t1_p3_id = team2_ids[3]
+                        AND te_t2_p1_id = team1_ids[1]
+                        AND te_t2_p2_id = team1_ids[2]
+                        AND te_t2_p3_id = team1_ids[3]
                 );
             ELSE
                 -- In league
