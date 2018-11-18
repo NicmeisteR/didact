@@ -267,9 +267,10 @@ func (crawler *Crawler) storeMatchResult(task *Task) error {
 func (crawler *Crawler) storeTeamEncounter(task *Task) error {
 	err := crawler.dataStore.storeTeamEncounter(task.Data.MatchID)
 	if err != nil {
-		log.Printf("[team_encounter %s] failed to store encounter for match: %v", task.Data.MatchID, err)
+		log.Printf("[team_encounter %d] failed to store encounter for match: %v", task.Data.MatchID, err)
 		return crawler.dataStore.blockTask(task)
 	}
+	log.Printf("[team_encounter %d] stored team encounter", task.Data.MatchID)
 	crawler.dataStore.finishTask(task)
 	return nil
 }

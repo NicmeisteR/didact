@@ -395,8 +395,7 @@ RETURNS INTEGER AS $$
                 0,      -- Priority
                 json_build_object(
                     'MatchID', match_id
-                )
-            FROM player;
+                );
         RAISE NOTICE 'Duration=%', clock_timestamp() - t;
         RETURN 1;
     END
