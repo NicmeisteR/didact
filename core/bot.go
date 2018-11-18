@@ -218,6 +218,8 @@ func (bot *Bot) onMessageCreate(s *discordgo.Session, m *discordgo.MessageCreate
 		bot.scanPlayer(m, args)
 		break
 
+	case "analyse":
+		fallthrough
 	case "analyze":
 		bot.analyzeMatch(m, args)
 	default:
