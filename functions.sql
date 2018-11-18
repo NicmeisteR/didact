@@ -389,7 +389,7 @@ RETURNS INTEGER AS $$
         RAISE NOTICE 'Initiate team encounter insert';
         INSERT INTO task (t_type, t_updated, t_status, t_priority, t_data)
             SELECT
-                4,      -- TaskPlayerStatsUpdate
+                4,      -- TaskTeamEncounterInsert
                 now(),  -- Updated
                 0,      -- TaskQueued
                 0,      -- Priority
