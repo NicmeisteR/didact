@@ -381,6 +381,27 @@ RETURNS INTEGER AS $$
     END
 $$ LANGUAGE plpgsql;
 
+CREATE OR REPLACE FUNCTION didact_init_team_encounter_insert(match_id INTEGER)
+RETURNS INTEGER AS $$
+    DECLARE
+        t TIMESTAMP := clock_timestamp();
+    BEGIN
+        RAISE NOTICE 'Initiate team encounter insert';
+        INSERT INTO task (t_type, t_updated, t_status, t_priority, t_data)
+            SELECT
+                4,      -- TaskPlayerStatsUpdate
+                now(),  -- Updated
+                0,      -- TaskQueued
+                0,      -- Priority
+                json_build_object(
+                    'MatchID', match_id
+                )
+            FROM player;
+        RAISE NOTICE 'Duration=%', clock_timestamp() - t;
+        RETURN 1;
+    END
+$$ LANGUAGE plpgsql;
+
 CREATE OR REPLACE FUNCTION didact_init_active_player_stat_scan(i INTERVAL)
 RETURNS INTEGER AS $$
     DECLARE
