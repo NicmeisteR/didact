@@ -816,7 +816,8 @@ RETURNS TABLE(
     map_uuid UUID,
     match_uuid UUID,
     playlist_uuid UUID,
-    season_uuid UUID
+    season_uuid UUID,
+    swapped BOOLEAN
 ) AS $$
     DECLARE
         community_id INTEGER := 0;
@@ -888,13 +889,13 @@ RETURNS TABLE(
                 -- Everywhere
                 RETURN QUERY
                 (
-                    SELECT * FROM team_encounter
+                    SELECT *, FALSE FROM team_encounter
                         WHERE te_start_date > NOW() - interval_
                         AND te_t1_p1_id = team1_ids[1]
                         AND te_t1_p2_id = team1_ids[2]
                         AND te_t1_p3_id = team1_ids[3]
                     UNION ALL
-                    SELECT * FROM team_encounter
+                    SELECT *, TRUE FROM team_encounter
                         WHERE te_start_date > NOW() - interval_
                         AND te_t1_p1_id = team2_ids[1]
                         AND te_t1_p2_id = team2_ids[2]
@@ -926,7 +927,7 @@ RETURNS TABLE(
                 -- Run query
                 RETURN QUERY
                 (
-                    SELECT te.*
+                    SELECT te.*, FALSE
                         FROM team_encounter te, community_league_team clp
                         WHERE te_start_date > NOW() - interval_
                         AND te_t1_p1_id = team1_ids[1]
@@ -936,7 +937,7 @@ RETURNS TABLE(
                         AND te_t2_p2_id = clp.clp_team_p2_id
                         AND te_t2_p3_id = clp.clp_team_p3_id
                     UNION ALL
-                    SELECT te.*
+                    SELECT te.*, TRUE
                         FROM team_encounter te, community_league_team clp
                         WHERE te_start_date > NOW() - interval_
                         AND te_t2_p1_id = team1_ids[1]
@@ -965,7 +966,7 @@ RETURNS TABLE(
             -- Run query
             RETURN QUERY
             (
-                SELECT * FROM team_encounter
+                SELECT *, FALSE FROM team_encounter
                     WHERE te_start_date > NOW() - interval_
                     AND te_t1_p1_id = team1_ids[1]
                     AND te_t1_p2_id = team1_ids[2]
@@ -974,7 +975,7 @@ RETURNS TABLE(
                     AND te_t2_p2_id = team2_ids[2]
                     AND te_t2_p3_id = team2_ids[3]
                 UNION ALL
-                SELECT * FROM team_encounter
+                SELECT *, TRUE FROM team_encounter
                     WHERE te_start_date > NOW() - interval_
                     AND te_t1_p1_id = team2_ids[1]
                     AND te_t1_p2_id = team2_ids[2]

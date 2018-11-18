@@ -298,7 +298,7 @@ CREATE TABLE match_player (
 
 CREATE INDEX match_player_match_idx
     ON match_player
-    USING BTREE(mp_match_id, mp_player_idx);
+    USING BTREE(mp_match_id);
 
 CREATE INDEX match_player_gamertag_idx
     ON match_player(mp_gamertag);
