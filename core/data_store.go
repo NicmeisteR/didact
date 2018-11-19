@@ -84,6 +84,50 @@ func (ds *DataStore) getPlayerGamertag(playerID int) (string, error) {
 }
 
 // -------------------------------------------------------------------------------------------------------------
+// Get the latest match
+// -------------------------------------------------------------------------------------------------------------
+
+// Query player stats
+func (ds *DataStore) getLatestMatch(playerID int) (int, string, time.Time, error) {
+	// Query row
+	row := ds.db.QueryRow(`
+		WITH latest(l_id) AS (
+			SELECT te_match_id
+			FROM team_encounter
+			WHERE te_t1_p1_id = $1
+			OR te_t1_p2_id = $1
+			OR te_t1_p3_id = $1
+			OR te_t1_p2_id = $1
+			OR te_t2_p2_id = $1
+			OR te_t2_p3_id = $1
+			ORDER BY te_start_date DESC
+			LIMIT 1
+		)
+		SELECT l_id, m_match_uuid, extract(epoch from m_start_date)
+		FROM latest, match
+		WHERE l_id = m_id
+	`, playerID)
+
+	// Scan row
+	var matchID int
+	var matchUUID string
+	var startDate float64
+	err := row.Scan(&matchID, &matchUUID, &startDate)
+
+	// No rows?
+	if err == sql.ErrNoRows {
+		return 0, "", time.Unix(0, 0), err
+	}
+
+	// Different error?
+	if err != nil {
+		return 0, "", time.Unix(0, 0), err
+	}
+
+	return matchID, matchUUID, time.Unix(int64(startDate), 0), nil
+}
+
+// -------------------------------------------------------------------------------------------------------------
 // Match History
 // -------------------------------------------------------------------------------------------------------------
 

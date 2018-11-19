@@ -2,7 +2,6 @@ package core
 
 import (
 	"database/sql"
-	"encoding/json"
 	"fmt"
 	"github.com/bwmarrin/discordgo"
 	"net/url"
@@ -104,43 +103,18 @@ func (bot *Bot) markAsTyping(channel string) {
 // URLs
 // -------------------------------------------------------------------------------------------------------------
 
-func (bot *Bot) dashboardURL(dashboardName string, params map[string]string) (*url.URL, error) {
-	// Superset filter_values expects filter values wrapped in arrays
-	wrappedParams := make(map[string][]string)
-	for k, v := range params {
-		var p []string
-		p = append(p, v)
-		wrappedParams[k] = p
-	}
-	filters := map[string]map[string][]string{
-		"*": wrappedParams,
-	}
-
-	// Marshall params to string
-	jsonBuffer, err := json.Marshal(filters)
-	if err != nil {
-		return nil, err
-	}
-
+func (bot *Bot) dashboardURL(dashboardUUID string, params map[string]string) (*url.URL, error) {
 	// Build URL
-	u, err := url.Parse("https://www.didact.io/superset/dashboard/")
+	u, err := url.Parse("https://www.didact.io/public/dashboard/")
 	if err != nil {
 		return nil, err
 	}
-	u.Path += dashboardName
+	u.Path += dashboardUUID
 	q := u.Query()
-	q.Set("preselect_filters", string(jsonBuffer))
-	q.Set("standalone", "true")
-	u.RawQuery = q.Encode()
-	return u, nil
-}
-
-func (bot *Bot) waypointProfileURL(gamertag string) (*url.URL, error) {
-	u, err := url.Parse("https://www.halowaypoint.com/en-us/games/halo-wars-2/service-record/players/")
-	if err != nil {
-		return nil, err
+	for key, value := range params {
+		q.Set(key, value)
 	}
-	u.Path += gamertag
+	u.RawQuery = q.Encode()
 	return u, nil
 }
 
@@ -215,13 +189,34 @@ func (bot *Bot) onMessageCreate(s *discordgo.Session, m *discordgo.MessageCreate
 	case "s":
 		fallthrough
 	case "scan":
-		bot.scanPlayer(m, args)
+		pid, gt, ok := bot.getPlayerID(m, args)
+		if !ok {
+			return
+		}
+		bot.scanPlayer(m, pid, gt)
 		break
 
 	case "analyse":
 		fallthrough
 	case "analyze":
-		bot.analyzeMatch(m, args)
+		mid, err := strconv.Atoi(args)
+		if err != nil {
+			bot.sendResponse(m, fmt.Sprintf("The match id **%d** is invalid.", args))
+			return
+		}
+		bot.analyzeMatch(m, mid)
+
+	case "last":
+		fallthrough
+	case "latest":
+		pid, gt, ok := bot.getPlayerID(m, args)
+		if !ok {
+			return
+		}
+		bot.scanPlayer(m, pid, gt)
+		bot.getLatest(m, pid, gt)
+		break
+
 	default:
 		bot.sendResponse(m, fmt.Sprintf("'%s' looks like nothing to me.", cmd))
 	}
@@ -244,19 +239,74 @@ func (bot *Bot) getStatus(m *discordgo.MessageCreate) {
 }
 
 // -------------------------------------------------------------------------------------------------------------
-// Scan player
+// Get player id
 // -------------------------------------------------------------------------------------------------------------
 
-func (bot *Bot) scanPlayer(m *discordgo.MessageCreate, args string) {
-	// Get player id
+func (bot *Bot) getPlayerID(m *discordgo.MessageCreate, args string) (int, string, bool) {
 	gamertag := strings.Trim(args, " \"'")
 	playerID, err := bot.dataStore.getPlayerID(gamertag)
 	if err != nil {
 		bot.sendResponse(m, fmt.Sprintf("Could not find player: **%v**.", gamertag))
-		return
+		return 0, "", false
 	}
 	bot.sendResponse(m, fmt.Sprintf("I found player **%s** with id **%d**.", gamertag, playerID))
+	return playerID, gamertag, true
+}
 
+// -------------------------------------------------------------------------------------------------------------
+// Get latest
+// -------------------------------------------------------------------------------------------------------------
+
+func (bot *Bot) getLatest(m *discordgo.MessageCreate, playerID int, gamertag string) {
+	// Get the latest match
+	matchID, matchUUID, startDate, err := bot.dataStore.getLatestMatch(playerID)
+	if err != nil {
+		bot.sendResponse(m, fmt.Sprintf("Ouch! Something went wrong: %v.", err))
+		return
+	}
+
+	// Analyze the match
+	if !bot.analyzeMatch(m, matchID) {
+		return
+	}
+
+	// Build URLs
+	didactURL, _ := bot.dashboardURL("4222ecd2-6698-4149-8a45-0c02057d4efc", map[string]string{
+		"match_id":   strconv.Itoa(matchID),
+		"left_team":  "1",
+		"right_team": "2",
+	})
+	waypointURL, _ := bot.waypointMatchURL(matchUUID, gamertag)
+
+	fields := []*discordgo.MessageEmbedField{}
+	fields = append(fields, &discordgo.MessageEmbedField{
+		Name:   "Didact Statistics",
+		Value:  fmt.Sprintf("%v", didactURL),
+		Inline: false,
+	})
+	fields = append(fields, &discordgo.MessageEmbedField{
+		Name:   "Waypoint Statistics",
+		Value:  fmt.Sprintf("%v", waypointURL),
+		Inline: false,
+	})
+
+	r := &discordgo.MessageEmbed{
+		Title:       "Latest known match",
+		Author:      &discordgo.MessageEmbedAuthor{},
+		Color:       0x010101,
+		Description: fmt.Sprintf("Player: **%d** Gamertag: **%s** Start: **%v**", playerID, gamertag, startDate),
+		Fields:      fields,
+		Timestamp:   time.Now().Format(time.RFC3339),
+	}
+
+	bot.session.ChannelMessageSendEmbed(m.ChannelID, r)
+}
+
+// -------------------------------------------------------------------------------------------------------------
+// Scan player
+// -------------------------------------------------------------------------------------------------------------
+
+func (bot *Bot) scanPlayer(m *discordgo.MessageCreate, playerID int, gamertag string) {
 	// Figure out where to start
 	count := 25
 	offset := 0
@@ -331,19 +381,12 @@ func (bot *Bot) scanPlayer(m *discordgo.MessageCreate, args string) {
 // Match events
 // -------------------------------------------------------------------------------------------------------------
 
-func (bot *Bot) analyzeMatch(m *discordgo.MessageCreate, args string) {
-	// Get message id
-	mid, err := strconv.Atoi(args)
-	if err != nil {
-		bot.sendResponse(m, fmt.Sprintf("The match id **%d** is invalid.", args))
-		return
-	}
-
+func (bot *Bot) analyzeMatch(m *discordgo.MessageCreate, mid int) bool {
 	// Match events already exist?
 	mUUID, err := bot.dataStore.getMatchUUID(mid)
 	if err != nil {
-		bot.sendResponse(m, fmt.Sprintf("I don't know of any match with id **%d**.", args))
-		return
+		bot.sendResponse(m, fmt.Sprintf("I don't know of any match with id **%d**.", mid))
+		return false
 	}
 	bot.sendResponse(m, fmt.Sprintf("I found match **%d** with uuid **%s**.", mid, mUUID))
 
@@ -353,19 +396,19 @@ func (bot *Bot) analyzeMatch(m *discordgo.MessageCreate, args string) {
 	// No such match? (404)
 	if err == ErrNotFound {
 		bot.sendResponse(m, fmt.Sprintf("The Halo API does not return any events for the match **%s**.", mUUID))
-		return
+		return false
 	}
 
 	// Hit the rate limit? (429)
 	if err == ErrRateLimit {
 		bot.sendResponse(m, fmt.Sprintf("I just hit the API rate limit, please request the events again."))
-		return
+		return false
 	}
 
 	// Try again if there was an unexpected error
 	if err != nil {
 		bot.sendResponse(m, fmt.Sprintf("Ouch! Something went wrong: %v.", err))
-		return
+		return false
 	}
 
 	// Store match events
@@ -375,5 +418,5 @@ func (bot *Bot) analyzeMatch(m *discordgo.MessageCreate, args string) {
 	}
 
 	bot.sendResponse(m, fmt.Sprintf("I stored the events for match **%d**.", mid))
-	return
+	return true
 }
