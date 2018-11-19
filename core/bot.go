@@ -145,17 +145,9 @@ func (bot *Bot) onMessageCreate(s *discordgo.Session, m *discordgo.MessageCreate
 
 	// Not addressing the bot?
 	msgFields := strings.Fields(m.Content)
-	if len(msgFields) < 2 || msgFields[0] != "!didact" {
+	if len(msgFields) < 1 || msgFields[0] != "!didact" {
 		return
 	}
-	cmd := msgFields[1]
-
-	// Extract the argument string
-	args := strings.TrimSpace(m.Content)
-	args = strings.TrimPrefix(args, "!didact")
-	args = strings.TrimLeft(args, " ")
-	args = strings.TrimPrefix(args, cmd)
-	args = strings.TrimLeft(args, " ")
 
 	// Known didact channel?
 	_, ok := bot.channels[m.ChannelID]
@@ -179,10 +171,22 @@ func (bot *Bot) onMessageCreate(s *discordgo.Session, m *discordgo.MessageCreate
 	// Mark as typing
 	bot.markAsTyping(m.ChannelID)
 
+	// Print help
+	if len(msgFields) == 1 {
+		bot.help(m)
+		return
+	}
+
+	// Extract the argument string
+	cmd := msgFields[1]
+	args := strings.TrimSpace(m.Content)
+	args = strings.TrimPrefix(args, "!didact")
+	args = strings.TrimLeft(args, " ")
+	args = strings.TrimPrefix(args, cmd)
+	args = strings.TrimLeft(args, " ")
+
 	// Process the command
 	switch cmd {
-	case "help":
-		break
 	case "status":
 		bot.getStatus(m)
 		break
@@ -222,9 +226,64 @@ func (bot *Bot) onMessageCreate(s *discordgo.Session, m *discordgo.MessageCreate
 		bot.getLatest(m, pid, gt)
 		break
 
+	case "help":
+		fallthrough
 	default:
-		bot.sendResponse(m, fmt.Sprintf("'%s' looks like nothing to me.", cmd))
+		bot.help(m)
 	}
+}
+
+// -------------------------------------------------------------------------------------------------------------
+// Get latest
+// -------------------------------------------------------------------------------------------------------------
+
+func (bot *Bot) help(m *discordgo.MessageCreate) {
+	teamStats := "https://www.didact.io/public/dashboard/79912130-2ef2-49ca-a14a-f2dac4c887f9"
+	matchStats := "https://www.didact.io/public/dashboard/4222ecd2-6698-4149-8a45-0c02057d4efc"
+	// search := "https://www.didact.io/public/dashboard/d8a4b068-0a33-4215-b949-6e2f45df2e17"
+
+	fields := []*discordgo.MessageEmbedField{}
+	fields = append(fields, &discordgo.MessageEmbedField{
+		Name:   "Command - Player Search",
+		Value:  "!didact find <query>",
+		Inline: false,
+	})
+	fields = append(fields, &discordgo.MessageEmbedField{
+		Name:   "Command - Last Match",
+		Value:  "!didact last <exact gamertag>",
+		Inline: false,
+	})
+	fields = append(fields, &discordgo.MessageEmbedField{
+		Name:   "Command - History Scan",
+		Value:  "!didact scan <exact gamertag>",
+		Inline: false,
+	})
+	fields = append(fields, &discordgo.MessageEmbedField{
+		Name:   "Command - Match Analysis",
+		Value:  "!didact analyse <match id>",
+		Inline: false,
+	})
+	fields = append(fields, &discordgo.MessageEmbedField{
+		Name:   "URL - Team Statistics",
+		Value:  teamStats,
+		Inline: false,
+	})
+	fields = append(fields, &discordgo.MessageEmbedField{
+		Name:   "URL - Match Statistics",
+		Value:  matchStats,
+		Inline: false,
+	})
+
+	r := &discordgo.MessageEmbed{
+		Title:       "Didact Discord Bot",
+		Author:      &discordgo.MessageEmbedAuthor{},
+		Color:       0x010101,
+		Description: "If you find bugs, please tell @x6767.",
+		Fields:      fields,
+		Timestamp:   time.Now().Format(time.RFC3339),
+	}
+
+	bot.session.ChannelMessageSendEmbed(m.ChannelID, r)
 }
 
 // -------------------------------------------------------------------------------------------------------------
