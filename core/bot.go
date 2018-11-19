@@ -119,7 +119,7 @@ func (bot *Bot) dashboardURL(dashboardUUID string, params map[string]string) (*u
 }
 
 func (bot *Bot) waypointMatchURL(matchUUID string, gamertag string) (*url.URL, error) {
-	u, err := url.Parse("https://www.halowaypoint.com/de-de/games/halo-wars-2/matches/")
+	u, err := url.Parse("https://www.halowaypoint.com/en-us/games/halo-wars-2/matches/")
 	if err != nil {
 		return nil, err
 	}
@@ -167,7 +167,7 @@ func (bot *Bot) onMessageCreate(s *discordgo.Session, m *discordgo.MessageCreate
 		}
 
 		// Didact channel?
-		if channel.Name != "didact" {
+		if channel.Name != "didact" && channel.Name != "hw2-stat-bot" {
 			return
 		}
 
@@ -382,6 +382,8 @@ func (bot *Bot) scanPlayer(m *discordgo.MessageCreate, playerID int, gamertag st
 // -------------------------------------------------------------------------------------------------------------
 
 func (bot *Bot) analyzeMatch(m *discordgo.MessageCreate, mid int) bool {
+	bot.markAsTyping(m.ChannelID)
+
 	// Match events already exist?
 	mUUID, err := bot.dataStore.getMatchUUID(mid)
 	if err != nil {
@@ -389,6 +391,8 @@ func (bot *Bot) analyzeMatch(m *discordgo.MessageCreate, mid int) bool {
 		return false
 	}
 	bot.sendResponse(m, fmt.Sprintf("I found match **%d** with uuid **%s**.", mid, mUUID))
+
+	bot.markAsTyping(m.ChannelID)
 
 	// Load match events
 	mEvents, err := bot.crawler.loadMatchEvents(mUUID)
@@ -410,6 +414,8 @@ func (bot *Bot) analyzeMatch(m *discordgo.MessageCreate, mid int) bool {
 		bot.sendResponse(m, fmt.Sprintf("Ouch! Something went wrong: %v.", err))
 		return false
 	}
+
+	bot.markAsTyping(m.ChannelID)
 
 	// Store match events
 	err = bot.dataStore.storeMatchEvents(mid, mEvents)
