@@ -1,6 +1,7 @@
 package core
 
 import (
+	"bytes"
 	"database/sql"
 	"fmt"
 	"github.com/bwmarrin/discordgo"
@@ -186,6 +187,10 @@ func (bot *Bot) onMessageCreate(s *discordgo.Session, m *discordgo.MessageCreate
 		bot.getStatus(m)
 		break
 
+	case "find":
+		bot.findPlayer(m, args)
+		return
+
 	case "s":
 		fallthrough
 	case "scan":
@@ -251,6 +256,47 @@ func (bot *Bot) getPlayerID(m *discordgo.MessageCreate, args string) (int, strin
 	}
 	bot.sendResponse(m, fmt.Sprintf("I found player **%s** with id **%d**.", gamertag, playerID))
 	return playerID, gamertag, true
+}
+
+// -------------------------------------------------------------------------------------------------------------
+// Find player
+// -------------------------------------------------------------------------------------------------------------
+
+func (bot *Bot) findPlayer(m *discordgo.MessageCreate, search string) {
+	gamertags, err := bot.dataStore.findPlayer(search)
+	if err != nil {
+		bot.sendResponse(m, fmt.Sprintf("Ouch! Something went wrong: %v.", err))
+		return
+	}
+	if len(gamertags) == 0 {
+		bot.sendResponse(m, fmt.Sprintf("Couldn't find any players for query **%s**.", search))
+		return
+	}
+
+	var buffer bytes.Buffer
+	for _, gt := range gamertags {
+		buffer.WriteString(gt)
+		buffer.WriteString("\n")
+		fmt.Sprintf("%s\n", gt)
+	}
+
+	fields := []*discordgo.MessageEmbedField{}
+	fields = append(fields, &discordgo.MessageEmbedField{
+		Name:   "Result",
+		Value:  buffer.String(),
+		Inline: false,
+	})
+
+	r := &discordgo.MessageEmbed{
+		Title:       "Player search",
+		Author:      &discordgo.MessageEmbedAuthor{},
+		Color:       0x010101,
+		Description: fmt.Sprintf("Query: **%s** Limit: **12**", search),
+		Fields:      fields,
+		Timestamp:   time.Now().Format(time.RFC3339),
+	}
+
+	bot.session.ChannelMessageSendEmbed(m.ChannelID, r)
 }
 
 // -------------------------------------------------------------------------------------------------------------

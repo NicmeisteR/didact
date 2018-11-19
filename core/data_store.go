@@ -1051,226 +1051,44 @@ func (ds *DataStore) storePlayerStats(playerId int, stats *PlayerStats) (err err
 }
 
 // -------------------------------------------------------------------------------------------------------------
-// Recent player teams
+// Serach a player
 // -------------------------------------------------------------------------------------------------------------
 
-func (ds *DataStore) recentPlayerTeams(playerID int, interval int, limit int) ([]*AnnotatedPlayerTeam, error) {
-	// Get the player teams
+func (ds *DataStore) findPlayer(query string) ([]string, error) {
 	results, err := ds.db.Query(`
-		WITH history_ AS (
-			SELECT mh.*
-			FROM match_history mh
-			WHERE mh.mh_player_id = $1
-			AND mh.mh_match_start_date > NOW() - ($2 || ' days')::interval
-		), matches_ AS (
-			SELECT *
-			FROM history_ h, match m
-			WHERE h.mh_match_uuid = m.m_match_uuid
-		), team_candidates_ AS (
-			SELECT te_t1_id AS tc_id, (CASE WHEN te_match_outcome = 1 THEN 1 ELSE 0 END) as tc_win, te_duration as tc_duration
-			FROM matches_ m, team_encounter te
-			WHERE m.m_id = te.te_match_id
-			
-			UNION ALL
-			
-			SELECT te_t2_id AS tc_id, (CASE WHEN te_match_outcome != 1 THEN 1 ELSE 0 END) as tc_win, te_duration as tc_duration
-			FROM matches_ m, team_encounter te
-			WHERE m.m_id = te.te_match_id
-		), team_stats_ AS (
-			SELECT
-				t.t_id,
-				t.t_p1_id,
-				t.t_p2_id,
-				t.t_p3_id,
-				count(*) AS matches,
-				sum(tc_win) AS wins,
-				sum(tc_duration) AS duration
-			FROM team_candidates_ tc, team t
-			WHERE t.t_id = tc.tc_id
-			AND (
-				t.t_p1_id = $1
-				OR t.t_p2_id = $1
-				OR t.t_p3_id = $1
-			)
-			GROUP BY t.t_id, t.t_p1_id, t.t_p2_id, t.t_p3_id
-			ORDER BY matches DESC
-			LIMIT $3
+		WITH players_ AS (
+			SELECT p_id, p_gamertag
+			FROM player
+			WHERE p_gamertag ILIKE '%' || $1 || '%'
+			LIMIT 100
 		)
-		SELECT
-			ts.t_id AS team_id,
-			p1.p_id AS p1ID,
-			p2.p_id AS p2ID,
-			p3.p_id AS p3ID,
-			p1.p_gamertag AS p1GT,
-			p2.p_gamertag AS p2GT,
-			p3.p_gamertag AS p3GT,
-			ts.matches,
-			ts.wins,
-			EXTRACT (EPOCH FROM ts.duration)
-		FROM team_stats_ ts, player p1, player p2, player p3
-		WHERE ts.t_p1_id = p1.p_id
-		AND ts.t_p2_id = p2.p_id
-		AND ts.t_p3_id = p3.p_id
+		SELECT p_gamertag, SUM(ps_matches_started) AS matches
+		FROM players_
+		CROSS JOIN LATERAL (
+			SELECT ps_matches_started
+			FROM player_stats
+			WHERE p_id = ps_player_id
+			AND ps_game_mode IS NULL
+			LIMIT 20
+		) x
+		GROUP BY p_gamertag
 		ORDER BY matches DESC
-		LIMIT $3
-	`, playerID, interval, limit)
+		LIMIT 10
+	`, query)
 
 	if err != nil {
 		return nil, err
 	}
 
-	var teams []*AnnotatedPlayerTeam
-
+	var gamertags []string
 	for results.Next() {
-		team := &AnnotatedPlayerTeam{}
-		var epochDuration float64
-
-		err := results.Scan(
-			&team.teamID,
-			&team.player1ID,
-			&team.player2ID,
-			&team.player3ID,
-			&team.player1GT,
-			&team.player2GT,
-			&team.player3GT,
-			&team.matches,
-			&team.wins,
-			&epochDuration,
-		)
+		var gamertag string
+		var matches string
+		err := results.Scan(&gamertag, &matches)
 		if err != nil {
 			return nil, err
 		}
-
-		team.duration = time.Duration(epochDuration) * time.Second
-		teams = append(teams, team)
+		gamertags = append(gamertags, gamertag)
 	}
-
-	return teams, nil
-}
-
-// -------------------------------------------------------------------------------------------------------------
-// Recent player matches
-// -------------------------------------------------------------------------------------------------------------
-
-func (ds *DataStore) recentPlayerMatches(playerID int, limit int, offset int) ([]*AnnotatedPlayerMatch, error) {
-	// Get the player matches
-	results, err := ds.db.Query(`
-		WITH history_ AS (
-			SELECT mh.*
-			FROM match_history mh
-			WHERE mh.mh_player_id = $1
-			ORDER BY mh_match_start_date DESC
-			LIMIT $2
-		), matches_ AS (
-			SELECT *
-			FROM history_ h, match m, team_encounter te
-			WHERE h.mh_match_uuid = m.m_match_uuid
-			AND m.m_id = te.te_match_id
-			LIMIT $2
-		), data_ AS (
-			SELECT
-				m.m_id AS match_id,
-				m.m_match_uuid AS match_uuid,
-				m.m_playlist_uuid AS playlist_uuid,
-				EXTRACT(EPOCH FROM m.mh_match_start_date) AS match_start_date,
-				EXTRACT(EPOCH FROM m.m_duration) AS match_duration,
-				m.mh_player_match_outcome AS match_outcome,
-				m.te_t1_id AS team1,
-				m.te_t2_id AS team2,
-				p1.p_id AS p1ID,
-				p2.p_id AS p2ID,
-				p3.p_id AS p3ID,
-				p4.p_id AS p4ID,
-				p5.p_id AS p5ID,
-				p6.p_id AS p6ID,
-				p1.p_gamertag AS p1GT,
-				p2.p_gamertag AS p2GT,
-				p3.p_gamertag AS p3GT,
-				p4.p_gamertag AS p4GT,
-				p5.p_gamertag AS p5GT,
-				p6.p_gamertag AS p6GT,
-				mm.mm_name AS map,
-				ml.ml_name AS leader
-			FROM matches_ m,
-				team t1,
-				team t2,
-				player p1, player p2, player p3,
-				player p4, player p5, player p6,
-				meta_map mm,
-				meta_leader ml
-			WHERE m.te_t1_id = t1.t_id
-			AND m.te_t2_id = t2.t_id
-			AND t1.t_p1_id = p1.p_id
-			AND t1.t_p2_id = p2.p_id
-			AND t1.t_p3_id = p3.p_id
-			AND t2.t_p1_id = p4.p_id
-			AND t2.t_p2_id = p5.p_id
-			AND t2.t_p3_id = p6.p_id
-			AND m.m_map_uuid = mm.mm_uuid
-			AND m.mh_leader_id = ml.ml_id
-		)
-		SELECT
-			d.*,
-			COALESCE(mpl.mpl_game_mode, '-') AS game_mode,
-			COALESCE(mpl.mpl_team_size, '-') AS team_size,
-			COALESCE(mpl.mpl_ranking, '-') AS ranking,
-			COALESCE(mpl.mpl_platform, '-') AS platform
-		FROM data_ d
-			LEFT OUTER JOIN meta_playlist mpl
-			ON d.playlist_uuid = mpl.mpl_uuid
-		ORDER BY d.match_start_date DESC
-		LIMIT $2
-	`, playerID, limit)
-
-	if err != nil {
-		return nil, err
-	}
-
-	var matches []*AnnotatedPlayerMatch
-
-	for results.Next() {
-		match := &AnnotatedPlayerMatch{}
-
-		var epochStartDate float64
-		var epochDuration float64
-
-		err := results.Scan(
-			&match.matchID,
-			&match.matchUUID,
-			&match.playlistUUID,
-			&epochStartDate,
-			&epochDuration,
-			&match.matchOutcome,
-			&match.team1ID,
-			&match.team2ID,
-			&match.player1ID,
-			&match.player2ID,
-			&match.player3ID,
-			&match.player4ID,
-			&match.player5ID,
-			&match.player6ID,
-			&match.player1GT,
-			&match.player2GT,
-			&match.player3GT,
-			&match.player4GT,
-			&match.player5GT,
-			&match.player6GT,
-			&match.mapName,
-			&match.leaderName,
-			&match.gameMode,
-			&match.teamSize,
-			&match.ranking,
-			&match.platform,
-		)
-		if err != nil {
-			return nil, err
-		}
-
-		match.matchStartDate = time.Unix(int64(epochStartDate), 0)
-		match.matchDuration = time.Duration(epochDuration) * time.Second
-
-		matches = append(matches, match)
-	}
-
-	return matches, nil
+	return gamertags, nil
 }
