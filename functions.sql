@@ -695,7 +695,7 @@ RETURNS INTEGER AS $$
             RETURN -1;
         END IF;
 
-        SELECT p_id INTO player_id FROM player WHERE p_gamertag = gt;
+        SELECT p_id INTO player_id FROM player WHERE p_gamertag ILIKE gt;
         IF NOT FOUND THEN
             RAISE NOTICE 'player % not found', gt;
             RETURN -1;
@@ -742,7 +742,7 @@ RETURNS INTEGER AS $$
         LOOP
             SELECT p_id INTO player_id
                 FROM player
-                WHERE p_gamertag = gamertag;
+                WHERE p_gamertag ILIKE gamertag;
 
             IF NOT FOUND THEN
                 RAISE NOTICE 'player % not found', gamertag;
@@ -860,7 +860,7 @@ RETURNS TABLE(
         LOOP
             SELECT p_id INTO player_id
                 FROM player
-                WHERE p_gamertag = gamertag;
+                WHERE p_gamertag ILIKE gamertag;
             IF NOT FOUND THEN
                 RAISE NOTICE 'Could not find player %', gamertag;
                 RETURN;
@@ -873,7 +873,7 @@ RETURNS TABLE(
         LOOP
             SELECT p_id INTO player_id
                 FROM player
-                WHERE p_gamertag = gamertag;
+                WHERE p_gamertag ILIKE gamertag;
             IF NOT FOUND THEN
                 RAISE NOTICE 'Could not find player %', gamertag;
                 RETURN;

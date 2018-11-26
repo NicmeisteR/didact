@@ -195,9 +195,15 @@ func (bot *Bot) onMessageCreate(s *discordgo.Session, m *discordgo.MessageCreate
 		bot.findPlayer(m, args)
 		return
 
-	case "s":
-		fallthrough
 	case "scan":
+		pid, gt, ok := bot.getPlayerID(m, args)
+		if !ok {
+			return
+		}
+		bot.scanPlayer(m, pid, gt)
+		break
+
+	case "stats":
 		pid, gt, ok := bot.getPlayerID(m, args)
 		if !ok {
 			return
@@ -249,13 +255,18 @@ func (bot *Bot) help(m *discordgo.MessageCreate) {
 		Inline: false,
 	})
 	fields = append(fields, &discordgo.MessageEmbedField{
+		Name:   "Command - Team Statisitics",
+		Value:  "!didact stats [<gamertag 1>, <gamertag 2>]",
+		Inline: false,
+	})
+	fields = append(fields, &discordgo.MessageEmbedField{
 		Name:   "Command - Last Match",
-		Value:  "!didact last <exact gamertag>",
+		Value:  "!didact last <gamertag>",
 		Inline: false,
 	})
 	fields = append(fields, &discordgo.MessageEmbedField{
 		Name:   "Command - History Scan",
-		Value:  "!didact scan <exact gamertag>",
+		Value:  "!didact scan <gamertag>",
 		Inline: false,
 	})
 	fields = append(fields, &discordgo.MessageEmbedField{
@@ -356,6 +367,33 @@ func (bot *Bot) findPlayer(m *discordgo.MessageCreate, search string) {
 	}
 
 	bot.session.ChannelMessageSendEmbed(m.ChannelID, r)
+}
+
+// -------------------------------------------------------------------------------------------------------------
+// Get stats
+// -------------------------------------------------------------------------------------------------------------
+
+func (bot *Bot) getStats(m *discordgo.MessageCreate, args string) {
+	// Get gamertags
+	raw_gamertags := strings.Split(args, ",")
+	var gamertags []string = nil
+	for _, gt := range raw_gamertags {
+		gamertags = append(gamertags, strings.Trim(gt, " \"'"))
+	}
+	gamertags = append(gamertags, "-")
+	gamertags = append(gamertags, "-")
+	gamertags = append(gamertags, "-")
+
+	// Build link
+	didactURL, _ := bot.dashboardURL("79912130-2ef2-49ca-a14a-f2dac4c887f9", map[string]string{
+		"t1_p1": gamertags[0],
+		"t1_p2": gamertags[1],
+		"t1_p3": gamertags[2],
+		"days":  "90",
+	})
+
+	// Send string
+	bot.sendResponse(m, didactURL.String())
 }
 
 // -------------------------------------------------------------------------------------------------------------

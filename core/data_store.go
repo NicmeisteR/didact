@@ -37,7 +37,7 @@ func (ds *DataStore) getPlayerID(gamertag string) (int, error) {
 	row := ds.db.QueryRow(`
 		SELECT p_id
 		FROM player
-		WHERE p_gamertag = $1
+		WHERE p_gamertag ILIKE $1
 	`, gamertag)
 
 	// Scan row
