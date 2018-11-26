@@ -252,7 +252,7 @@ func (bot *Bot) help(m *discordgo.MessageCreate) {
 	})
 	fields = append(fields, &discordgo.MessageEmbedField{
 		Name:   "Command - Team Statisitics",
-		Value:  "!didact stats [<gamertag 1>, <gamertag 2>]",
+		Value:  "!didact stats <gamertag 1> [, <gamertag 2>, <gamertag 3>]",
 		Inline: false,
 	})
 	fields = append(fields, &discordgo.MessageEmbedField{
