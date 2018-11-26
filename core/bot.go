@@ -204,11 +204,7 @@ func (bot *Bot) onMessageCreate(s *discordgo.Session, m *discordgo.MessageCreate
 		break
 
 	case "stats":
-		pid, gt, ok := bot.getPlayerID(m, args)
-		if !ok {
-			return
-		}
-		bot.scanPlayer(m, pid, gt)
+		bot.getStats(m, args)
 		break
 
 	case "analyse":
