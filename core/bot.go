@@ -274,6 +274,11 @@ func (bot *Bot) help(m *discordgo.MessageCreate) {
 		Inline: false,
 	})
 	fields = append(fields, &discordgo.MessageEmbedField{
+		Name:   "Command - Full History Scan",
+		Value:  "!didact fullscan <gamertag>",
+		Inline: false,
+	})
+	fields = append(fields, &discordgo.MessageEmbedField{
 		Name:   "Command - Match Analysis",
 		Value:  "!didact analyse <match id>",
 		Inline: false,
