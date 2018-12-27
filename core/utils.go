@@ -33,6 +33,9 @@ func sqlDuration(value string) string {
 	if len(value) == 0 {
 		return "PT0H"
 	}
+	if value[0] == '-' {
+		return "PT0H"
+	}
 	return value
 }
 
