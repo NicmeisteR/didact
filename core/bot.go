@@ -259,8 +259,8 @@ func (bot *Bot) help(m *discordgo.MessageCreate) {
 		Inline: false,
 	})
 	fields = append(fields, &discordgo.MessageEmbedField{
-		Name:   "Command - Team Statisitics",
-		Value:  "!didact stats <gamertag 1> [, <gamertag 2>, <gamertag 3>]",
+		Name:   "Command - Statisitics",
+		Value:  "!didact stats <p-1-1> [, <gamertag p-1-2>, <p-1-3>] [/ <p-2-1>, <p-2-2>, <p-2-3>]",
 		Inline: false,
 	})
 	fields = append(fields, &discordgo.MessageEmbedField{
@@ -383,47 +383,120 @@ func (bot *Bot) findPlayer(m *discordgo.MessageCreate, search string) {
 // -------------------------------------------------------------------------------------------------------------
 
 func (bot *Bot) getStats(m *discordgo.MessageCreate, args string) {
-	// Get gamertags
-	raw_gamertags := strings.Split(args, ",")
-	var gamertags []string = nil
-	for _, gt := range raw_gamertags {
-		gamertags = append(gamertags, strings.Trim(gt, " \"'"))
-	}
-
-	// Build description
-	var description bytes.Buffer
-	for i, gt := range gamertags {
-		if i > 0 {
-			description.WriteString(", ")
+	if strings.Contains(args, "/") {
+		// Get teams
+		raw_teams := strings.Split(args, "/")
+		if len(raw_teams) != 2 {
+			bot.sendResponse(m, "Invalid teams.")
+			return
 		}
-		description.WriteString("**")
-		description.WriteString(gt)
-		description.WriteString("**")
+
+		// Get gamertags team 1
+		raw_gamertags_t1 := strings.Split(raw_teams[0], ",")
+		var gamertags_t1 []string = nil
+		for _, gt := range raw_gamertags_t1 {
+			gamertags_t1 = append(gamertags_t1, strings.Trim(gt, " \"'"))
+		}
+
+		// Get gamertags team 2
+		raw_gamertags_t2 := strings.Split(raw_teams[1], ",")
+		var gamertags_t2 []string = nil
+		for _, gt := range raw_gamertags_t2 {
+			gamertags_t2 = append(gamertags_t2, strings.Trim(gt, " \"'"))
+		}
+
+		// Build description
+		var description bytes.Buffer
+		for i, gt := range gamertags_t1 {
+			if i > 0 {
+				description.WriteString(", ")
+			}
+			description.WriteString("**")
+			description.WriteString(gt)
+			description.WriteString("**")
+		}
+		description.WriteString(" vs. ")
+		for i, gt := range gamertags_t2 {
+			if i > 0 {
+				description.WriteString(", ")
+			}
+			description.WriteString("**")
+			description.WriteString(gt)
+			description.WriteString("**")
+		}
+
+		// Build link
+		gamertags_t1 = append(gamertags_t1, "-")
+		gamertags_t1 = append(gamertags_t1, "-")
+		gamertags_t1 = append(gamertags_t1, "-")
+		gamertags_t2 = append(gamertags_t2, "-")
+		gamertags_t2 = append(gamertags_t2, "-")
+		gamertags_t2 = append(gamertags_t2, "-")
+		didactURL, _ := bot.dashboardURL("64d4d274-c18a-4f1e-b2c2-cf9672685ff2", map[string]string{
+			"t1_p1": gamertags_t1[0],
+			"t1_p2": gamertags_t1[1],
+			"t1_p3": gamertags_t1[2],
+			"t2_p1": gamertags_t2[0],
+			"t2_p2": gamertags_t2[1],
+			"t2_p3": gamertags_t2[2],
+			"days":  "90",
+		})
+
+		// Build embed
+		r := &discordgo.MessageEmbed{
+			Title:       fmt.Sprintf("Statistics"),
+			URL:         didactURL.String(),
+			Author:      &discordgo.MessageEmbedAuthor{},
+			Color:       0x010101,
+			Description: description.String(),
+			Timestamp:   time.Now().Format(time.RFC3339),
+		}
+
+		// Send embed
+		bot.session.ChannelMessageSendEmbed(m.ChannelID, r)
+	} else {
+		// Get gamertags
+		raw_gamertags := strings.Split(args, ",")
+		var gamertags []string = nil
+		for _, gt := range raw_gamertags {
+			gamertags = append(gamertags, strings.Trim(gt, " \"'"))
+		}
+
+		// Build description
+		var description bytes.Buffer
+		for i, gt := range gamertags {
+			if i > 0 {
+				description.WriteString(", ")
+			}
+			description.WriteString("**")
+			description.WriteString(gt)
+			description.WriteString("**")
+		}
+
+		// Build link
+		gamertags = append(gamertags, "-")
+		gamertags = append(gamertags, "-")
+		gamertags = append(gamertags, "-")
+		didactURL, _ := bot.dashboardURL("79912130-2ef2-49ca-a14a-f2dac4c887f9", map[string]string{
+			"t1_p1": gamertags[0],
+			"t1_p2": gamertags[1],
+			"t1_p3": gamertags[2],
+			"days":  "90",
+		})
+
+		// Build embed
+		r := &discordgo.MessageEmbed{
+			Title:       fmt.Sprintf("Statistics"),
+			URL:         didactURL.String(),
+			Author:      &discordgo.MessageEmbedAuthor{},
+			Color:       0x010101,
+			Description: description.String(),
+			Timestamp:   time.Now().Format(time.RFC3339),
+		}
+
+		// Send embed
+		bot.session.ChannelMessageSendEmbed(m.ChannelID, r)
 	}
-
-	// Build link
-	gamertags = append(gamertags, "-")
-	gamertags = append(gamertags, "-")
-	gamertags = append(gamertags, "-")
-	didactURL, _ := bot.dashboardURL("79912130-2ef2-49ca-a14a-f2dac4c887f9", map[string]string{
-		"t1_p1": gamertags[0],
-		"t1_p2": gamertags[1],
-		"t1_p3": gamertags[2],
-		"days":  "90",
-	})
-
-	// Build embed
-	r := &discordgo.MessageEmbed{
-		Title:       fmt.Sprintf("Team Statistics"),
-		URL:         didactURL.String(),
-		Author:      &discordgo.MessageEmbedAuthor{},
-		Color:       0x010101,
-		Description: description.String(),
-		Timestamp:   time.Now().Format(time.RFC3339),
-	}
-
-	// Send embed
-	bot.session.ChannelMessageSendEmbed(m.ChannelID, r)
 }
 
 // -------------------------------------------------------------------------------------------------------------
