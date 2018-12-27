@@ -200,7 +200,15 @@ func (bot *Bot) onMessageCreate(s *discordgo.Session, m *discordgo.MessageCreate
 		if !ok {
 			return
 		}
-		bot.scanPlayer(m, pid, gt)
+		bot.scanPlayer(m, pid, gt, false)
+		break
+
+	case "fullscan":
+		pid, gt, ok := bot.getPlayerID(m, args)
+		if !ok {
+			return
+		}
+		bot.scanPlayer(m, pid, gt, true)
 		break
 
 	case "stats":
@@ -224,7 +232,7 @@ func (bot *Bot) onMessageCreate(s *discordgo.Session, m *discordgo.MessageCreate
 		if !ok {
 			return
 		}
-		bot.scanPlayer(m, pid, gt)
+		bot.scanPlayer(m, pid, gt, false)
 		bot.getLatest(m, pid, gt)
 		break
 
@@ -466,15 +474,31 @@ func (bot *Bot) getLatest(m *discordgo.MessageCreate, playerID int, gamertag str
 // Scan player
 // -------------------------------------------------------------------------------------------------------------
 
-func (bot *Bot) scanPlayer(m *discordgo.MessageCreate, playerID int, gamertag string) {
+func (bot *Bot) scanPlayer(m *discordgo.MessageCreate, playerID int, gamertag string, full bool) {
 	// Figure out where to start
 	count := 25
 	offset := 0
 	newMatches := make([]string, 0)
 
+	totalSeenMatches := 0
+	lastNotification := 0
+	notificationThreshold := 25
+
 	bot.sendResponse(m, fmt.Sprintf("I started the match history scan for player **%d** with gamertag **%s**.", playerID, gamertag))
+	bot.markAsTyping(m.ChannelID)
 	for {
-		bot.markAsTyping(m.ChannelID)
+		// Notify user about progress?
+		if (totalSeenMatches - lastNotification) >= notificationThreshold {
+			bot.sendResponse(m, fmt.Sprintf("I scanned **%d** matches from player **%d**. (**%d** total, **%d** new)", totalSeenMatches-lastNotification, playerID, totalSeenMatches, len(newMatches)))
+			bot.markAsTyping(m.ChannelID)
+			lastNotification = totalSeenMatches
+
+			// Exponential backoff for notifications
+			notificationThreshold *= 2
+			if notificationThreshold >= 200 {
+				notificationThreshold = 200
+			}
+		}
 
 		// Get the match history
 		history, err := bot.crawler.loadMatchHistory(gamertag, offset, count)
@@ -517,8 +541,11 @@ func (bot *Bot) scanPlayer(m *discordgo.MessageCreate, playerID int, gamertag st
 			}
 		}
 
+		// Remember total seen matches
+		totalSeenMatches += seenMatches
+
 		// Continue?
-		if foundMatches > 0 {
+		if (foundMatches > 0) || (full && (len(history.Results) > 0)) {
 			offset += count
 		} else {
 			break
@@ -528,9 +555,26 @@ func (bot *Bot) scanPlayer(m *discordgo.MessageCreate, playerID int, gamertag st
 	if len(newMatches) == 0 {
 		bot.sendResponse(m, fmt.Sprintf("I found no new matches for player **%d**.", playerID))
 	} else if len(newMatches) > 0 {
-		bot.sendResponse(m, fmt.Sprintf("I found **%d** new match(es) for player **%d** and I will now load the match result(s).", len(newMatches), playerID))
-		for _, newMatch := range newMatches {
-			bot.markAsTyping(m.ChannelID)
+		bot.sendResponse(m, fmt.Sprintf("I found **%d** new match(es) from player **%d** and will now load the match results.", len(newMatches), playerID))
+
+		notificationThreshold = 5
+		lastNotification = 0
+
+		for i, newMatch := range newMatches {
+			// Notify user about progress?
+			if (i - lastNotification) >= notificationThreshold {
+				bot.sendResponse(m, fmt.Sprintf("I loaded **%d** match results from player **%d**. (**%d** total)", (i-lastNotification), playerID, i))
+				bot.markAsTyping(m.ChannelID)
+				lastNotification = i
+
+				// Exponential backoff for notifications
+				notificationThreshold *= 2
+				if notificationThreshold >= 20 {
+					notificationThreshold = 20
+				}
+			}
+
+			// Update the match result
 			bot.updateMatchResult(m, newMatch)
 		}
 	}
