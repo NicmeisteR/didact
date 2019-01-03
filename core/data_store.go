@@ -613,10 +613,7 @@ func (ds *DataStore) storeMatch(match *Match) (int, error) {
 		if player.PlayerId.Gamertag == nil || *player.PlayerId.Gamertag == "" {
 			continue
 		}
-		_, err = tx.Exec(`SELECT didact_upsert_player($1)`, player.PlayerId.Gamertag)
-		if err != nil {
-			return 0, err
-		}
+		tx.Exec(`SELECT didact_upsert_player($1)`, player.PlayerId.Gamertag)
 	}
 
 	return matchId, nil

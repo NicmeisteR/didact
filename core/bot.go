@@ -562,8 +562,22 @@ func (bot *Bot) scanPlayer(m *discordgo.MessageCreate, playerID int, gamertag st
 	lastNotification := 0
 	notificationThreshold := 25
 
+	// Update the playlist stats
+	stats, err := bot.crawler.loadPlayerStats(gamertag)
+	if err != nil {
+		bot.sendResponse(m, fmt.Sprintf("Ouch! Something went wrong: %v.", err))
+		return
+	}
+	err = bot.crawler.dataStore.storePlayerStats(playerID, stats)
+	if err != nil {
+		bot.sendResponse(m, fmt.Sprintf("Ouch! Something went wrong: %v.", err))
+		return
+	}
+	bot.sendResponse(m, fmt.Sprintf("I updated the playlist stats from player **%d**.", playerID))
+
 	bot.sendResponse(m, fmt.Sprintf("I started the match history scan for player **%d** with gamertag **%s**.", playerID, gamertag))
 	bot.markAsTyping(m.ChannelID)
+
 	for {
 		// Notify user about progress?
 		if (totalSeenMatches - lastNotification) >= notificationThreshold {
