@@ -439,7 +439,6 @@ func (bot *Bot) getStats(m *discordgo.MessageCreate, args string) {
 			"t2_p1": gamertags_t2[0],
 			"t2_p2": gamertags_t2[1],
 			"t2_p3": gamertags_t2[2],
-			"days":  "90",
 		})
 
 		// Build embed
@@ -481,7 +480,6 @@ func (bot *Bot) getStats(m *discordgo.MessageCreate, args string) {
 			"t1_p1": gamertags[0],
 			"t1_p2": gamertags[1],
 			"t1_p3": gamertags[2],
-			"days":  "90",
 		})
 
 		// Build embed
