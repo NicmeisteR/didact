@@ -178,6 +178,7 @@ func (crawler *Crawler) loadMatch(matchId string) (*Match, error) {
 	if err != nil {
 		return nil, err
 	}
+	defer resp.Body.Close()
 	if resp.StatusCode == 403 {
 		return nil, ErrForbidden
 	}
@@ -339,6 +340,7 @@ func (crawler *Crawler) loadMatchEvents(matchUUID string) (*MatchEvents, error) 
 	if err != nil {
 		return nil, err
 	}
+	defer resp.Body.Close()
 	if resp.StatusCode == 403 {
 		return nil, ErrForbidden
 	}
@@ -627,6 +629,7 @@ func (crawler *Crawler) loadMatchHistory(gamertag string, start int, count int) 
 	if err != nil {
 		return nil, err
 	}
+	defer resp.Body.Close()
 	if resp.StatusCode == 403 {
 		return nil, ErrForbidden
 	}
@@ -776,6 +779,7 @@ func (crawler *Crawler) loadPlayerStats(gamertag string) (*PlayerStats, error) {
 	if err != nil {
 		return nil, err
 	}
+	defer resp.Body.Close()
 	if resp.StatusCode == 403 {
 		return nil, ErrForbidden
 	}
