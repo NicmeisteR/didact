@@ -235,16 +235,16 @@ func (ds *DataStore) playerNeedsHistoryScan(playerId int, stats *PlayerStats) (b
 // -------------------------------------------------------------------------------------------------------------
 
 // Check if the match exists
-func (ds *DataStore) matchExists(matchUUID string) bool {
+func (ds *DataStore) matchExists(matchUUID string) (int, bool) {
 	row := ds.db.QueryRow(`
 		SELECT m_id FROM match WHERE m_match_uuid = $1
 	`, matchUUID)
-	var matchId string
+	var matchId int
 	switch err := row.Scan(&matchId); err {
 	case sql.ErrNoRows:
-		return false
+		return 0, false
 	default:
-		return true
+		return matchId, true
 	}
 }
 
@@ -1088,4 +1088,64 @@ func (ds *DataStore) findPlayer(query string) ([]string, error) {
 		gamertags = append(gamertags, gamertag)
 	}
 	return gamertags, nil
+}
+
+// -------------------------------------------------------------------------------------------------------------
+// Annotate a match
+// -------------------------------------------------------------------------------------------------------------
+
+func (ds *DataStore) annotateMatch(matchID int, labels []string) error {
+	// Create transaction
+	ctx := context.Background()
+	txOpts := new(sql.TxOptions)
+	tx, err := ds.db.BeginTx(ctx, txOpts)
+
+	defer func() {
+		if err == nil {
+			tx.Commit()
+			return
+		}
+		tx.Rollback()
+	}()
+
+	for _, label := range labels {
+		_, err := tx.Exec(`
+			INSERT INTO match_annotation (
+				ma_match_id,
+				ma_label
+			)
+			VALUES (
+				$1, $2
+			)
+			ON CONFLICT DO NOTHING
+		`, matchID, label)
+
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (ds *DataStore) getMatchAnnotations(matchID int) ([]string, error) {
+	results, err := ds.db.Query(`
+		SELECT ma_label
+		FROM match_annotation
+		WHERE ma_match_id = $1
+	`, matchID)
+
+	if err != nil {
+		return nil, err
+	}
+
+	var labels []string
+	for results.Next() {
+		var label string
+		err := results.Scan(&label)
+		if err != nil {
+			return nil, err
+		}
+		labels = append(labels, label)
+	}
+	return labels, nil
 }

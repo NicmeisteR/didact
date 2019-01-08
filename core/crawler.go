@@ -209,7 +209,7 @@ func (crawler *Crawler) loadMatch(matchId string) (*Match, error) {
 
 func (crawler *Crawler) storeMatchResult(task *Task) error {
 	// The match exists already?
-	if crawler.dataStore.matchExists(task.Data.MatchUUID) {
+	if _, ok := crawler.dataStore.matchExists(task.Data.MatchUUID); ok {
 		log.Printf("[match %s] already exists", task.Data.MatchUUID)
 		crawler.dataStore.finishTask(task)
 		return nil
@@ -276,11 +276,10 @@ func (crawler *Crawler) storeTeamEncounter(task *Task) error {
 	return nil
 }
 
-func (bot *Bot) updateMatchResult(msg *discordgo.MessageCreate, matchUUID string) {
-
+func (bot *Bot) updateMatchResult(msg *discordgo.MessageCreate, matchUUID string) (int, bool) {
 	// The match exists already?
-	if bot.dataStore.matchExists(matchUUID) {
-		return
+	if matchId, ok := bot.dataStore.matchExists(matchUUID); ok {
+		return matchId, true
 	}
 
 	// Get the match
@@ -289,37 +288,39 @@ func (bot *Bot) updateMatchResult(msg *discordgo.MessageCreate, matchUUID string
 	// No such user? (404)
 	if err == ErrNotFound {
 		bot.sendResponse(msg, fmt.Sprintf("The Halo API does not return any data for the match **%s**.", matchUUID))
-		return
+		return 0, false
 	}
 
 	// Hit the rate limit? (429)
 	if err == ErrRateLimit {
 		bot.sendResponse(msg, fmt.Sprintf("I just hit the API rate limit, please ask x6767 to update the match manually **%s**.", matchUUID))
-		return
+		return 0, false
 	}
 
 	// Try again if there was an unexpected error
 	if err != nil {
 		bot.sendResponse(msg, fmt.Sprintf("Ouch! Something went wrong loading the match results: %v.", err))
-		return
+		return 0, false
 	}
 
 	// Insert match
 	matchID, err := bot.dataStore.storeMatch(match)
 	if err == ErrMetadataIncomplete {
 		bot.sendResponse(msg, fmt.Sprintf("It seems like this match has metadata that I don't understand: **%s**.", matchUUID))
-		return
+		return 0, false
 	}
 	if err != nil {
 		bot.sendResponse(msg, fmt.Sprintf("Ouch! Something went wrong storing the match results: %v.", err))
-		return
+		return 0, false
 	}
 
 	err = bot.dataStore.storeTeamEncounter(matchID)
 	if err != nil {
 		bot.sendResponse(msg, fmt.Sprintf("Ouch! Something went wrong storing the team encounter: %v.", err))
-		return
+		return 0, false
 	}
+
+	return matchID, true
 }
 
 // -------------------------------------------------------------------------------------------------------------

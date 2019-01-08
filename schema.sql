@@ -507,78 +507,16 @@ CREATE INDEX team_encounter_t2_p3_idx
     USING BTREE(te_t2_p3_id, te_start_date);
 
 -- ----------------------------------------------------------------------------
--- Community Leagues
+-- Match annotations
 -- ----------------------------------------------------------------------------
 
--- A community
-CREATE TABLE community (
-    c_id SERIAL NOT NULL,
-    c_name VARCHAR(255) NOT NULL,
+CREATE TABLE match_annotation(
+    ma_match_id     INTEGER NOT NULL,
+    ma_label        VARCHAR(255) NOT NULL,
 
-    PRIMARY KEY (c_id)
+    PRIMARY KEY (ma_match_id, ma_label)
 );
 
--- A community league. The team size is checked when adding teams to a league.
-CREATE TABLE community_league (
-    cl_id SERIAL NOT NULL,
-    cl_community_id INTEGER NOT NULL,
-    cl_name VARCHAR(255) NOT NULL,
-
-    cl_team_size INTEGER NOT NULL,
-
-    FOREIGN KEY (cl_community_id)
-        REFERENCES community(c_id)
-        ON DELETE CASCADE,
-
-    PRIMARY KEY (cl_id)
-);
-
--- A community member.
-CREATE TABLE community_member (
-    cm_community_id INTEGER NOT NULL,
-    cm_player_id INTEGER NOT NULL,
-    cm_joined_at TIMESTAMP NOT NULL,
-
-    FOREIGN KEY (cm_community_id)
-        REFERENCES community(c_id)
-        ON DELETE CASCADE,
-
-    FOREIGN KEY (cm_player_id)
-        REFERENCES player(p_id)
-        ON DELETE CASCADE,
-
-    PRIMARY KEY (cm_community_id, cm_player_id)
-);
-
-CREATE INDEX community_member_community_id_idx
-    ON community_member
-    USING BTREE(cm_community_id);
-
-CREATE INDEX community_member_player_id_idx
-    ON community_member
-    USING BTREE(cm_player_id);
-
--- A community league team.
-CREATE TABLE community_league_team (
-    clp_league_id INTEGER NOT NULL,
-
-    clp_team_p1_id INTEGER NOT NULL,
-    clp_team_p2_id INTEGER NOT NULL,
-    clp_team_p3_id INTEGER NOT NULL,
-
-    clp_joined_at TIMESTAMP NOT NULL,
-
-    FOREIGN KEY (clp_league_id)
-        REFERENCES community_league(cl_id)
-        ON DELETE CASCADE,
-
-    PRIMARY KEY (clp_league_id, clp_team_p1_id, clp_team_p2_id, clp_team_p3_id)
-);
-
-CREATE INDEX community_league_team_community_id_idx
-    ON community_league_team
-    USING BTREE(clp_community_id);
-
-CREATE INDEX community_league_team_team_id_idx
-    ON community_league_team
-    USING BTREE(clp_team_p1_id, clp_team_p2_id, clp_team_p3_id);
+CREATE INDEX match_annotation_label_idx
+    ON match_annotation
+    USING BTREE(ma_label);

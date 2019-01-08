@@ -215,6 +215,14 @@ func (bot *Bot) onMessageCreate(s *discordgo.Session, m *discordgo.MessageCreate
 		bot.getStats(m, args)
 		break
 
+	case "annotate":
+		bot.annotateMatch(m, args)
+		break
+
+	case "annotations":
+		bot.getMatchAnnotations(m, args)
+		break
+
 	case "analyse":
 		fallthrough
 	case "analyze":
@@ -248,10 +256,6 @@ func (bot *Bot) onMessageCreate(s *discordgo.Session, m *discordgo.MessageCreate
 // -------------------------------------------------------------------------------------------------------------
 
 func (bot *Bot) help(m *discordgo.MessageCreate) {
-	teamStats := "https://www.didact.io/public/dashboard/79912130-2ef2-49ca-a14a-f2dac4c887f9"
-	matchStats := "https://www.didact.io/public/dashboard/4222ecd2-6698-4149-8a45-0c02057d4efc"
-	// search := "https://www.didact.io/public/dashboard/d8a4b068-0a33-4215-b949-6e2f45df2e17"
-
 	fields := []*discordgo.MessageEmbedField{}
 	fields = append(fields, &discordgo.MessageEmbedField{
 		Name:   "Command - Player Search",
@@ -281,16 +285,6 @@ func (bot *Bot) help(m *discordgo.MessageCreate) {
 	fields = append(fields, &discordgo.MessageEmbedField{
 		Name:   "Command - Match Analysis",
 		Value:  "!didact analyse <match id>",
-		Inline: false,
-	})
-	fields = append(fields, &discordgo.MessageEmbedField{
-		Name:   "URL - Team Statistics",
-		Value:  teamStats,
-		Inline: false,
-	})
-	fields = append(fields, &discordgo.MessageEmbedField{
-		Name:   "URL - Match Statistics",
-		Value:  matchStats,
 		Inline: false,
 	})
 
@@ -335,6 +329,123 @@ func (bot *Bot) getPlayerID(m *discordgo.MessageCreate, args string) (int, strin
 	}
 	bot.sendResponse(m, fmt.Sprintf("I found player **%s** with id **%d**.", gamertag, playerID))
 	return playerID, gamertag, true
+}
+
+// -------------------------------------------------------------------------------------------------------------
+// Annotate a match
+// -------------------------------------------------------------------------------------------------------------
+
+func (bot *Bot) annotateMatch(m *discordgo.MessageCreate, argString string) {
+	// Read args
+	rawArgs := strings.Split(argString, " ")
+	args := []string{}
+	for _, rawArg := range rawArgs {
+		args = append(args, strings.Trim(rawArg, "\"'"))
+	}
+	bot.markAsTyping(m.ChannelID)
+
+	// Too few?
+	if len(args) < 2 {
+		bot.sendResponse(m, "Invalid arguments. Give me a waypoint match uuid and at least one label.")
+		return
+	}
+
+	// Update the match result
+	newLabels := args[1:]
+	bot.sendResponse(m, fmt.Sprintf("I will try to annotate the match **%v** with the labels **%v**.", args[0], newLabels))
+	matchID, ok := bot.updateMatchResult(m, args[0])
+	if !ok {
+		return
+	}
+	bot.sendResponse(m, fmt.Sprintf("I stored the match **%v** with id **%v**.", args[0], matchID))
+	bot.markAsTyping(m.ChannelID)
+
+	// Annotate the match
+	err := bot.dataStore.annotateMatch(matchID, newLabels)
+	if err != nil {
+		bot.sendResponse(m, fmt.Sprintf("Ouch! Something went wrong: %v.", err))
+		return
+	}
+
+	// Get the annotations
+	labels, err := bot.dataStore.getMatchAnnotations(matchID)
+	if err != nil {
+		bot.sendResponse(m, fmt.Sprintf("Ouch! Something went wrong: %v.", err))
+		return
+	}
+
+	// Create result message
+	var buffer bytes.Buffer
+	for _, label := range labels {
+		buffer.WriteString("**")
+		buffer.WriteString(label)
+		buffer.WriteString("**")
+		buffer.WriteString("\n")
+	}
+	fields := []*discordgo.MessageEmbedField{}
+	fields = append(fields, &discordgo.MessageEmbedField{
+		Name:   "Result",
+		Value:  buffer.String(),
+		Inline: true,
+	})
+	r := &discordgo.MessageEmbed{
+		Title:     "Match annotations",
+		Author:    &discordgo.MessageEmbedAuthor{},
+		Color:     0x010101,
+		Fields:    fields,
+		Timestamp: time.Now().Format(time.RFC3339),
+	}
+
+	// Send message
+	bot.session.ChannelMessageSendEmbed(m.ChannelID, r)
+}
+
+// -------------------------------------------------------------------------------------------------------------
+// Get match annotations
+// -------------------------------------------------------------------------------------------------------------
+
+func (bot *Bot) getMatchAnnotations(m *discordgo.MessageCreate, arg string) {
+	// Read args
+	bot.markAsTyping(m.ChannelID)
+
+	// The match exists already?
+	matchID, matchExists := bot.dataStore.matchExists(arg)
+	if !matchExists {
+		bot.sendResponse(m, fmt.Sprintf("I don't know match **%v**.", arg))
+		return
+	}
+
+	// Get the annotations
+	labels, err := bot.dataStore.getMatchAnnotations(matchID)
+	if err != nil {
+		bot.sendResponse(m, fmt.Sprintf("Ouch! Something went wrong: %v.", err))
+		return
+	}
+
+	// Create result message
+	var buffer bytes.Buffer
+	for _, label := range labels {
+		buffer.WriteString("**")
+		buffer.WriteString(label)
+		buffer.WriteString("**")
+		buffer.WriteString("\n")
+	}
+	fields := []*discordgo.MessageEmbedField{}
+	fields = append(fields, &discordgo.MessageEmbedField{
+		Name:   "Result",
+		Value:  buffer.String(),
+		Inline: true,
+	})
+	r := &discordgo.MessageEmbed{
+		Title:     "Match annotations",
+		Author:    &discordgo.MessageEmbedAuthor{},
+		Color:     0x010101,
+		Fields:    fields,
+		Timestamp: time.Now().Format(time.RFC3339),
+	}
+
+	// Send message
+	bot.session.ChannelMessageSendEmbed(m.ChannelID, r)
 }
 
 // -------------------------------------------------------------------------------------------------------------
