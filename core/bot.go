@@ -377,14 +377,12 @@ func (bot *Bot) annotateMatch(m *discordgo.MessageCreate, argString string) {
 	// Create result message
 	var buffer bytes.Buffer
 	for _, label := range labels {
-		buffer.WriteString("**")
 		buffer.WriteString(label)
-		buffer.WriteString("**")
 		buffer.WriteString("\n")
 	}
 	fields := []*discordgo.MessageEmbedField{}
 	fields = append(fields, &discordgo.MessageEmbedField{
-		Name:   "Result",
+		Name:   "Results",
 		Value:  buffer.String(),
 		Inline: true,
 	})
@@ -425,9 +423,7 @@ func (bot *Bot) getMatchAnnotations(m *discordgo.MessageCreate, arg string) {
 	// Create result message
 	var buffer bytes.Buffer
 	for _, label := range labels {
-		buffer.WriteString("**")
 		buffer.WriteString(label)
-		buffer.WriteString("**")
 		buffer.WriteString("\n")
 	}
 	fields := []*discordgo.MessageEmbedField{}
