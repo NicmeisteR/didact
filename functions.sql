@@ -750,5 +750,5 @@ RETURNS TABLE (
 	)
 	SELECT *
 	FROM matches
-	ORDER BY start_date DESC
+	ORDER BY te_start_date DESC
 $$ LANGUAGE sql STABLE;
