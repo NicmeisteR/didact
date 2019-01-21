@@ -713,7 +713,7 @@ RETURNS TABLE (
 			te_match_uuid,
 			te_playlist_uuid,
 			(CASE WHEN te_match_outcome = 1 THEN true ELSE false END),
-			1 + GREATEST((te_t1_p2_id = 0)::int + (te_t1_p3_id = 0)::int, (te_t2_p2_id = 0)::int + (te_t2_p3_id = 0)::int) as team_size
+			1 + GREATEST((te_t1_p2_id != 0)::int + (te_t1_p3_id != 0)::int, (te_t2_p2_id != 0)::int + (te_t2_p3_id != 0)::int) as team_size
 		FROM team_encounter
 		WHERE (
 			te_t1_p1_id = player_id
@@ -735,7 +735,7 @@ RETURNS TABLE (
 			te_match_uuid,
 			te_playlist_uuid,
 			(CASE WHEN te_match_outcome = 2 THEN true ELSE false END),
-			1 + GREATEST((te_t1_p2_id = 0)::int + (te_t1_p3_id = 0)::int, (te_t2_p2_id = 0)::int + (te_t2_p3_id = 0)::int)
+			1 + GREATEST((te_t1_p2_id != 0)::int + (te_t1_p3_id != 0)::int, (te_t2_p2_id != 0)::int + (te_t2_p3_id != 0)::int)
 		FROM team_encounter
 		WHERE (
 			te_t2_p1_id = player_id
