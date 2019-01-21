@@ -720,7 +720,7 @@ RETURNS TABLE (
 			OR te_t1_p2_id = player_id
 			OR te_t1_p3_id = player_id
 		)
-		AND te_start_date > (NOW() - INTERVAL target_interval)
+		AND te_start_date > (NOW() - target_interval)
 	), matches2 AS (
 		SELECT
 			te_match_id,
