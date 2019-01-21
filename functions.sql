@@ -752,3 +752,68 @@ RETURNS TABLE (
 	FROM matches
 	ORDER BY te_start_date DESC
 $$ LANGUAGE sql STABLE;
+
+CREATE OR REPLACE FUNCTION didact_player_match_data(IN player_id INTEGER, IN target_interval INTERVAL)
+RETURNS TABLE (
+    match_id INTEGER,
+    match_uuid UUID,
+    start_date TIMESTAMP,
+    map_name VARCHAR,
+    is_win BOOLEAN,
+    team_size INTEGER,
+    p11_gamertag INTEGER,
+    p12_gamertag INTEGER,
+    p13_gamertag INTEGER,
+    p21_gamertag INTEGER,
+    p22_gamertag INTEGER,
+    p23_gamertag INTEGER,
+    csr INTEGER,
+    mmr_rating NUMERIC(8,4),
+    mmr_variance NUMERIC(8,4),
+    leader_name VARCHAR
+) AS $$
+    WITH matches AS (
+		SELECT *
+		FROM didact_player_matches(player_id, target_interval)
+		LIMIT 10000
+	)
+	SELECT
+		m.match_id,
+		m.match_uuid,
+		m.start_date,
+		mm.mm_name,
+		m.is_win,
+		m.team_size,
+		p11.p_gamertag,
+		p12.p_gamertag,
+		p13.p_gamertag,
+		p21.p_gamertag,
+		p22.p_gamertag,
+		p23.p_gamertag,
+		(
+			CASE
+				WHEN mp_csr_new_designation < 6
+				THEN (
+					((mp_csr_new_designation - 1) * 300) +
+					(mp_csr_new_tier * 50) +
+					(mp_csr_new_percent_tier / 100.0) * 50
+				)::INTEGER
+				ELSE mp_csr_new_raw
+			END
+		) AS csr,
+		mp.mp_mmr_new_rating,
+		mp.mp_mmr_new_variance,
+		ml.ml_name AS leader
+	FROM matches m
+	LEFT OUTER JOIN player p11 ON m.t1_p1_id = p11.p_id
+	LEFT OUTER JOIN player p12 ON m.t1_p2_id = p12.p_id
+	LEFT OUTER JOIN player p13 ON m.t1_p3_id = p13.p_id
+	LEFT OUTER JOIN player p21 ON m.t2_p1_id = p21.p_id
+	LEFT OUTER JOIN player p22 ON m.t2_p2_id = p22.p_id
+	LEFT OUTER JOIN player p23 ON m.t2_p3_id = p23.p_id
+	LEFT OUTER JOIN meta_map mm ON mm.mm_uuid::UUID = m.map_uuid
+    INNER JOIN player p ON p.p_gamertag = player_id
+	INNER JOIN match_player mp ON mp.mp_match_id = m.match_id AND mp.mp_gamertag = p.p_gamertag
+	LEFT OUTER JOIN meta_leader ml ON ml.ml_id = mp.mp_leader_id
+	ORDER BY m.start_date DESC
+$$ LANGUAGE sql STABLE;
