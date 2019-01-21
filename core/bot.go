@@ -215,14 +215,6 @@ func (bot *Bot) onMessageCreate(s *discordgo.Session, m *discordgo.MessageCreate
 		bot.getStats(m, args)
 		break
 
-	case "annotate":
-		bot.annotateMatch(m, args)
-		break
-
-	case "annotations":
-		bot.getMatchAnnotations(m, args)
-		break
-
 	case "analyse":
 		fallthrough
 	case "analyze":

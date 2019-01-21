@@ -678,3 +678,77 @@ RETURNS TABLE (
             "CommandXP" INTEGER
         )
 $$ LANGUAGE sql STABLE;
+
+-- ----------------------------------------------------------------------------
+-- PLAYER MATCHES
+-- ----------------------------------------------------------------------------
+
+CREATE OR REPLACE FUNCTION didact_player_matches(IN player_id INTEGER, IN target_interval INTERVAL)
+RETURNS TABLE (
+    match_id INTEGER,
+    t1_p1_id INTEGER,
+    t1_p2_id INTEGER,
+    t1_p3_id INTEGER,
+    t2_p1_id INTEGER,
+    t2_p2_id INTEGER,
+    t2_p3_id INTEGER,
+    start_date TIMESTAMP,
+    map_uuid UUID,
+    match_uuid UUID,
+    playlist_uuid UUID,
+    is_win BOOLEAN,
+    team_size INTEGER
+) AS $$
+	WITH matches1 AS (
+		SELECT
+			te_match_id,
+			te_t1_p1_id,
+			te_t1_p2_id,
+			te_t1_p3_id,
+			te_t2_p1_id,
+			te_t2_p2_id,
+			te_t2_p3_id,
+			te_start_date,
+			te_map_uuid,
+			te_match_uuid,
+			te_playlist_uuid,
+			(CASE WHEN te_match_outcome = 1 THEN true ELSE false END),
+			1 + GREATEST((te_t1_p2_id = 0)::int + (te_t1_p3_id = 0)::int, (te_t2_p2_id = 0)::int + (te_t2_p3_id = 0)::int) as team_size
+		FROM team_encounter
+		WHERE (
+			te_t1_p1_id = player_id
+			OR te_t1_p2_id = player_id
+			OR te_t1_p3_id = player_id
+		)
+		AND te_start_date > (NOW() - INTERVAL target_interval)
+	), matches2 AS (
+		SELECT
+			te_match_id,
+			te_t2_p1_id,
+			te_t2_p2_id,
+			te_t2_p3_id,
+			te_t1_p1_id,
+			te_t1_p2_id,
+			te_t1_p3_id,
+			te_start_date,
+			te_map_uuid,
+			te_match_uuid,
+			te_playlist_uuid,
+			(CASE WHEN te_match_outcome = 2 THEN true ELSE false END),
+			1 + GREATEST((te_t1_p2_id = 0)::int + (te_t1_p3_id = 0)::int, (te_t2_p2_id = 0)::int + (te_t2_p3_id = 0)::int)
+		FROM team_encounter
+		WHERE (
+			te_t2_p1_id = player_id
+			OR te_t2_p2_id = player_id
+			OR te_t2_p3_id = player_id
+		)
+		AND te_start_date > (NOW() - target_interval)
+	), matches AS (
+		SELECT * FROM matches1
+		UNION ALL
+		SELECT * FROM matches2
+	)
+	SELECT *
+	FROM matches
+	ORDER BY start_date DESC
+$$ LANGUAGE sql STABLE;
