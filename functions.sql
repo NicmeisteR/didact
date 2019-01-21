@@ -805,7 +805,7 @@ RETURNS TABLE (
 		) AS csr,
 		mp.mp_mmr_new_rating,
 		mp.mp_mmr_new_variance,
-		ml.ml_name
+		ml.ml_name,
         mpl.mpl_game_mode,
         mpl.mpl_ranking
 	FROM matches m
