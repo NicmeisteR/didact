@@ -770,7 +770,9 @@ RETURNS TABLE (
     csr INTEGER,
     mmr_rating DOUBLE PRECISION,
     mmr_variance DOUBLE PRECISION,
-    leader_name VARCHAR
+    leader_name VARCHAR,
+    playlist_mode VARCHAR,
+    playlist_ranking VARCHAR
 ) AS $$
     WITH matches AS (
 		SELECT *
@@ -804,6 +806,8 @@ RETURNS TABLE (
 		mp.mp_mmr_new_rating,
 		mp.mp_mmr_new_variance,
 		ml.ml_name
+        mpl.mpl_game_mode,
+        mpl.mpl_ranking
 	FROM matches m
 	LEFT OUTER JOIN player p11 ON m.t1_p1_id = p11.p_id
 	LEFT OUTER JOIN player p12 ON m.t1_p2_id = p12.p_id
@@ -814,5 +818,6 @@ RETURNS TABLE (
 	LEFT OUTER JOIN meta_map mm ON mm.mm_uuid::UUID = m.map_uuid
 	INNER JOIN match_player mp ON mp.mp_match_id = m.match_id AND mp.mp_gamertag = player_name
 	LEFT OUTER JOIN meta_leader ml ON ml.ml_id = mp.mp_leader_id
+    LEFT OUTER JOIN meta_playlist mpl ON mpl.mpl_id::UUID = m.playlist_uuid
 	ORDER BY m.start_date DESC
 $$ LANGUAGE sql STABLE;
