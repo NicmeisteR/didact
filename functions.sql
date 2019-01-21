@@ -693,6 +693,7 @@ RETURNS TABLE (
     t2_p2_id INTEGER,
     t2_p3_id INTEGER,
     start_date TIMESTAMP,
+    duration INTERVAL,
     map_uuid UUID,
     match_uuid UUID,
     playlist_uuid UUID,
