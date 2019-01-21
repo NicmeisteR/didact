@@ -812,7 +812,7 @@ RETURNS TABLE (
 	LEFT OUTER JOIN player p22 ON m.t2_p2_id = p22.p_id
 	LEFT OUTER JOIN player p23 ON m.t2_p3_id = p23.p_id
 	LEFT OUTER JOIN meta_map mm ON mm.mm_uuid::UUID = m.map_uuid
-    INNER JOIN player p ON p.p_gamertag = player_id
+    INNER JOIN player p ON p.p_id = player_id
 	INNER JOIN match_player mp ON mp.mp_match_id = m.match_id AND mp.mp_gamertag = p.p_gamertag
 	LEFT OUTER JOIN meta_leader ml ON ml.ml_id = mp.mp_leader_id
 	ORDER BY m.start_date DESC
