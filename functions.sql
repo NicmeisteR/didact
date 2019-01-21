@@ -753,7 +753,7 @@ RETURNS TABLE (
 	ORDER BY te_start_date DESC
 $$ LANGUAGE sql STABLE;
 
-CREATE OR REPLACE FUNCTION didact_player_match_data(IN player_id INTEGER, IN target_interval INTERVAL)
+CREATE OR REPLACE FUNCTION didact_player_match_data(IN player_id INTEGER, IN player_name VARCHAR, IN target_interval INTERVAL)
 RETURNS TABLE (
     match_id INTEGER,
     match_uuid UUID,
@@ -812,8 +812,7 @@ RETURNS TABLE (
 	LEFT OUTER JOIN player p22 ON m.t2_p2_id = p22.p_id
 	LEFT OUTER JOIN player p23 ON m.t2_p3_id = p23.p_id
 	LEFT OUTER JOIN meta_map mm ON mm.mm_uuid::UUID = m.map_uuid
-    INNER JOIN player p ON p.p_id = player_id
-	INNER JOIN match_player mp ON mp.mp_match_id = m.match_id AND mp.mp_gamertag = p.p_gamertag
+	INNER JOIN match_player mp ON mp.mp_match_id = m.match_id AND mp.mp_gamertag = player_name
 	LEFT OUTER JOIN meta_leader ml ON ml.ml_id = mp.mp_leader_id
 	ORDER BY m.start_date DESC
 $$ LANGUAGE sql STABLE;
