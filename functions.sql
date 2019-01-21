@@ -768,8 +768,8 @@ RETURNS TABLE (
     p22_gamertag VARCHAR,
     p23_gamertag VARCHAR,
     csr INTEGER,
-    mmr_rating NUMERIC(8,4),
-    mmr_variance NUMERIC(8,4),
+    mmr_rating DOUBLE,
+    mmr_variance DOUBLE,
     leader_name VARCHAR
 ) AS $$
     WITH matches AS (
