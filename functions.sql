@@ -761,12 +761,12 @@ RETURNS TABLE (
     map_name VARCHAR,
     is_win BOOLEAN,
     team_size INTEGER,
-    p11_gamertag INTEGER,
-    p12_gamertag INTEGER,
-    p13_gamertag INTEGER,
-    p21_gamertag INTEGER,
-    p22_gamertag INTEGER,
-    p23_gamertag INTEGER,
+    p11_gamertag VARCHAR,
+    p12_gamertag VARCHAR,
+    p13_gamertag VARCHAR,
+    p21_gamertag VARCHAR,
+    p22_gamertag VARCHAR,
+    p23_gamertag VARCHAR,
     csr INTEGER,
     mmr_rating NUMERIC(8,4),
     mmr_variance NUMERIC(8,4),
@@ -803,7 +803,7 @@ RETURNS TABLE (
 		) AS csr,
 		mp.mp_mmr_new_rating,
 		mp.mp_mmr_new_variance,
-		ml.ml_name AS leader
+		ml.ml_name
 	FROM matches m
 	LEFT OUTER JOIN player p11 ON m.t1_p1_id = p11.p_id
 	LEFT OUTER JOIN player p12 ON m.t1_p2_id = p12.p_id
