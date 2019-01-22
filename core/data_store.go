@@ -1149,3 +1149,54 @@ func (ds *DataStore) getMatchAnnotations(matchID int) ([]string, error) {
 	}
 	return labels, nil
 }
+
+// -------------------------------------------------------------------------------------------------------------
+// Get player matches
+// -------------------------------------------------------------------------------------------------------------
+
+func (ds *DataStore) getPlayerTeamStats(player_id int, player_name string, days int, team_size int) ([]string, error) {
+	results, err := ds.db.Query(`
+		WITH data_ AS (
+			SELECT * FROM didact_player_match_data($1, $2, INTERVAL $3 day)
+		), top_teams_ AS (
+			SELECT p11_gamertag AS p1, p12_gamertag AS p2, p13_gamertag AS p3, COUNT(*) AS matches
+			FROM data_
+			WHERE playlist_ranking = 'CSR'
+			AND team_size = $4
+			GROUP BY p11_gamertag, p12_gamertag, p13_gamertag
+			ORDER BY matches
+			LIMIT 3
+		)
+		SELECT
+			CONCAT(
+				p11_gamertag,
+				CASE WHEN p12_gamertag IS NULL THEN '' ELSE ' & ' END,
+				p12_gamertag,
+				CASE WHEN p13_gamertag IS NULL THEN '' ELSE ' & ' END,
+				p13_gamertag
+			) as team,
+			map_name,
+			leader_name,
+			COUNT(*) AS as matches,
+			SUM(CASE WHEN is_win THEN 1 ELSE 0 END) AS wins,
+			SUM(mmr_new - mmr_prev) AS mmr,
+			SUM(csr_new - csr_prev) AS csr,
+			SUM(duration) AS duration
+		FROM data_ d, top_teams_ tt
+		WHERE d.p11_gamertag = tt.p1
+		AND d.p12_gamertag = tt.p2
+		AND d.p13_gamertag = tt.p3
+		GROUPY BY
+			GROUPING SETS (
+				(team),
+				(team, map_name),
+				(team, leader_name),
+			);
+	`, player_id, player_name, days, team_size)
+
+	if err != nil {
+		return nil, err
+	}
+	// TODO
+	return nil, nil
+}
