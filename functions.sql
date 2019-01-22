@@ -771,9 +771,10 @@ RETURNS TABLE (
     p21_gamertag VARCHAR,
     p22_gamertag VARCHAR,
     p23_gamertag VARCHAR,
-    csr INTEGER,
-    mmr_rating DOUBLE PRECISION,
-    mmr_variance DOUBLE PRECISION,
+    csr_prev INTEGER,
+    csr_new INTEGER,
+    mmr_prev DOUBLE PRECISION,
+    mmr_new DOUBLE PRECISION,
     leader_name VARCHAR,
     playlist_mode VARCHAR,
     playlist_ranking VARCHAR
@@ -799,6 +800,17 @@ RETURNS TABLE (
 		p23.p_gamertag,
 		(
 			CASE
+				WHEN mp_csr_prev_designation < 6
+				THEN (
+					((mp_csr_prev_designation - 1) * 300) +
+					(mp_csr_prev_tier * 50) +
+					(mp_csr_prev_percent_tier / 100.0) * 50
+				)::INTEGER
+				ELSE mp_csr_prev_raw
+			END
+		) AS csr_prev,
+		(
+			CASE
 				WHEN mp_csr_new_designation < 6
 				THEN (
 					((mp_csr_new_designation - 1) * 300) +
@@ -807,9 +819,9 @@ RETURNS TABLE (
 				)::INTEGER
 				ELSE mp_csr_new_raw
 			END
-		) AS csr,
+		) AS csr_new,
+		mp.mp_mmr_prev_rating,
 		mp.mp_mmr_new_rating,
-		mp.mp_mmr_new_variance,
 		ml.ml_name,
         mpl.mpl_game_mode,
         mpl.mpl_ranking
