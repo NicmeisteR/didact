@@ -481,119 +481,171 @@ func (bot *Bot) findPlayer(m *discordgo.MessageCreate, search string) {
 // Get stats
 // -------------------------------------------------------------------------------------------------------------
 
-func (bot *Bot) getStats(m *discordgo.MessageCreate, args string) {
-	if strings.Contains(args, "/") {
-		// Get teams
-		raw_teams := strings.Split(args, "/")
-		if len(raw_teams) != 2 {
-			bot.sendResponse(m, "Invalid teams.")
-			return
+func (bot *Bot) getStats(m *discordgo.MessageCreate, raw string) {
+    args := make([]string, 0)
+	last := 0
+
+	// Get arguments
+    pos := 0
+	for ; pos < len(raw); pos++ {
+		if raw[pos] == ' ' {
+            trimmed := strings.TrimSpace(raw[last:pos])
+            if len(trimmed) == 0 {
+                continue
+            }
+			args = append(args, trimmed)
+			last = pos
 		}
-
-		// Get gamertags team 1
-		raw_gamertags_t1 := strings.Split(raw_teams[0], ",")
-		var gamertags_t1 []string = nil
-		for _, gt := range raw_gamertags_t1 {
-			gamertags_t1 = append(gamertags_t1, strings.Trim(gt, " \"'"))
+		if len(args) == 3 {
+			break
 		}
-
-		// Get gamertags team 2
-		raw_gamertags_t2 := strings.Split(raw_teams[1], ",")
-		var gamertags_t2 []string = nil
-		for _, gt := range raw_gamertags_t2 {
-			gamertags_t2 = append(gamertags_t2, strings.Trim(gt, " \"'"))
-		}
-
-		// Build description
-		var description bytes.Buffer
-		for i, gt := range gamertags_t1 {
-			if i > 0 {
-				description.WriteString(", ")
-			}
-			description.WriteString("**")
-			description.WriteString(gt)
-			description.WriteString("**")
-		}
-		description.WriteString(" vs. ")
-		for i, gt := range gamertags_t2 {
-			if i > 0 {
-				description.WriteString(", ")
-			}
-			description.WriteString("**")
-			description.WriteString(gt)
-			description.WriteString("**")
-		}
-
-		// Build link
-		gamertags_t1 = append(gamertags_t1, "-")
-		gamertags_t1 = append(gamertags_t1, "-")
-		gamertags_t1 = append(gamertags_t1, "-")
-		gamertags_t2 = append(gamertags_t2, "-")
-		gamertags_t2 = append(gamertags_t2, "-")
-		gamertags_t2 = append(gamertags_t2, "-")
-		didactURL, _ := bot.dashboardURL("64d4d274-c18a-4f1e-b2c2-cf9672685ff2", map[string]string{
-			"t1_p1": gamertags_t1[0],
-			"t1_p2": gamertags_t1[1],
-			"t1_p3": gamertags_t1[2],
-			"t2_p1": gamertags_t2[0],
-			"t2_p2": gamertags_t2[1],
-			"t2_p3": gamertags_t2[2],
-		})
-
-		// Build embed
-		r := &discordgo.MessageEmbed{
-			Title:       fmt.Sprintf("Statistics"),
-			URL:         didactURL.String(),
-			Author:      &discordgo.MessageEmbedAuthor{},
-			Color:       0x010101,
-			Description: description.String(),
-			Timestamp:   time.Now().Format(time.RFC3339),
-		}
-
-		// Send embed
-		bot.session.ChannelMessageSendEmbed(m.ChannelID, r)
-	} else {
-		// Get gamertags
-		raw_gamertags := strings.Split(args, ",")
-		var gamertags []string = nil
-		for _, gt := range raw_gamertags {
-			gamertags = append(gamertags, strings.Trim(gt, " \"'"))
-		}
-
-		// Build description
-		var description bytes.Buffer
-		for i, gt := range gamertags {
-			if i > 0 {
-				description.WriteString(", ")
-			}
-			description.WriteString("**")
-			description.WriteString(gt)
-			description.WriteString("**")
-		}
-
-		// Build link
-		gamertags = append(gamertags, "-")
-		gamertags = append(gamertags, "-")
-		gamertags = append(gamertags, "-")
-		didactURL, _ := bot.dashboardURL("79912130-2ef2-49ca-a14a-f2dac4c887f9", map[string]string{
-			"t1_p1": gamertags[0],
-			"t1_p2": gamertags[1],
-			"t1_p3": gamertags[2],
-		})
-
-		// Build embed
-		r := &discordgo.MessageEmbed{
-			Title:       fmt.Sprintf("Statistics"),
-			URL:         didactURL.String(),
-			Author:      &discordgo.MessageEmbedAuthor{},
-			Color:       0x010101,
-			Description: description.String(),
-			Timestamp:   time.Now().Format(time.RFC3339),
-		}
-
-		// Send embed
-		bot.session.ChannelMessageSendEmbed(m.ChannelID, r)
 	}
+	if last < len(raw) {
+		args = append(args, strings.TrimSpace(raw[last:pos]))
+	}
+
+	// Too few?
+	if len(args) < 3 {
+		bot.sendResponse(m, "Usage: !didact stats 1r/2r/3r <days> <gamertag>")
+		return
+	}
+
+	// Parse the days
+	days, err := strconv.Atoi(args[1])
+	if err != nil {
+		bot.sendResponse(m, fmt.Sprintf("The interval **%v** is invalid.", args[1]))
+		return
+	}
+
+	// Get the player
+	pid, gt, ok := bot.getPlayerID(m, args[2])
+	if !ok {
+		return
+	}
+
+    // Scan the player
+    ok = bot.scanPlayer(m, pid, gt, false)
+    if !ok {
+        return
+    }
+
+	// Get team stats
+	var allStats []PlayerTeamStats
+	switch args[0] {
+	case "1r":
+		allStats, err = bot.dataStore.getPlayerTeamStats(pid, gt, days, 1)
+		break
+	case "2r":
+		allStats, err = bot.dataStore.getPlayerTeamStats(pid, gt, days, 2)
+		break
+	case "3r":
+		allStats, err = bot.dataStore.getPlayerTeamStats(pid, gt, days, 3)
+		break
+	}
+
+	// Failed to get team stats?
+	if err != nil {
+		bot.sendResponse(m, fmt.Sprintf("Ouch! Something went wrong: %v.", err))
+		return
+	}
+
+    // Group results
+	var playerStats PlayerTeamStats
+    teamStats := make([][]*PlayerTeamStats, 0)
+    mapStats := make([][]*PlayerTeamStats, 0)
+    leaderStats := make([][]*PlayerTeamStats, 0)
+    nextID := 0
+    teamIDs := make(map[string]int)
+    teamNames := make([]string, 0)
+
+    for _, stats := range allStats {
+        if stats.Team == nil {
+            playerStats = stats
+        } else {
+            id, ok := teamIDs[*stats.Team]
+            if !ok {
+                id = nextID
+                nextID += 1
+                teamIDs[*stats.Team] = id
+                teamNames = append(teamNames, *stats.Team)
+                teamStats = append(teamStats, make([]*PlayerTeamStats, 0))
+                mapStats = append(mapStats, make([]*PlayerTeamStats, 0))
+                leaderStats = append(leaderStats, make([]*PlayerTeamStats, 0))
+            }
+            if stats.Map == nil && stats.Leader == nil {
+                teamStats[id] = append(teamStats[id], &stats)
+            } else if stats.Map != nil && stats.Leader == nil {
+                mapStats[id] = append(mapStats[id], &stats)
+            } else if stats.Map == nil && stats.Leader != nil {
+                leaderStats[id] = append(leaderStats[id], &stats)
+            }
+        }
+    }
+
+    // Build title
+    title := "Statistics 1v1 Ranked"
+	switch args[0] {
+	case "1r":
+		break
+	case "2r":
+        title = "Statistics 2v2 Ranked"
+		break
+	case "3r":
+        title = "Statistics 2v2 Ranked"
+		break
+	}
+
+    // Build description
+    var desc bytes.Buffer
+    desc.WriteString("Gamertag: **")
+    desc.WriteString(gt)
+    desc.WriteString("**\n")
+
+    var general bytes.Buffer
+    general.WriteString(fmt.Sprintf("Matches: **%d**\n", playerStats.Matches))
+
+	fields := []*discordgo.MessageEmbedField{}
+	fields = append(fields, &discordgo.MessageEmbedField{
+		Name:   "General",
+		Value:  general.String(),
+		Inline: true,
+	})
+
+    for _, teamName := range teamNames {
+        var mapStatsTitle bytes.Buffer
+        mapStatsTitle.WriteString(teamName)
+        mapStatsTitle.WriteString(" ")
+        mapStatsTitle.WriteString(" Maps")
+
+        var leaderStatsTitle bytes.Buffer
+        leaderStatsTitle.WriteString(teamName)
+        leaderStatsTitle.WriteString(" ")
+        leaderStatsTitle.WriteString(" Leader")
+
+        fields = append(fields, &discordgo.MessageEmbedField{
+            Name:   mapStatsTitle.String(),
+            Value:  "foo",
+            Inline: true,
+        })
+
+        fields = append(fields, &discordgo.MessageEmbedField{
+            Name:   leaderStatsTitle.String(),
+            Value:  "foo",
+            Inline: true,
+        })
+    }
+
+    // Build embed
+	r := &discordgo.MessageEmbed{
+		Title:     title,
+		Author:    &discordgo.MessageEmbedAuthor{},
+		Color:     0x010101,
+		Fields:    fields,
+		Timestamp: time.Now().Format(time.RFC3339),
+	}
+
+	// Send message
+	bot.session.ChannelMessageSendEmbed(m.ChannelID, r)
 }
 
 // -------------------------------------------------------------------------------------------------------------
@@ -649,7 +701,7 @@ func (bot *Bot) getLatest(m *discordgo.MessageCreate, playerID int, gamertag str
 // Scan player
 // -------------------------------------------------------------------------------------------------------------
 
-func (bot *Bot) scanPlayer(m *discordgo.MessageCreate, playerID int, gamertag string, full bool) {
+func (bot *Bot) scanPlayer(m *discordgo.MessageCreate, playerID int, gamertag string, full bool) bool {
 	// Figure out where to start
 	count := 25
 	offset := 0
@@ -663,12 +715,12 @@ func (bot *Bot) scanPlayer(m *discordgo.MessageCreate, playerID int, gamertag st
 	stats, err := bot.crawler.loadPlayerStats(gamertag)
 	if err != nil {
 		bot.sendResponse(m, fmt.Sprintf("Ouch! Something went wrong: %v.", err))
-		return
+		return false
 	}
 	err = bot.crawler.dataStore.storePlayerStats(playerID, stats)
 	if err != nil {
 		bot.sendResponse(m, fmt.Sprintf("Ouch! Something went wrong: %v.", err))
-		return
+		return false
 	}
 	bot.sendResponse(m, fmt.Sprintf("I updated the playlist stats from player **%d**.", playerID))
 
@@ -695,19 +747,19 @@ func (bot *Bot) scanPlayer(m *discordgo.MessageCreate, playerID int, gamertag st
 		// No such user? (404)
 		if err == ErrNotFound {
 			bot.sendResponse(m, fmt.Sprintf("The Halo API does not return any data for the player **%d**.", playerID))
-			return
+			return false
 		}
 
 		// Hit the rate limit? (429)
 		if err == ErrRateLimit {
 			bot.sendResponse(m, fmt.Sprintf("I just hit the API rate limit, please repeat the scan of **%d**.", playerID))
-			return
+			return false
 		}
 
 		// Try again if there was an unexpected error
 		if err != nil {
 			bot.sendResponse(m, fmt.Sprintf("Ouch! Something went wrong: %v.", err))
-			return
+			return false
 		}
 
 		// Insert all matches into the database
@@ -768,6 +820,7 @@ func (bot *Bot) scanPlayer(m *discordgo.MessageCreate, playerID int, gamertag st
 		}
 	}
 	bot.sendResponse(m, fmt.Sprintf("I finished the match history scan for player **%d**.", playerID))
+    return true
 }
 
 // -------------------------------------------------------------------------------------------------------------

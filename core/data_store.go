@@ -8,6 +8,7 @@ import (
 	"log"
 	"strings"
 	"time"
+	"fmt"
 )
 
 type DataStore struct {
@@ -1154,15 +1155,15 @@ func (ds *DataStore) getMatchAnnotations(matchID int) ([]string, error) {
 // Get player matches
 // -------------------------------------------------------------------------------------------------------------
 
-func (ds *DataStore) getPlayerTeamStats(player_id int, player_name string, days int, team_size int) ([]string, error) {
-	results, err := ds.db.Query(`
+func (ds *DataStore) getPlayerTeamStats(player_id int, player_name string, days int, team_size int) ([]PlayerTeamStats, error) {
+    query := fmt.Sprintf(`
 		WITH data_ AS (
-			SELECT * FROM didact_player_match_data($1, $2, INTERVAL $3 day)
+            SELECT * FROM didact_player_match_data($1, $2, INTERVAL '%d days')
 		), top_teams_ AS (
 			SELECT p11_gamertag AS p1, p12_gamertag AS p2, p13_gamertag AS p3, COUNT(*) AS matches
 			FROM data_
 			WHERE playlist_ranking = 'CSR'
-			AND team_size = $4
+			AND team_size = $3
 			GROUP BY p11_gamertag, p12_gamertag, p13_gamertag
 			ORDER BY matches
 			LIMIT 3
@@ -1177,26 +1178,49 @@ func (ds *DataStore) getPlayerTeamStats(player_id int, player_name string, days 
 			) as team,
 			map_name,
 			leader_name,
-			COUNT(*) AS as matches,
-			SUM(CASE WHEN is_win THEN 1 ELSE 0 END) AS wins,
-			SUM(mmr_new - mmr_prev) AS mmr,
-			SUM(csr_new - csr_prev) AS csr,
-			SUM(duration) AS duration
+			COUNT(*) AS matches,
+			COALESCE(SUM(CASE WHEN is_win THEN 1 ELSE 0 END), 0) AS wins,
+			COALESCE(SUM(mmr_new - mmr_prev), 0.0) AS mmr,
+			COALESCE(SUM(csr_new - csr_prev), 0) AS csr,
+			COALESCE(EXTRACT(EPOCH FROM SUM(duration)), 0) AS duration
 		FROM data_ d, top_teams_ tt
 		WHERE d.p11_gamertag = tt.p1
-		AND d.p12_gamertag = tt.p2
-		AND d.p13_gamertag = tt.p3
-		GROUPY BY
+		AND COALESCE(d.p12_gamertag, '') = COALESCE(tt.p2, '')
+		AND COALESCE(d.p13_gamertag, '') = COALESCE(tt.p3, '')
+		GROUP BY
 			GROUPING SETS (
 				(team),
 				(team, map_name),
-				(team, leader_name),
+				(team, leader_name)
 			);
-	`, player_id, player_name, days, team_size)
+	`, days)
+
+	// Get the player team stats
+	results, err := ds.db.Query(query, player_id, player_name, team_size)
 
 	if err != nil {
 		return nil, err
 	}
-	// TODO
-	return nil, nil
+
+	// Read all results
+	var allStats []PlayerTeamStats
+	for results.Next() {
+		var stats PlayerTeamStats
+		err := results.Scan(
+			&stats.Team,
+			&stats.Map,
+			&stats.Leader,
+			&stats.Matches,
+			&stats.Wins,
+			&stats.MMR,
+			&stats.CSR,
+			&stats.Duration,
+		)
+		if err != nil {
+			return nil, err
+		}
+		allStats = append(allStats, stats)
+	}
+
+	return allStats, nil
 }
