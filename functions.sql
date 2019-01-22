@@ -821,7 +821,7 @@ RETURNS TABLE (
 	LEFT OUTER JOIN player p22 ON m.t2_p2_id = p22.p_id
 	LEFT OUTER JOIN player p23 ON m.t2_p3_id = p23.p_id
 	LEFT OUTER JOIN meta_map mm ON mm.mm_uuid::UUID = m.map_uuid
-	INNER JOIN match_player mp ON mp.mp_match_id = m.match_id AND mp.mp_gamertag = player_name
+	CROSS JOIN LATERAL (SELECT * FROM match_player mp WHERE mp.mp_match_id = m.match_id AND mp.mp_gamertag = player_name LIMIT 1) mp
 	LEFT OUTER JOIN meta_leader ml ON ml.ml_id = mp.mp_leader_id
     LEFT OUTER JOIN meta_playlist mpl ON mpl.mpl_uuid::UUID = m.playlist_uuid
 	ORDER BY m.start_date DESC
