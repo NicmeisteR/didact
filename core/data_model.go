@@ -1,8 +1,7 @@
 package core
 
-// Player stats
-type PlayerTeamStats struct {
-	Team     *string
+// Player match aggregates
+type PlayerMatchAggregates struct {
 	Map      *string
 	Leader   *string
 	Matches  int64

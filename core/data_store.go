@@ -1156,27 +1156,12 @@ func (ds *DataStore) getMatchAnnotations(matchID int) ([]string, error) {
 // Get player matches
 // -------------------------------------------------------------------------------------------------------------
 
-func (ds *DataStore) getPlayerTeamStats(player_id int, player_name string, days int, team_size int) ([]*PlayerTeamStats, error) {
+func (ds *DataStore) getPlayerMatchAggregates(player_id int, player_name string, days int, team_size int) ([]*PlayerMatchAggregates, error) {
     query := fmt.Sprintf(`
 		WITH data_ AS (
             SELECT * FROM didact_player_match_data($1, $2, INTERVAL '%d days')
-		), top_teams_ AS (
-			SELECT p11_gamertag AS p1, p12_gamertag AS p2, p13_gamertag AS p3, COUNT(*) AS matches
-			FROM data_
-			WHERE playlist_ranking = 'CSR'
-			AND team_size = $3
-			GROUP BY p11_gamertag, p12_gamertag, p13_gamertag
-			ORDER BY matches DESC
-			LIMIT 2
 		)
 		SELECT
-			CONCAT(
-				p11_gamertag,
-				CASE WHEN p12_gamertag IS NULL THEN '' ELSE ' & ' END,
-				p12_gamertag,
-				CASE WHEN p13_gamertag IS NULL THEN '' ELSE ' & ' END,
-				p13_gamertag
-			) as team,
 			map_name,
 			leader_name,
 			COUNT(*) AS matches,
@@ -1184,15 +1169,13 @@ func (ds *DataStore) getPlayerTeamStats(player_id int, player_name string, days 
 			COALESCE(SUM(mmr_new - mmr_prev), 0.0) AS mmr,
 			COALESCE(SUM(csr_new - csr_prev), 0) AS csr,
 			COALESCE(EXTRACT(EPOCH FROM SUM(duration)), 0) AS duration
-		FROM data_ d, top_teams_ tt
-		WHERE d.p11_gamertag = tt.p1
-		AND COALESCE(d.p12_gamertag, '') = COALESCE(tt.p2, '')
-		AND COALESCE(d.p13_gamertag, '') = COALESCE(tt.p3, '')
+		FROM data_ d
+        WHERE d.team_size = $3
 		GROUP BY
 			GROUPING SETS (
-				(team),
-				(team, map_name),
-				(team, leader_name)
+				(),
+				(map_name),
+				(leader_name)
 			);
 	`, days)
 
@@ -1204,11 +1187,10 @@ func (ds *DataStore) getPlayerTeamStats(player_id int, player_name string, days 
 	}
 
 	// Read all results
-	var allStats []*PlayerTeamStats
+	var allStats []*PlayerMatchAggregates
 	for results.Next() {
-        stats := &PlayerTeamStats{}
+        stats := &PlayerMatchAggregates{}
 		err := results.Scan(
-			&stats.Team,
 			&stats.Map,
 			&stats.Leader,
 			&stats.Matches,
