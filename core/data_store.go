@@ -33,29 +33,30 @@ func NewDataStore(config *Config) (*DataStore, error) {
 // -------------------------------------------------------------------------------------------------------------
 
 // Query player stats
-func (ds *DataStore) getPlayerID(gamertag string) (int, error) {
+func (ds *DataStore) getPlayerID(gamertag string) (int, string, error) {
 	// Query row
 	row := ds.db.QueryRow(`
-		SELECT p_id
+		SELECT p_id, p_gamertag
 		FROM player
 		WHERE p_gamertag ILIKE $1
 	`, gamertag)
 
 	// Scan row
 	var playerID int
-	err := row.Scan(&playerID)
+	var playerName string
+	err := row.Scan(&playerID, &playerName)
 
 	// No rows?
 	if err == sql.ErrNoRows {
-		return 0, err
+		return 0, "", err
 	}
 
 	// Different error?
 	if err != nil {
-		return 0, err
+		return 0, "", err
 	}
 
-	return playerID, nil
+	return playerID, playerName, nil
 }
 
 // Query player stats
@@ -1155,7 +1156,7 @@ func (ds *DataStore) getMatchAnnotations(matchID int) ([]string, error) {
 // Get player matches
 // -------------------------------------------------------------------------------------------------------------
 
-func (ds *DataStore) getPlayerTeamStats(player_id int, player_name string, days int, team_size int) ([]PlayerTeamStats, error) {
+func (ds *DataStore) getPlayerTeamStats(player_id int, player_name string, days int, team_size int) ([]*PlayerTeamStats, error) {
     query := fmt.Sprintf(`
 		WITH data_ AS (
             SELECT * FROM didact_player_match_data($1, $2, INTERVAL '%d days')
@@ -1165,8 +1166,8 @@ func (ds *DataStore) getPlayerTeamStats(player_id int, player_name string, days 
 			WHERE playlist_ranking = 'CSR'
 			AND team_size = $3
 			GROUP BY p11_gamertag, p12_gamertag, p13_gamertag
-			ORDER BY matches
-			LIMIT 3
+			ORDER BY matches DESC
+			LIMIT 2
 		)
 		SELECT
 			CONCAT(
@@ -1203,9 +1204,9 @@ func (ds *DataStore) getPlayerTeamStats(player_id int, player_name string, days 
 	}
 
 	// Read all results
-	var allStats []PlayerTeamStats
+	var allStats []*PlayerTeamStats
 	for results.Next() {
-		var stats PlayerTeamStats
+        stats := &PlayerTeamStats{}
 		err := results.Scan(
 			&stats.Team,
 			&stats.Map,
