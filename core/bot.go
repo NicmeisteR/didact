@@ -274,11 +274,6 @@ func (bot *Bot) help(m *discordgo.MessageCreate) {
 		Value:  "!didact fullscan <gamertag>",
 		Inline: false,
 	})
-	fields = append(fields, &discordgo.MessageEmbedField{
-		Name:   "Command - Match Analysis",
-		Value:  "!didact analyse <match id>",
-		Inline: false,
-	})
 
 	r := &discordgo.MessageEmbed{
 		Title:       "Didact Discord Bot",
