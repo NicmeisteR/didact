@@ -596,11 +596,12 @@ func (bot *Bot) getStats(m *discordgo.MessageCreate, raw string) {
         csr = float64(playerStats.CSR) / float64(playerStats.Matches)
     }
     var general bytes.Buffer
+    general.WriteString(fmt.Sprintf("Days: **%d**\n", days))
     general.WriteString(fmt.Sprintf("Matches: **%d**\n", playerStats.Matches))
     general.WriteString(fmt.Sprintf("Wins: **%d** (**%.2f**%%)\n", playerStats.Wins, wl))
     general.WriteString(fmt.Sprintf("MMR: **%+.2f** (Ø **%+.2f**)\n", playerStats.MMR, mmr))
     general.WriteString(fmt.Sprintf("CSR: **%+d** (Ø **%+.2f**)\n", playerStats.CSR, csr))
-    general.WriteString(fmt.Sprintf("Minutes: **%.2f** (Ø **%.2f**)\n", float64(playerStats.Duration) / 60.0 / 60.0, minutes))
+    general.WriteString(fmt.Sprintf("Duration: **%.2f**h (Ø **%.2f**min)\n", float64(playerStats.Duration) / 60.0 / 60.0, minutes))
 
 	fields := []*discordgo.MessageEmbedField{}
 	fields = append(fields, &discordgo.MessageEmbedField{
