@@ -1171,6 +1171,8 @@ func (ds *DataStore) getPlayerMatchAggregates(player_id int, player_name string,
 			COALESCE(EXTRACT(EPOCH FROM SUM(duration)), 0) AS duration
 		FROM data_ d
         WHERE d.team_size = $3
+        AND d.playlist_mode = 'Deathmatch'
+        AND d.playlist_ranking = 'CSR'
 		GROUP BY
 			GROUPING SETS (
 				(),

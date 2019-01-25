@@ -569,7 +569,7 @@ func (bot *Bot) getStats(m *discordgo.MessageCreate, raw string) {
         title = "Statistics 2v2 Ranked"
 		break
 	case "3r":
-        title = "Statistics 2v2 Ranked"
+        title = "Statistics 3v3 Ranked"
 		break
 	}
 
