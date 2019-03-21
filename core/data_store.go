@@ -277,7 +277,7 @@ func (ds *DataStore) storeMatch(match *Match) (int, error) {
 	// Get map uuids
 	mapUUID, ok := MapUUIDs[match.MapId]
 	if !ok {
-		log.Printf("Unknown map: %s\n", mapUUID)
+		log.Printf("Unknown map: %s\n", match.MapId)
 		return 0, ErrMetadataIncomplete
 	}
 

@@ -584,6 +584,7 @@ var GameObjectUUIDs = map[string]string{
 }
 
 var MapUUIDs = map[string]string{
+	"skirmish\\design\\fort_jordan\\fort_jordan":                 "670bb7db-cdaf-4b30-8c04-558c1360709b",
 	"rostermode\\design\\RM_EvenFlowArt\\RM_EvenFlowArt":         "0f5669ff-5fb1-4307-9db3-1a21d71e70ff",
 	"rostermode\\design\\RM_EvenFlowNight\\RM_EvenFlowNight":     "5e4652ae-6dde-4d78-8c43-849703ea1151",
 	"rostermode\\design\\RM_EvenFlow_Desert\\RM_EvenFlow_Desert": "350ece0f-f6f3-4069-a1e5-2a3b5bae9cee",
