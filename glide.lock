@@ -1,0 +1,29 @@
+hash: 28438dfb2afa74061db473ba2895112e3be1f3e24362e239a7535c4af2beb9e1
+updated: 2019-03-20T20:43:51.365432-07:00
+imports:
+- name: github.com/bwmarrin/discordgo
+  version: 8325a6bf6dd6c91ed4040a1617b07287b8fb0eba
+- name: github.com/gorilla/websocket
+  version: 0ec3d1bd7fe50c503d6df98ee649d81f4857c564
+- name: github.com/lib/pq
+  version: 4ded0e9383f75c197b3a2aaa6d590ac52df6fd79
+  subpackages:
+  - oid
+- name: github.com/tidwall/gjson
+  version: eee0b6226f0d1db2675a176fdfaa8419bcad4ca8
+- name: github.com/tidwall/match
+  version: 33827db735fff6510490d69a8622612558a557ed
+- name: github.com/tidwall/pretty
+  version: 65a9db5fad5105a89e17f38adcc9878685be6d78
+- name: golang.org/x/crypto
+  version: b7391e95e576cacdcdd422573063bc057239113d
+  subpackages:
+  - internal/subtle
+  - nacl/secretbox
+  - poly1305
+  - salsa20/salsa
+- name: golang.org/x/sys
+  version: acbc56fc7007d2a01796d5bde54f39e3b3e95945
+  subpackages:
+  - cpu
+testImports: []
