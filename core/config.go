@@ -28,14 +28,14 @@ type CrawlerConfig struct {
 	TaskWorkers   int            `json:"TaskWorkers"`
 }
 
-type BotConfig struct {
+type DiscordBotConfig struct {
 	Key string `json:"Key"`
 }
 
 type Config struct {
-	Crawler  CrawlerConfig `json:"Crawler"`
-	Database DBConfig      `json:"Database"`
-	Bot      BotConfig     `json:"Bot"`
+	Crawler     CrawlerConfig    `json:"Crawler"`
+	Database    DBConfig         `json:"Database"`
+	DiscordBot  DiscordBotConfig `json:"DiscordBot"`
 }
 
 func (dbc *DBConfig) GetConnectionString(obfuscate bool) string {

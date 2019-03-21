@@ -11,7 +11,7 @@ import (
 	"time"
 )
 
-type Bot struct {
+type DiscordBot struct {
 	config    *Config
 	dataStore *DataStore
 	crawler   *Crawler
@@ -19,8 +19,8 @@ type Bot struct {
 	channels  map[string]bool
 }
 
-func NewBot(config *Config, dataStore *DataStore, crawler *Crawler) *Bot {
-	bot := new(Bot)
+func NewDiscordBot(config *Config, dataStore *DataStore, crawler *Crawler) *DiscordBot {
+	bot := new(DiscordBot)
 	bot.config = config
 	bot.crawler = crawler
 	bot.channels = make(map[string]bool)
@@ -32,11 +32,11 @@ func NewBot(config *Config, dataStore *DataStore, crawler *Crawler) *Bot {
 // Control
 // -------------------------------------------------------------------------------------------------------------
 
-func (bot *Bot) Start() error {
+func (bot *DiscordBot) Start() error {
 	var err error
 
 	// Create a new Discord session using the provided bot token.
-	bot.session, err = discordgo.New("Bot " + bot.config.Bot.Key)
+	bot.session, err = discordgo.New("Bot " + bot.config.DiscordBot.Key)
 	if err != nil {
 		return err
 	}
@@ -56,7 +56,7 @@ func (bot *Bot) Start() error {
 	return nil
 }
 
-func (bot *Bot) Stop() {
+func (bot *DiscordBot) Stop() {
 	if bot.session != nil {
 		bot.session.Close()
 	}
@@ -68,34 +68,34 @@ func (bot *Bot) Stop() {
 // -------------------------------------------------------------------------------------------------------------
 
 // Broadcast a message
-func (bot *Bot) broadcast(m string) {
+func (bot *DiscordBot) broadcast(m string) {
 	for cid := range bot.channels {
 		bot.session.ChannelMessageSend(cid, m)
 	}
 }
 
 // Broadcast an embed
-func (bot *Bot) broadcastEmbed(m *discordgo.MessageEmbed) {
+func (bot *DiscordBot) broadcastEmbed(m *discordgo.MessageEmbed) {
 	for cid := range bot.channels {
 		bot.session.ChannelMessageSendEmbed(cid, m)
 	}
 }
 
 // Broadcast a complex message
-func (bot *Bot) broadcastComplex(m *discordgo.MessageSend) {
+func (bot *DiscordBot) broadcastComplex(m *discordgo.MessageSend) {
 	for cid := range bot.channels {
 		bot.session.ChannelMessageSendComplex(cid, m)
 	}
 }
 
 // Send a response
-func (bot *Bot) sendResponse(m *discordgo.MessageCreate, r string) {
+func (bot *DiscordBot) sendResponse(m *discordgo.MessageCreate, r string) {
 	// withMention := fmt.Sprintf("%s %s", m.Author.Mention(), r)
 	bot.session.ChannelMessageSend(m.ChannelID, r)
 }
 
 // Mark as typing
-func (bot *Bot) markAsTyping(channel string) {
+func (bot *DiscordBot) markAsTyping(channel string) {
 	bot.session.ChannelTyping(channel)
 
 }
@@ -104,7 +104,7 @@ func (bot *Bot) markAsTyping(channel string) {
 // URLs
 // -------------------------------------------------------------------------------------------------------------
 
-func (bot *Bot) dashboardURL(dashboardUUID string, params map[string]string) (*url.URL, error) {
+func (bot *DiscordBot) dashboardURL(dashboardUUID string, params map[string]string) (*url.URL, error) {
 	// Build URL
 	u, err := url.Parse("https://www.didact.io/public/dashboard/")
 	if err != nil {
@@ -119,7 +119,7 @@ func (bot *Bot) dashboardURL(dashboardUUID string, params map[string]string) (*u
 	return u, nil
 }
 
-func (bot *Bot) waypointMatchURL(matchUUID string, gamertag string) (*url.URL, error) {
+func (bot *DiscordBot) waypointMatchURL(matchUUID string, gamertag string) (*url.URL, error) {
 	u, err := url.Parse("https://www.halowaypoint.com/en-us/games/halo-wars-2/matches/")
 	if err != nil {
 		return nil, err
@@ -136,7 +136,7 @@ func (bot *Bot) waypointMatchURL(matchUUID string, gamertag string) (*url.URL, e
 
 // This function will be called (due to AddHandler above) every time a new
 // message is created on any channel that the autenticated bot has access to.
-func (bot *Bot) onMessageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
+func (bot *DiscordBot) onMessageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 
 	// Ignore all messages created by the bot itself
 	if m.Author.ID == s.State.User.ID {
@@ -247,7 +247,7 @@ func (bot *Bot) onMessageCreate(s *discordgo.Session, m *discordgo.MessageCreate
 // Get latest
 // -------------------------------------------------------------------------------------------------------------
 
-func (bot *Bot) help(m *discordgo.MessageCreate) {
+func (bot *DiscordBot) help(m *discordgo.MessageCreate) {
 	fields := []*discordgo.MessageEmbedField{}
 	fields = append(fields, &discordgo.MessageEmbedField{
 		Name:   "Command - Player Search",
@@ -276,7 +276,7 @@ func (bot *Bot) help(m *discordgo.MessageCreate) {
 	})
 
 	r := &discordgo.MessageEmbed{
-		Title:       "Didact Discord Bot",
+		Title:       "Didact Discord DiscordBot",
 		Author:      &discordgo.MessageEmbedAuthor{},
 		Color:       0x010101,
 		Description: "If you find bugs, please tell @x6767.",
@@ -291,7 +291,7 @@ func (bot *Bot) help(m *discordgo.MessageCreate) {
 // Status
 // -------------------------------------------------------------------------------------------------------------
 
-func (bot *Bot) getStatus(m *discordgo.MessageCreate) {
+func (bot *DiscordBot) getStatus(m *discordgo.MessageCreate) {
 	r := &discordgo.MessageEmbed{
 		Author:      &discordgo.MessageEmbedAuthor{},
 		Color:       0x00ff00,
@@ -307,7 +307,7 @@ func (bot *Bot) getStatus(m *discordgo.MessageCreate) {
 // Get player id
 // -------------------------------------------------------------------------------------------------------------
 
-func (bot *Bot) getPlayerID(m *discordgo.MessageCreate, args string) (int, string, bool) {
+func (bot *DiscordBot) getPlayerID(m *discordgo.MessageCreate, args string) (int, string, bool) {
 	gamertag := strings.Trim(args, " \"'")
 	playerID, gamertag, err := bot.dataStore.getPlayerID(gamertag)
 	if err != nil {
@@ -322,7 +322,7 @@ func (bot *Bot) getPlayerID(m *discordgo.MessageCreate, args string) (int, strin
 // Annotate a match
 // -------------------------------------------------------------------------------------------------------------
 
-func (bot *Bot) annotateMatch(m *discordgo.MessageCreate, argString string) {
+func (bot *DiscordBot) annotateMatch(m *discordgo.MessageCreate, argString string) {
 	// Read args
 	rawArgs := strings.Split(argString, " ")
 	args := []string{}
@@ -389,7 +389,7 @@ func (bot *Bot) annotateMatch(m *discordgo.MessageCreate, argString string) {
 // Get match annotations
 // -------------------------------------------------------------------------------------------------------------
 
-func (bot *Bot) getMatchAnnotations(m *discordgo.MessageCreate, arg string) {
+func (bot *DiscordBot) getMatchAnnotations(m *discordgo.MessageCreate, arg string) {
 	// Read args
 	bot.markAsTyping(m.ChannelID)
 
@@ -435,7 +435,7 @@ func (bot *Bot) getMatchAnnotations(m *discordgo.MessageCreate, arg string) {
 // Find player
 // -------------------------------------------------------------------------------------------------------------
 
-func (bot *Bot) findPlayer(m *discordgo.MessageCreate, search string) {
+func (bot *DiscordBot) findPlayer(m *discordgo.MessageCreate, search string) {
 	gamertags, err := bot.dataStore.findPlayer(search)
 	if err != nil {
 		bot.sendResponse(m, fmt.Sprintf("Ouch! Something went wrong: %v.", err))
@@ -476,7 +476,7 @@ func (bot *Bot) findPlayer(m *discordgo.MessageCreate, search string) {
 // Get stats
 // -------------------------------------------------------------------------------------------------------------
 
-func (bot *Bot) getStats(m *discordgo.MessageCreate, raw string) {
+func (bot *DiscordBot) getStats(m *discordgo.MessageCreate, raw string) {
     args := make([]string, 0)
 	last := 0
 
@@ -689,7 +689,7 @@ func (bot *Bot) getStats(m *discordgo.MessageCreate, raw string) {
 // Get latest
 // -------------------------------------------------------------------------------------------------------------
 
-func (bot *Bot) getLatest(m *discordgo.MessageCreate, playerID int, gamertag string) {
+func (bot *DiscordBot) getLatest(m *discordgo.MessageCreate, playerID int, gamertag string) {
 	// Get the latest match
 	matchID, matchUUID, startDate, err := bot.dataStore.getLatestMatch(playerID)
 	if err != nil {
@@ -738,7 +738,7 @@ func (bot *Bot) getLatest(m *discordgo.MessageCreate, playerID int, gamertag str
 // Scan player
 // -------------------------------------------------------------------------------------------------------------
 
-func (bot *Bot) scanPlayer(m *discordgo.MessageCreate, playerID int, gamertag string, full bool) bool {
+func (bot *DiscordBot) scanPlayer(m *discordgo.MessageCreate, playerID int, gamertag string, full bool) bool {
 	// Figure out where to start
 	count := 25
 	offset := 0
@@ -864,7 +864,7 @@ func (bot *Bot) scanPlayer(m *discordgo.MessageCreate, playerID int, gamertag st
 // Match events
 // -------------------------------------------------------------------------------------------------------------
 
-func (bot *Bot) analyzeMatch(m *discordgo.MessageCreate, mid int) bool {
+func (bot *DiscordBot) analyzeMatch(m *discordgo.MessageCreate, mid int) bool {
 	bot.markAsTyping(m.ChannelID)
 
 	// Match events already exist?

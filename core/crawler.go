@@ -276,7 +276,7 @@ func (crawler *Crawler) storeTeamEncounter(task *Task) error {
 	return nil
 }
 
-func (bot *Bot) updateMatchResult(msg *discordgo.MessageCreate, matchUUID string) (int, bool) {
+func (bot *DiscordBot) updateMatchResult(msg *discordgo.MessageCreate, matchUUID string) (int, bool) {
 	// The match exists already?
 	if matchId, ok := bot.dataStore.matchExists(matchUUID); ok {
 		return matchId, true

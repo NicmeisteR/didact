@@ -40,20 +40,20 @@ func main() {
 	log.Println("started crawler")
 
 	// Create bot
-	bot := core.NewBot(config, dataStore, crawler)
-	err = bot.Start()
+	discordBot := core.NewDiscordBot(config, dataStore, crawler)
+	err = discordBot.Start()
 	if err != nil {
-		log.Printf("failed to create bot: %v\n", err)
+		log.Printf("failed to create discord bot: %v\n", err)
 		os.Exit(1)
 	}
-	log.Println("started bot")
+	log.Println("started discord bot")
 
 	// handle sigint
 	sigChan := make(chan os.Signal, 1)
 	signal.Notify(sigChan, os.Interrupt)
 	for _ = range sigChan {
 		log.Println("received an interrupt, stopping workers...")
-		bot.Stop()
+		discordBot.Stop()
 		crawler.Stop()
 		return
 	}
