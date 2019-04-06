@@ -443,13 +443,21 @@ CREATE TABLE match_events (
 CREATE TABLE team_encounter (
     te_match_id         INTEGER NOT NULL,
 
-    te_t1_p1_id         INTEGER NOT NULL,
-    te_t1_p2_id         INTEGER NOT NULL,
-    te_t1_p3_id         INTEGER NOT NULL,
+    te_t1_p1_id         INTEGER,
+    te_t1_p2_id         INTEGER,
+    te_t1_p3_id         INTEGER,
 
-    te_t2_p1_id         INTEGER NOT NULL,
-    te_t2_p2_id         INTEGER NOT NULL,
-    te_t2_p3_id         INTEGER NOT NULL,
+    te_t2_p1_id         INTEGER,
+    te_t2_p2_id         INTEGER,
+    te_t2_p3_id         INTEGER,
+
+    te_t1_p1_pos        INTEGER,
+    te_t1_p2_pos        INTEGER,
+    te_t1_p3_pos        INTEGER,
+
+    te_t2_p1_pos        INTEGER,
+    te_t2_p2_pos        INTEGER,
+    te_t2_p3_pos        INTEGER,
 
     te_start_date       TIMESTAMP NOT NULL,
     te_duration         INTERVAL,
@@ -459,6 +467,10 @@ CREATE TABLE team_encounter (
     te_match_uuid       UUID NOT NULL,
     te_playlist_uuid    UUID,
     te_season_uuid      UUID,
+
+    te_mmr_min          DOUBLE PRECISION,
+    te_mmr_max          DOUBLE PRECISION,
+    te_mmr_avg_diff     DOUBLE PRECISION,
 
     FOREIGN KEY (te_match_id)
         REFERENCES match(m_id)
