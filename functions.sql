@@ -156,7 +156,7 @@ RETURNS VOID AS $$
             SELECT
                 p_id AS player_id,
                 mp_match_id AS match_id,
-                mp_player_pos AS player_pos,
+                mp_player_idx AS player_pos,
                 mp_team_id AS team_id,
                 mp_mmr_new_rating AS mmr,
                 rank() over (partition by mp_match_id, mp_team_id order by p_id asc) as rank
