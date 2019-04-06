@@ -7,9 +7,14 @@ let $leader_powers_2 := jn:parse-json(file:read-text("./meta/data/leader_powers_
 let $leader_powers_3 := jn:parse-json(file:read-text("./meta/data/leader_powers_3.json"))."ContentItems"
 let $leader_powers := [$leader_powers_1[], $leader_powers_2[], $leader_powers_3[]]
 
-return [
-    for $leader_power in $leader_powers[]
-    where $leader_power."Type" = "HW2LeaderPower"
-    order by $leader_power."View"."HW2LeaderPower"."ObjectTypeId"
-    return [ $leader_power."View"."HW2LeaderPower"."ObjectTypeId", $leader_power."View"."Identity" ]
-]
+return {
+    "leader_powers": [
+        for $leader_power in $leader_powers[]
+        where $leader_power."Type" = "HW2LeaderPower"
+        order by $leader_power."View"."HW2LeaderPower"."ObjectTypeId"
+        return {
+            "type_id": $leader_power."View"."HW2LeaderPower"."ObjectTypeId",
+            "uuid": $leader_power."View"."Identity"
+        }
+    ]
+}

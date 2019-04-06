@@ -21,6 +21,13 @@ CREATE INDEX task_queue_idx
 -- META DATA
 -- ----------------------------------------------------------------------------
 
+CREATE TABLE meta_leader_power (
+    mlp_id          VARCHAR(255) NOT NULL,
+    mlp_name        VARCHAR(255),
+    mlp_uuid        UUID UNIQUE,
+    PRIMARY KEY (mlp_id)
+);
+
 -- Playlist metadata.
 CREATE TABLE meta_playlist (
     mpl_uuid        UUID NOT NULL,
