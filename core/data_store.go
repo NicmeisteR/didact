@@ -640,45 +640,94 @@ func (ds *DataStore) storeTeamEncounter(matchID int) error {
 
 	// Store team encounter
 	_, err = tx.Exec(`
-        WITH t_ AS (
-            SELECT team_id, player_1, player_2, player_3, match_outcome
-            FROM didact_match_teams($1)
+        WITH x_ AS (
+            SELECT
+                p_id AS player_id,
+                mp_match_id AS match_id,
+                mp_player_idx AS player_pos,
+                mp_team_id AS team_id,
+                mp_mmr_new_rating AS mmr,
+                rank() over (partition by mp_match_id, mp_team_id order by p_id asc) as rank
+            FROM match_player, player
+            WHERE mp_match_id = $1
+            AND p_gamertag = mp_gamertag
+        ), t_ AS (
+            SELECT
+                m1.match_id AS match_id,
+                m1.team_id AS team_id,
+                m1.player_id AS p1_id,
+                m2.player_id AS p2_id,
+                m3.player_id AS p3_id,
+                m1.player_pos AS p1_pos,
+                m2.player_pos AS p2_pos,
+                m3.player_pos AS p3_pos,
+                LEAST(m1.mmr, COALESCE(m2.mmr, m1.mmr), COALESCE(m3.mmr, m1.mmr)) AS mmr_min,
+                GREATEST(m1.mmr, COALESCE(m2.mmr, m1.mmr), COALESCE(m3.mmr, m1.mmr)) AS mmr_max,
+                (m1.mmr + COALESCE(m2.mmr, 0.0) + COALESCE(m3.mmr, 0.0)) AS mmr_sum,
+                (
+                    (m1.player_id IS NOT NULL)::INTEGER +
+                    (m2.player_id IS NOT NULL)::INTEGER +
+                    (m3.player_id IS NOT NULL)::INTEGER
+                ) team_size
+            FROM x_ m1
+                LEFT OUTER JOIN x_ m2
+                    ON m1.match_id = m2.match_id
+                    AND m1.team_id = m2.team_id
+                    AND m2.rank = 2
+                LEFT OUTER JOIN x_ m3
+                    ON m1.match_id = m3.match_id
+                    AND m1.team_id = m3.team_id
+                    AND m3.rank = 3
+            WHERE m1.rank = 1
         )
         INSERT INTO team_encounter(
-            te_match_id,
-            te_t1_p1_id,
-            te_t1_p2_id,
-            te_t1_p3_id,
-            te_t2_p1_id,
-            te_t2_p2_id,
-            te_t2_p3_id,
-            te_start_date,
-            te_duration,
-            te_match_outcome,
-            te_map_uuid,
-            te_match_uuid,
-            te_playlist_uuid,
-            te_season_uuid
+                te_match_id,
+                te_t1_p1_id,
+                te_t1_p2_id,
+                te_t1_p3_id,
+                te_t2_p1_id,
+                te_t2_p2_id,
+                te_t2_p3_id,
+                te_t1_p1_pos,
+                te_t1_p2_pos,
+                te_t1_p3_pos,
+                te_t2_p1_pos,
+                te_t2_p2_pos,
+                te_t2_p3_pos,
+                te_start_date,
+                te_duration,
+                te_match_outcome,
+                te_map_uuid,
+                te_match_uuid,
+                te_playlist_uuid,
+                te_season_uuid,
+                te_mmr_min,
+                te_mmr_max,
+                te_mmr_avg_diff
         )
         SELECT
-            m.m_id,
-            t1.player_1,
-            t1.player_2,
-            t1.player_3,
-            t2.player_1,
-            t2.player_2,
-            t2.player_3,
-            m.m_start_date,
-            m.m_duration,
-            t1.match_outcome,
-            m.m_map_uuid,
-            m.m_match_uuid,
-            m.m_playlist_uuid,
-            m.m_season_uuid
-        FROM match m, t_ t1, t_ t2
-        WHERE m.m_id = $1
-        AND t1.team_id = 1
-        AND t2.team_id = 2
+                m.m_id,
+                t1.p1_id, t1.p2_id, t1.p3_id,
+                t2.p1_id, t2.p2_id, t2.p3_id,
+                t1.p1_pos, t1.p2_pos, t1.p3_pos,
+                t2.p1_pos, t2.p2_pos, t2.p3_pos,
+                m.m_start_date,
+                m.m_duration,
+                mt.mt_match_outcome,
+                m.m_map_uuid,
+                m.m_match_uuid,
+                m.m_playlist_uuid,
+                m.m_season_uuid,
+                LEAST(t1.mmr_min, t2.mmr_min),
+                GREATEST(t1.mmr_max, t2.mmr_max),
+                ABS((t1.mmr_sum::FLOAT / t1.team_size::FLOAT) - (t2.mmr_sum::FLOAT / t2.team_size::FLOAT))
+        FROM t_ t1, t_ t2, match m, match_team mt
+        WHERE t1.match_id = t2.match_id
+        -- The < predicate prevents the nested loop join (estimates are far off here)
+        AND t1.team_id < t2.team_id
+        AND t1.match_id = m.m_id
+        AND mt.mt_match_id = m.m_id
+        AND mt.mt_team_id = 1
         ON CONFLICT DO NOTHING;
 	`, matchID)
 
