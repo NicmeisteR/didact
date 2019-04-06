@@ -1,3 +1,7 @@
+-- FUNCTIONS
+
+SELECT oid::regprocedure FROM pg_proc WHERE proname like 'didact%' AND pg_function_is_visible(oid);
+
 -- MATCHES
 
 SELECT

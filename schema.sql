@@ -38,6 +38,7 @@ CREATE UNIQUE INDEX meta_playlist_uuid_idx
 CREATE TABLE meta_leader (
     ml_id       INTEGER NOT NULL,
     ml_name     VARCHAR(255) NOT NULL,
+    ml_faction  VARCHAR(40) NOT NULL
     PRIMARY KEY (ml_id)
 );
 
@@ -58,6 +59,7 @@ CREATE UNIQUE INDEX meta_map_uuid_idx
 CREATE TABLE meta_object (
     mo_id       VARCHAR(255) NOT NULL,
     mo_name     VARCHAR(255),
+    mo_uuid     UUID UNIQUE,
     PRIMARY KEY(mo_id)
 );
 
@@ -518,17 +520,6 @@ CREATE INDEX team_encounter_t2_p3_idx
     ON team_encounter
     USING BTREE(te_t2_p3_id, te_start_date);
 
--- ----------------------------------------------------------------------------
--- Match annotations
--- ----------------------------------------------------------------------------
-
-CREATE TABLE match_annotation(
-    ma_match_id     INTEGER NOT NULL,
-    ma_label        VARCHAR(255) NOT NULL,
-
-    PRIMARY KEY (ma_match_id, ma_label)
-);
-
-CREATE INDEX match_annotation_label_idx
-    ON match_annotation
-    USING BTREE(ma_label);
+CREATE INDEX team_encounter_start_idx
+    ON team_encounter
+    USING BTREE(te_start_date);

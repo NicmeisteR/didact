@@ -25,6 +25,6 @@ func main() {
 	}
 
 	for _, obj := range data.GameObjects {
-		fmt.Printf("%s %s\n", obj.UUID, obj.Name)
+		fmt.Printf("UPDATE meta_object SET mo_uuid='%s'::UUID WHERE mo_id='%s';\n", obj.UUID, obj.Name)
 	}
 }
