@@ -231,7 +231,7 @@ RETURNS VOID AS $$
                 m.m_season_uuid,
                 LEAST(t1.mmr_min, t2.mmr_min),
                 GREATEST(t1.mmr_max, t2.mmr_max),
-                ABS((t1.mmr_sum / t1.team_size) - (t2.mmr_sum / t2.team_size))
+                ABS((t1.mmr_sum::DOUBLE / t1.team_size::DOUBLE) - (t2.mmr_sum::DOUBLE / t2.team_size::DOUBLE))
         FROM t_ t1, t_ t2, match m, match_team mt
         WHERE t1.match_id = t2.match_id
         -- The < predicate prevents the nested loop join (estimates are far off here)
