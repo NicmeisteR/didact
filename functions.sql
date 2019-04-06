@@ -245,6 +245,150 @@ RETURNS VOID AS $$
         END
 $$ LANGUAGE plpgsql;
 
+CREATE OR REPLACE FUNCTION didact_find_team_encounters(team1 character varying[], team2 character varying[], interval_ interval)
+RETURNS TABLE (
+  match_id         INTEGER,
+  t1_p1_id         INTEGER,
+  t1_p2_id         INTEGER,
+  t1_p3_id         INTEGER,
+  t2_p1_id         INTEGER,
+  t2_p2_id         INTEGER,
+  t2_p3_id         INTEGER,
+  t1_p1_pos        INTEGER,
+  t1_p2_pos        INTEGER,
+  t1_p3_pos        INTEGER,
+  t2_p1_pos        INTEGER,
+  t2_p2_pos        INTEGER,
+  t2_p3_pos        INTEGER,
+  start_date       TIMESTAMP,
+  duration         INTERVAL,
+  outcome          INTEGER,
+  map_uuid         UUID,
+  match_uuid       UUID,
+  playlist_uuid    UUID,
+  season_uuid      UUID,
+  mmr_min          DOUBLE PRECISION,
+  mmr_max          DOUBLE PRECISION,
+  mmr_avg_diff     DOUBLE PRECISION,
+  swapped          BOOLEAN
+) AS $$
+    DECLARE
+        league_id INTEGER := 0;
+        player_id INTEGER := 0;
+        gamertag VARCHAR := '';
+        team1_gts VARCHAR[] := Array[]::VARCHAR[];
+        team2_gts VARCHAR[] := Array[]::VARCHAR[];
+        team1_ids INTEGER[] := Array[]::INTEGER[];
+        team2_ids INTEGER[] := Array[]::INTEGER[];
+    BEGIN
+        -- Remove empty gamertags
+        SELECT COALESCE(array_agg(x), array[]::varchar[])
+            INTO team1_gts FROM unnest(team1) AS x WHERE x <> '' AND x <> '-' AND x <> '_';
+        SELECT COALESCE(array_agg(x), array[]::varchar[])
+            INTO team2_gts FROM unnest(team2) AS x WHERE x <> '' AND x <> '-' AND x <> '_';
+
+        -- Get player ids of team 1
+        FOREACH gamertag IN ARRAY team1_gts
+        LOOP
+            SELECT p_id INTO player_id
+                FROM player
+                WHERE p_gamertag ILIKE gamertag;
+            IF NOT FOUND THEN
+                RAISE NOTICE 'Could not find player %', gamertag;
+                RETURN;
+            END IF;
+            team1_ids := array_append(team1_ids, player_id);
+        END LOOP;
+
+        -- Get player ids of team 2
+        FOREACH gamertag IN ARRAY team2_gts
+        LOOP
+            SELECT p_id INTO player_id
+                FROM player
+                WHERE p_gamertag ILIKE gamertag;
+            IF NOT FOUND THEN
+                RAISE NOTICE 'Could not find player %', gamertag;
+                RETURN;
+            END IF;
+            team2_ids := array_append(team2_ids, player_id);
+        END LOOP;
+
+        -- Sort player ids
+        SELECT array_agg(x) INTO team1_ids FROM (SELECT unnest(team1_ids) AS x ORDER BY x) d;
+        SELECT array_agg(x) INTO team2_ids FROM (SELECT unnest(team2_ids) AS x ORDER BY x) d;
+
+        -- Team 2 size invalid?
+        IF array_length(team2_ids, 1) > 0 AND array_length(team2_ids, 1) <> array_length(team1_ids, 1) THEN
+            RAISE NOTICE 'Size of team 2 invalid';
+            RETURN;
+        END IF;
+
+        IF array_length(team2_ids, 1) IS NULL THEN
+            -- Versus everyone
+
+            -- Pad team ids
+            team1_ids := array_append(team1_ids, NULL);
+            team1_ids := array_append(team1_ids, NULL);
+            team1_ids := array_append(team1_ids, NULL);
+            team2_ids := array_append(team2_ids, NULL);
+            team2_ids := array_append(team2_ids, NULL);
+            team2_ids := array_append(team2_ids, NULL);
+
+            -- Everywhere
+            RETURN QUERY
+            (
+                SELECT *, FALSE FROM team_encounter
+                    WHERE te_start_date > NOW() - interval_
+                    AND te_t1_p1_id = team1_ids[1]
+                    AND (team1_ids[2] IS NULL OR te_t1_p2_id = team1_ids[2])
+                    AND (team1_ids[3] IS NULL OR te_t1_p3_id = team1_ids[3])
+                UNION ALL
+                SELECT *, TRUE FROM team_encounter
+                    WHERE te_start_date > NOW() - interval_
+                    AND te_t2_p1_id = team1_ids[1]
+                    AND (team1_ids[2] IS NULL OR te_t2_p2_id = team1_ids[2])
+                    AND (team1_ids[3] IS NULL OR te_t2_p3_id = team1_ids[3])
+            );
+        ELSE
+            -- Versus team
+
+            -- Pad team ids
+            team1_ids := array_append(team1_ids, NULL);
+            team1_ids := array_append(team1_ids, NULL);
+            team1_ids := array_append(team1_ids, NULL);
+            team2_ids := array_append(team2_ids, NULL);
+            team2_ids := array_append(team2_ids, NULL);
+            team2_ids := array_append(team2_ids, NULL);
+
+            RAISE NOTICE 'Querying matches of team [%, %, %] vs team [%, %, %]',
+                team1_ids[1], team1_ids[2], team1_ids[3],
+                team2_ids[1], team2_ids[2], team2_ids[3];
+
+            -- Run query
+            RETURN QUERY
+            (
+                SELECT *, FALSE FROM team_encounter
+                    WHERE te_start_date > NOW() - interval_
+                    AND te_t1_p1_id = team1_ids[1]
+                    AND (team1_ids[2] IS NULL OR te_t1_p2_id = team1_ids[2])
+                    AND (team1_ids[3] IS NULL OR te_t1_p3_id = team1_ids[3])
+                    AND (team2_ids[1] IS NULL OR te_t2_p1_id = team2_ids[1])
+                    AND (team2_ids[2] IS NULL OR te_t2_p2_id = team2_ids[2])
+                    AND (team2_ids[3] IS NULL OR te_t2_p3_id = team2_ids[3])
+                UNION ALL
+                SELECT *, TRUE FROM team_encounter
+                    WHERE te_start_date > NOW() - interval_
+                    AND te_t1_p1_id = team2_ids[1]
+                    AND (team2_ids[2] IS NULL OR te_t1_p2_id = team2_ids[2])
+                    AND (team2_ids[3] IS NULL OR te_t1_p3_id = team2_ids[3])
+                    AND (team1_ids[1] IS NULL OR te_t2_p1_id = team1_ids[1])
+                    AND (team1_ids[2] IS NULL OR te_t2_p2_id = team1_ids[2])
+                    AND (team1_ids[3] IS NULL OR te_t2_p3_id = team1_ids[3])
+            );
+        END IF;
+    END
+$$ LANGUAGE plpgsql;
+
 -- ----------------------------------------------------------------------------
 -- TASKS
 -- ----------------------------------------------------------------------------
