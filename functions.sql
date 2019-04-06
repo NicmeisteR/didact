@@ -174,7 +174,7 @@ RETURNS VOID AS $$
                 m3.player_pos AS p3_pos,
                 LEAST(m1.mmr, COALESCE(m2.mmr, m1.mmr), COALESCE(m3.mmr, m1.mmr)) AS mmr_min,
                 GREATEST(m1.mmr, COALESCE(m2.mmr, m1.mmr), COALESCE(m3.mmr, m1.mmr)) AS mmr_max,
-                (m1.mmr + COALESCE(m2.mmr, 0.0), COALESCE(m3.mmr, 0.0)) AS mmr_sum,
+                (m1.mmr + COALESCE(m2.mmr, 0.0) + COALESCE(m3.mmr, 0.0)) AS mmr_sum,
                 (
                     (m1.player_id IS NOT NULL)::INTEGER +
                     (m2.player_id IS NOT NULL)::INTEGER +
@@ -231,7 +231,7 @@ RETURNS VOID AS $$
                 m.m_season_uuid,
                 LEAST(t1.mmr_min, t2.mmr_min),
                 GREATEST(t1.mmr_max, t2.mmr_max),
-                ABS((t1.mmr_sum::DOUBLE / t1.team_size::DOUBLE) - (t2.mmr_sum::DOUBLE / t2.team_size::DOUBLE))
+                ABS((t1.mmr_sum / CAST(t1.team_size AS DOUBLE PRECISION)) - (t2.mmr_sum / CAST(t2.team_size AS DOUBLE PRECISION)))
         FROM t_ t1, t_ t2, match m, match_team mt
         WHERE t1.match_id = t2.match_id
         -- The < predicate prevents the nested loop join (estimates are far off here)

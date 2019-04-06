@@ -8,13 +8,14 @@ let $objects_3 := jn:parse-json(file:read-text("./meta/data/game_objects_3.json"
 let $objects_4 := jn:parse-json(file:read-text("./meta/data/game_objects_4.json"))."ContentItems"
 let $objects := [$objects_1[], $objects_2[], $objects_3[], $objects_4[]]
 
-return [
-    for $object in $objects[]
-    where $object."Type" = "HW2Object"
-    order by $object."View"."HW2Object"."ObjectTypeId"
-    return [
-        $object."View"."Identity",
-        $object."View"."HW2Object"."ObjectTypeId",
-        $object."View"."HW2Object"."Image"."View"."Media"."MediaUrl"
+return {
+    game_objects: [
+        for $object in $objects[]
+        where $object."Type" = "HW2Object"
+        order by $object."View"."HW2Object"."ObjectTypeId"
+        return {
+            uuid: $object."View"."Identity",
+            name: $object."View"."HW2Object"."ObjectTypeId"
+        }
     ]
-]
+}
