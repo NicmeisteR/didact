@@ -211,10 +211,6 @@ func (bot *DiscordBot) onMessageCreate(s *discordgo.Session, m *discordgo.Messag
 		bot.scanPlayer(m, pid, gt, true)
 		break
 
-	case "stats":
-		bot.getStats(m, args)
-		break
-
 	case "analyse":
 		fallthrough
 	case "analyze":
@@ -254,11 +250,11 @@ func (bot *DiscordBot) help(m *discordgo.MessageCreate) {
 		Value:  "!didact find <query>",
 		Inline: false,
 	})
-	fields = append(fields, &discordgo.MessageEmbedField{
-		Name:   "Command - Statistics",
-		Value:  "!didact stats <1r/2r/3r> <days> <gamertag>",
-		Inline: false,
-	})
+//	fields = append(fields, &discordgo.MessageEmbedField{
+//		Name:   "Command - Statistics",
+//		Value:  "!didact stats <1r/2r/3r> <days> <gamertag>",
+//		Inline: false,
+//	})
 	fields = append(fields, &discordgo.MessageEmbedField{
 		Name:   "Command - Last Match",
 		Value:  "!didact last <gamertag>",
