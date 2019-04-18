@@ -523,3 +523,50 @@ CREATE INDEX team_encounter_t2_p3_idx
 CREATE INDEX team_encounter_start_idx
     ON team_encounter
     USING BTREE(te_start_date);
+
+CREATE INDEX team_encounter_match_uuid_idx
+    ON team_encounter
+    USING BTREE(te_match_uuid);
+
+-- ----------------------------------------------------------------------------
+-- RATED GAME
+-- ----------------------------------------------------------------------------
+
+CREATE TABLE rated_match (
+    rm_match_id         INTEGER,
+
+    rm_t1_p1_id         INTEGER,
+    rm_t1_p2_id         INTEGER,
+    rm_t1_p3_id         INTEGER,
+
+    rm_t2_p1_id         INTEGER,
+    rm_t2_p2_id         INTEGER,
+    rm_t2_p3_id         INTEGER,
+
+    rm_t1_p1_pos        INTEGER,
+    rm_t1_p2_pos        INTEGER,
+    rm_t1_p3_pos        INTEGER,
+
+    rm_t2_p1_pos        INTEGER,
+    rm_t2_p2_pos        INTEGER,
+    rm_t2_p3_pos        INTEGER,
+
+    rm_start_date       TIMESTAMP NOT NULL,
+    rm_duration         INTERVAL,
+    rm_match_outcome    INTEGER NOT NULL,
+
+    rm_map_uuid         UUID NOT NULL,
+    rm_match_uuid       UUID NOT NULL,
+    rm_playlist_uuid    UUID,
+    rm_season_uuid      UUID,
+
+    rm_mmr_min          DOUBLE PRECISION,
+    rm_mmr_max          DOUBLE PRECISION,
+    rm_mmr_avg_diff     DOUBLE PRECISION,
+
+    FOREIGN KEY (rm_match_id)
+        REFERENCES match(m_id)
+        ON DELETE CASCADE,
+
+    PRIMARY KEY (rm_match_id)
+);
