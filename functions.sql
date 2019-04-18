@@ -340,14 +340,14 @@ RETURNS TABLE (
                 SELECT *, FALSE FROM team_encounter
                     WHERE te_start_date > NOW() - interval_
                     AND te_t1_p1_id = team1_ids[1]
-                    AND te_t1_p2_id = team1_ids[2]
-                    AND te_t1_p3_id = team1_ids[3]
+                    AND (te_t1_p2_id = team1_ids[2] OR (te_t1_p2_id IS NULL AND team1_ids[2] IS NULL))
+                    AND (te_t1_p3_id = team1_ids[3] OR (te_t1_p3_id IS NULL AND team1_ids[3] IS NULL))
                 UNION ALL
                 SELECT *, TRUE FROM team_encounter
                     WHERE te_start_date > NOW() - interval_
-                    AND te_t2_p1_id = team2_ids[1]
-                    AND te_t2_p2_id = team1_ids[2]
-                    AND te_t2_p3_id = team1_ids[3]
+                    AND te_t2_p1_id = team1_ids[1]
+                    AND (te_t2_p2_id = team1_ids[2] OR (te_t2_p2_id IS NULL AND team1_ids[2] IS NULL))
+                    AND (te_t2_p3_id = team1_ids[3] OR (te_t2_p3_id IS NULL AND team1_ids[3] IS NULL))
             );
         ELSE
             -- Versus team
@@ -370,20 +370,20 @@ RETURNS TABLE (
                 SELECT *, FALSE FROM team_encounter
                     WHERE te_start_date > NOW() - interval_
                     AND te_t1_p1_id = team1_ids[1]
-                    AND te_t1_p2_id = team1_ids[2]
-                    AND te_t1_p3_id = team1_ids[3]
-                    AND te_t2_p1_id = team2_ids[1]
-                    AND te_t2_p2_id = team2_ids[2]
-                    AND te_t2_p3_id = team2_ids[3]
+                    AND (te_t1_p2_id = team1_ids[2] OR (te_t1_p2_id IS NULL AND team1_ids[2] IS NULL))
+                    AND (te_t1_p3_id = team1_ids[3] OR (te_t1_p3_id IS NULL AND team1_ids[3] IS NULL))
+                    AND (te_t2_p1_id = team2_ids[1] OR (te_t2_p1_id IS NULL AND team2_ids[1] IS NULL))
+                    AND (te_t2_p2_id = team2_ids[2] OR (te_t2_p2_id IS NULL AND team2_ids[2] IS NULL))
+                    AND (te_t2_p3_id = team2_ids[3] OR (te_t2_p3_id IS NULL AND team2_ids[3] IS NULL))
                 UNION ALL
                 SELECT *, TRUE FROM team_encounter
                     WHERE te_start_date > NOW() - interval_
                     AND te_t1_p1_id = team2_ids[1]
-                    AND te_t1_p2_id = team2_ids[2]
-                    AND te_t1_p3_id = team2_ids[3]
-                    AND te_t2_p1_id = team1_ids[1]
-                    AND te_t2_p2_id = team1_ids[2]
-                    AND te_t2_p3_id = team1_ids[3]
+                    AND (te_t1_p2_id = team2_ids[2] OR (te_t1_p2_id is NULL AND team2_ids[2] IS NULL))
+                    AND (te_t1_p3_id = team2_ids[3] OR (te_t1_p3_id is NULL AND team2_ids[3] IS NULL))
+                    AND (te_t2_p1_id = team1_ids[1] OR (te_t2_p1_id is NULL AND team1_ids[1] IS NULL))
+                    AND (te_t2_p2_id = team1_ids[2] OR (te_t2_p2_id is NULL AND team1_ids[2] IS NULL))
+                    AND (te_t2_p3_id = team1_ids[3] OR (te_t2_p3_id is NULL AND team1_ids[3] IS NULL))
             );
         END IF;
     END
