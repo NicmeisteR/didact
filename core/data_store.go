@@ -4,11 +4,11 @@ import (
 	"context"
 	"database/sql"
 	"encoding/json"
+	"fmt"
 	_ "github.com/lib/pq"
 	"log"
 	"strings"
 	"time"
-	"fmt"
 )
 
 type DataStore struct {
@@ -1206,7 +1206,7 @@ func (ds *DataStore) getMatchAnnotations(matchID int) ([]string, error) {
 // -------------------------------------------------------------------------------------------------------------
 
 func (ds *DataStore) getPlayerMatchAggregates(player_id int, player_name string, days int, team_size int) ([]*PlayerMatchAggregates, error) {
-    query := fmt.Sprintf(`
+	query := fmt.Sprintf(`
 		WITH data_ AS (
             SELECT * FROM didact_player_match_data($1, $2, INTERVAL '%d days')
 		)
@@ -1240,7 +1240,7 @@ func (ds *DataStore) getPlayerMatchAggregates(player_id int, player_name string,
 	// Read all results
 	var allStats []*PlayerMatchAggregates
 	for results.Next() {
-        stats := &PlayerMatchAggregates{}
+		stats := &PlayerMatchAggregates{}
 		err := results.Scan(
 			&stats.Map,
 			&stats.Leader,
@@ -1257,4 +1257,81 @@ func (ds *DataStore) getPlayerMatchAggregates(player_id int, player_name string,
 	}
 
 	return allStats, nil
+}
+
+// -------------------------------------------------------------------------------------------------------------
+// Get system statistics
+// -------------------------------------------------------------------------------------------------------------
+
+func (ds *DataStore) getSystemStats() (*SystemStats, error) {
+	// Get the relation sizes
+	query := fmt.Sprintf(`
+		SELECT relname as relation, n_live_tup as tuples
+			FROM pg_stat_all_tables
+		WHERE relname = 'player'
+		OR relname = 'match'
+		OR relname = 'match_history'
+	`)
+	results, err := ds.db.Query(query)
+	if err != nil {
+		return nil, err
+	}
+
+	// Read all results
+	var relStats []*RelationStats
+	for results.Next() {
+		stats := &RelationStats{}
+		err := results.Scan(
+			&stats.Name,
+			&stats.Tuples,
+		)
+		if err != nil {
+			return nil, err
+		}
+		relStats = append(relStats, stats)
+	}
+
+	// Get the database size
+	query = fmt.Sprintf(`
+		SELECT pg_size_pretty(SUM(pg_total_relation_size(quote_ident(schemaname) || '.' || quote_ident(tablename)))::BIGINT)
+		FROM pg_tables
+		WHERE schemaname = 'public'
+	`)
+	row := ds.db.QueryRow(query)
+	var dbSize string
+	err = row.Scan(&dbSize)
+	if err != nil {
+		return nil, err
+	}
+
+	// Get the number of tasks
+	query = fmt.Sprintf(`
+		select t_status, count(*) from task group by t_status
+	`)
+	results, err = ds.db.Query(query)
+	if err != nil {
+		return nil, err
+	}
+
+	// Read all results
+	var taskStats []*TaskStats
+	for results.Next() {
+		stats := &TaskStats{}
+		err := results.Scan(
+			&stats.Status,
+			&stats.Tuples,
+		)
+		if err != nil {
+			return nil, err
+		}
+		taskStats = append(taskStats, stats)
+	}
+
+	sysStats := &SystemStats{
+		DBSize:    dbSize,
+		Relations: relStats,
+		Tasks:     taskStats,
+	}
+
+	return sysStats, nil
 }

@@ -10,3 +10,22 @@ type PlayerMatchAggregates struct {
 	CSR      int64
 	Duration float64
 }
+
+// Relation statistics
+type RelationStats struct {
+	Name   string
+	Tuples int64
+}
+
+// Task statistics
+type TaskStats struct {
+	Status TaskStatus
+	Tuples int64
+}
+
+// System Status
+type SystemStats struct {
+	DBSize    string
+	Relations []*RelationStats
+	Tasks     []*TaskStats
+}

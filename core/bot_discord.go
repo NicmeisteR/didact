@@ -5,6 +5,8 @@ import (
 	"database/sql"
 	"fmt"
 	"github.com/bwmarrin/discordgo"
+	"golang.org/x/text/language"
+	"golang.org/x/text/message"
 	"net/url"
 	"strconv"
 	"strings"
@@ -246,15 +248,15 @@ func (bot *DiscordBot) onMessageCreate(s *discordgo.Session, m *discordgo.Messag
 func (bot *DiscordBot) help(m *discordgo.MessageCreate) {
 	fields := []*discordgo.MessageEmbedField{}
 	fields = append(fields, &discordgo.MessageEmbedField{
+		Name:   "Command - Status",
+		Value:  "!didact status",
+		Inline: false,
+	})
+	fields = append(fields, &discordgo.MessageEmbedField{
 		Name:   "Command - Player Search",
 		Value:  "!didact find <query>",
 		Inline: false,
 	})
-//	fields = append(fields, &discordgo.MessageEmbedField{
-//		Name:   "Command - Statistics",
-//		Value:  "!didact stats <1r/2r/3r> <days> <gamertag>",
-//		Inline: false,
-//	})
 	fields = append(fields, &discordgo.MessageEmbedField{
 		Name:   "Command - Last Match",
 		Value:  "!didact last <gamertag>",
@@ -288,14 +290,69 @@ func (bot *DiscordBot) help(m *discordgo.MessageCreate) {
 // -------------------------------------------------------------------------------------------------------------
 
 func (bot *DiscordBot) getStatus(m *discordgo.MessageCreate) {
-	r := &discordgo.MessageEmbed{
-		Author:      &discordgo.MessageEmbedAuthor{},
-		Color:       0x00ff00,
-		Description: "",
-		Fields:      []*discordgo.MessageEmbedField{},
-		Timestamp:   time.Now().Format(time.RFC3339),
-		Title:       "Server Status",
+	p := message.NewPrinter(language.English)
+
+	stats, err := bot.dataStore.getSystemStats()
+	if err != nil {
+		bot.sendResponse(m, fmt.Sprintf("Ouch! Something went wrong: %v.", err))
+		return
 	}
+
+	fields := []*discordgo.MessageEmbedField{}
+
+	// Relation Stats
+	fields = append(fields, &discordgo.MessageEmbedField{
+		Name:   "Size",
+		Value:  stats.DBSize,
+		Inline: false,
+	})
+
+	// Relation Stats
+	var relStats bytes.Buffer
+	for _, rel := range stats.Relations {
+		relStats.WriteString(p.Sprintf("%s: **%d**\n", rel.Name, rel.Tuples))
+	}
+	fields = append(fields, &discordgo.MessageEmbedField{
+		Name:   "Relations",
+		Value:  relStats.String(),
+		Inline: false,
+	})
+
+	// Task Stats
+	var taskStats bytes.Buffer
+	for _, g := range stats.Tasks {
+		statusName := ""
+		switch g.Status {
+		case TaskQueued:
+			statusName = "queued"
+			break
+		case TaskDeferred:
+			statusName = "deferred"
+			break
+		case TaskActive:
+			statusName = "active"
+			break
+		case TaskBlocked:
+			statusName = "blocked"
+			break
+		}
+		taskStats.WriteString(p.Sprintf("%s: **%d**\n", statusName, g.Tuples))
+	}
+	fields = append(fields, &discordgo.MessageEmbedField{
+		Name:   "Crawler Tasks",
+		Value:  taskStats.String(),
+		Inline: false,
+	})
+
+	r := &discordgo.MessageEmbed{
+		Title:       "Didact Status",
+		Author:      &discordgo.MessageEmbedAuthor{},
+		Color:       0x010101,
+		Description: "",
+		Fields:      fields,
+		Timestamp:   time.Now().Format(time.RFC3339),
+	}
+
 	bot.session.ChannelMessageSendEmbed(m.ChannelID, r)
 }
 
@@ -473,17 +530,17 @@ func (bot *DiscordBot) findPlayer(m *discordgo.MessageCreate, search string) {
 // -------------------------------------------------------------------------------------------------------------
 
 func (bot *DiscordBot) getStats(m *discordgo.MessageCreate, raw string) {
-    args := make([]string, 0)
+	args := make([]string, 0)
 	last := 0
 
 	// Get arguments
-    pos := 0
+	pos := 0
 	for ; pos < len(raw); pos++ {
 		if raw[pos] == ' ' {
-            trimmed := strings.TrimSpace(raw[last:pos])
-            if len(trimmed) == 0 {
-                continue
-            }
+			trimmed := strings.TrimSpace(raw[last:pos])
+			if len(trimmed) == 0 {
+				continue
+			}
 			args = append(args, trimmed)
 			last = pos
 		}
@@ -514,11 +571,11 @@ func (bot *DiscordBot) getStats(m *discordgo.MessageCreate, raw string) {
 		return
 	}
 
-    // Scan the player
-    ok = bot.scanPlayer(m, pid, gt, false)
-    if !ok {
-        return
-    }
+	// Scan the player
+	ok = bot.scanPlayer(m, pid, gt, false)
+	if !ok {
+		return
+	}
 	bot.markAsTyping(m.ChannelID)
 
 	// Get team stats
@@ -541,58 +598,58 @@ func (bot *DiscordBot) getStats(m *discordgo.MessageCreate, raw string) {
 		return
 	}
 
-    // Group results
-    playerStats := &PlayerMatchAggregates{}
-    mapStats := make([]*PlayerMatchAggregates, 0)
-    leaderStats := make([]*PlayerMatchAggregates, 0)
+	// Group results
+	playerStats := &PlayerMatchAggregates{}
+	mapStats := make([]*PlayerMatchAggregates, 0)
+	leaderStats := make([]*PlayerMatchAggregates, 0)
 
-    for _, stats := range allStats {
-        if stats.Map == nil && stats.Leader == nil {
-            playerStats = stats
-        } else if stats.Map != nil && stats.Leader == nil {
-            mapStats = append(mapStats, stats)
-        } else if stats.Map == nil && stats.Leader != nil {
-            leaderStats = append(leaderStats, stats)
-        }
-    }
+	for _, stats := range allStats {
+		if stats.Map == nil && stats.Leader == nil {
+			playerStats = stats
+		} else if stats.Map != nil && stats.Leader == nil {
+			mapStats = append(mapStats, stats)
+		} else if stats.Map == nil && stats.Leader != nil {
+			leaderStats = append(leaderStats, stats)
+		}
+	}
 
-    // Build title
-    title := "Statistics 1v1 Ranked"
+	// Build title
+	title := "Statistics 1v1 Ranked"
 	switch args[0] {
 	case "1r":
 		break
 	case "2r":
-        title = "Statistics 2v2 Ranked"
+		title = "Statistics 2v2 Ranked"
 		break
 	case "3r":
-        title = "Statistics 3v3 Ranked"
+		title = "Statistics 3v3 Ranked"
 		break
 	}
 
-    // Build description
-    var desc bytes.Buffer
-    desc.WriteString("Gamertag: **")
-    desc.WriteString(gt)
-    desc.WriteString("**\n")
+	// Build description
+	var desc bytes.Buffer
+	desc.WriteString("Gamertag: **")
+	desc.WriteString(gt)
+	desc.WriteString("**\n")
 
-    matches := playerStats.Matches
-    wl := 0.0
-    minutes := 0.0
-    mmr := 0.0
-    csr := 0.0
-    if matches > 0 {
-        wl = float64(playerStats.Wins) * 100 / float64(playerStats.Matches)
-        minutes = playerStats.Duration / float64(playerStats.Matches) / 60.0
-        mmr = playerStats.MMR / float64(playerStats.Matches)
-        csr = float64(playerStats.CSR) / float64(playerStats.Matches)
-    }
-    var general bytes.Buffer
-    general.WriteString(fmt.Sprintf("Days: **%d**\n", days))
-    general.WriteString(fmt.Sprintf("Matches: **%d**\n", playerStats.Matches))
-    general.WriteString(fmt.Sprintf("Wins: **%d** (**%.2f**%%)\n", playerStats.Wins, wl))
-    general.WriteString(fmt.Sprintf("MMR: **%+.2f** (Ø **%+.2f**)\n", playerStats.MMR, mmr))
-    general.WriteString(fmt.Sprintf("CSR: **%+d** (Ø **%+.2f**)\n", playerStats.CSR, csr))
-    general.WriteString(fmt.Sprintf("Duration: **%.2f**h (Ø **%.2f**min)\n", float64(playerStats.Duration) / 60.0 / 60.0, minutes))
+	matches := playerStats.Matches
+	wl := 0.0
+	minutes := 0.0
+	mmr := 0.0
+	csr := 0.0
+	if matches > 0 {
+		wl = float64(playerStats.Wins) * 100 / float64(playerStats.Matches)
+		minutes = playerStats.Duration / float64(playerStats.Matches) / 60.0
+		mmr = playerStats.MMR / float64(playerStats.Matches)
+		csr = float64(playerStats.CSR) / float64(playerStats.Matches)
+	}
+	var general bytes.Buffer
+	general.WriteString(fmt.Sprintf("Days: **%d**\n", days))
+	general.WriteString(fmt.Sprintf("Matches: **%d**\n", playerStats.Matches))
+	general.WriteString(fmt.Sprintf("Wins: **%d** (**%.2f**%%)\n", playerStats.Wins, wl))
+	general.WriteString(fmt.Sprintf("MMR: **%+.2f** (Ø **%+.2f**)\n", playerStats.MMR, mmr))
+	general.WriteString(fmt.Sprintf("CSR: **%+d** (Ø **%+.2f**)\n", playerStats.CSR, csr))
+	general.WriteString(fmt.Sprintf("Duration: **%.2f**h (Ø **%.2f**min)\n", float64(playerStats.Duration)/60.0/60.0, minutes))
 
 	fields := []*discordgo.MessageEmbedField{}
 	fields = append(fields, &discordgo.MessageEmbedField{
@@ -601,74 +658,74 @@ func (bot *DiscordBot) getStats(m *discordgo.MessageCreate, raw string) {
 		Inline: true,
 	})
 
-    var printStatsRow = func(b *bytes.Buffer, s *PlayerMatchAggregates, row int) {
-        matches := s.Matches
-        indicator := 0
-        minutes := 0.0
-        mmr := 0.0
-        if matches > 0 {
-            indicator = int(s.Wins * 6 / s.Matches)
-            minutes = s.Duration / float64(s.Matches) / 60.0
-            mmr = s.MMR / float64(s.Matches)
-        }
-        b.WriteString(fmt.Sprintf("%-2d", row))
-        b.WriteString(" [")
-        b.WriteString(strings.Repeat("#", indicator))
-        b.WriteString(strings.Repeat(" ", 6 - indicator))
-        b.WriteString("] ")
-        b.WriteString(fmt.Sprintf("%d %d %.2f %.1f", s.Matches, s.Wins, mmr, minutes))
-        b.WriteString("\n")
-    }
+	var printStatsRow = func(b *bytes.Buffer, s *PlayerMatchAggregates, row int) {
+		matches := s.Matches
+		indicator := 0
+		minutes := 0.0
+		mmr := 0.0
+		if matches > 0 {
+			indicator = int(s.Wins * 6 / s.Matches)
+			minutes = s.Duration / float64(s.Matches) / 60.0
+			mmr = s.MMR / float64(s.Matches)
+		}
+		b.WriteString(fmt.Sprintf("%-2d", row))
+		b.WriteString(" [")
+		b.WriteString(strings.Repeat("#", indicator))
+		b.WriteString(strings.Repeat(" ", 6-indicator))
+		b.WriteString("] ")
+		b.WriteString(fmt.Sprintf("%d %d %.2f %.1f", s.Matches, s.Wins, mmr, minutes))
+		b.WriteString("\n")
+	}
 
-    // Maps
-    desc = bytes.Buffer{}
-    desc.WriteString("```m  w/l      * wins Ømmr Øt\n")
-    mapNames := make([]string, 0)
-    for i, s := range mapStats {
-        printStatsRow(&desc, s, i)
-        mapNames = append(mapNames, *s.Map)
-    }
-    desc.WriteString("\n")
-    for i, n := range mapNames {
-        if i > 0 {
-            desc.WriteString(", ")
-        }
-        desc.WriteString(strconv.Itoa(i))
-        desc.WriteString("-")
-        desc.WriteString(n)
-    }
-    desc.WriteString("```")
-    fields = append(fields, &discordgo.MessageEmbedField{
-        Name:   "Maps",
-        Value:  desc.String(),
-        Inline: false,
-    })
+	// Maps
+	desc = bytes.Buffer{}
+	desc.WriteString("```m  w/l      * wins Ømmr Øt\n")
+	mapNames := make([]string, 0)
+	for i, s := range mapStats {
+		printStatsRow(&desc, s, i)
+		mapNames = append(mapNames, *s.Map)
+	}
+	desc.WriteString("\n")
+	for i, n := range mapNames {
+		if i > 0 {
+			desc.WriteString(", ")
+		}
+		desc.WriteString(strconv.Itoa(i))
+		desc.WriteString("-")
+		desc.WriteString(n)
+	}
+	desc.WriteString("```")
+	fields = append(fields, &discordgo.MessageEmbedField{
+		Name:   "Maps",
+		Value:  desc.String(),
+		Inline: false,
+	})
 
-    // Leaders
-    desc = bytes.Buffer{}
-    desc.WriteString("```l  w/l      * wins Ømmr Øt\n")
-    leaderNames := make([]string, 0)
-    for i, s := range leaderStats {
-        printStatsRow(&desc, s, i)
-        leaderNames = append(leaderNames, *s.Leader)
-    }
-    desc.WriteString("\n")
-    for i, n := range leaderNames {
-        if i > 0 {
-            desc.WriteString(", ")
-        }
-        desc.WriteString(strconv.Itoa(i))
-        desc.WriteString("-")
-        desc.WriteString(n)
-    }
-    desc.WriteString("```")
-    fields = append(fields, &discordgo.MessageEmbedField{
-        Name:   "Leaders",
-        Value:  desc.String(),
-        Inline: false,
-    })
+	// Leaders
+	desc = bytes.Buffer{}
+	desc.WriteString("```l  w/l      * wins Ømmr Øt\n")
+	leaderNames := make([]string, 0)
+	for i, s := range leaderStats {
+		printStatsRow(&desc, s, i)
+		leaderNames = append(leaderNames, *s.Leader)
+	}
+	desc.WriteString("\n")
+	for i, n := range leaderNames {
+		if i > 0 {
+			desc.WriteString(", ")
+		}
+		desc.WriteString(strconv.Itoa(i))
+		desc.WriteString("-")
+		desc.WriteString(n)
+	}
+	desc.WriteString("```")
+	fields = append(fields, &discordgo.MessageEmbedField{
+		Name:   "Leaders",
+		Value:  desc.String(),
+		Inline: false,
+	})
 
-    // Build embed
+	// Build embed
 	r := &discordgo.MessageEmbed{
 		Title:     title,
 		Author:    &discordgo.MessageEmbedAuthor{},
@@ -853,7 +910,7 @@ func (bot *DiscordBot) scanPlayer(m *discordgo.MessageCreate, playerID int, game
 		}
 	}
 	bot.sendResponse(m, fmt.Sprintf("I finished the match history scan for player **%d**.", playerID))
-    return true
+	return true
 }
 
 // -------------------------------------------------------------------------------------------------------------
