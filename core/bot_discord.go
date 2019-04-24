@@ -197,6 +197,10 @@ func (bot *DiscordBot) onMessageCreate(s *discordgo.Session, m *discordgo.Messag
 		bot.findPlayer(m, args)
 		return
 
+	case "communityscan":
+		bot.scanCommunity(m, args)
+		break
+
 	case "scan":
 		pid, gt, ok := bot.getPlayerID(m, args)
 		if !ok {
@@ -349,6 +353,86 @@ func (bot *DiscordBot) getStatus(m *discordgo.MessageCreate) {
 		Author:      &discordgo.MessageEmbedAuthor{},
 		Color:       0x010101,
 		Description: "",
+		Fields:      fields,
+		Timestamp:   time.Now().Format(time.RFC3339),
+	}
+
+	bot.session.ChannelMessageSendEmbed(m.ChannelID, r)
+}
+
+// -------------------------------------------------------------------------------------------------------------
+// Scan init
+// -------------------------------------------------------------------------------------------------------------
+
+func (bot *DiscordBot) scanCommunity(m *discordgo.MessageCreate, arg string) {
+	p := message.NewPrinter(language.English)
+
+	var err error
+	var initReturnCode *int
+
+	// Requested full scan?
+	if len(arg) == 0 {
+		bot.sendResponse(m, "I will try to initialize a scan of ALL players.")
+		initReturnCode, err = bot.dataStore.initFullPlayerScan()
+	} else {
+		// Parse the days
+		days, err := strconv.Atoi(arg)
+		if err != nil {
+			bot.sendResponse(m, fmt.Sprintf("The interval **%v** is invalid.", arg))
+			return
+		}
+
+		// Init active player scan
+		bot.sendResponse(m, fmt.Sprintf("I will try to initialize a scan of players that played at least a single match in the last %d days.", days))
+		initReturnCode, err = bot.dataStore.initActivePlayerScan(days)
+	}
+
+	// Initialization failed?
+	if err != nil {
+		bot.sendResponse(m, fmt.Sprintf("Ouch! Something went wrong: %v.", err))
+		return
+	}
+
+	// Return code != 0
+	if initReturnCode == nil || *initReturnCode != 0 {
+		bot.sendResponse(m, "I failed to initialize the scan. **The crawler must be idle!**")
+		return
+	}
+
+	stats, err := bot.dataStore.getTaskStats()
+	if err != nil {
+		bot.sendResponse(m, fmt.Sprintf("Ouch! Something went wrong: %v.", err))
+		return
+	}
+
+	fields := []*discordgo.MessageEmbedField{}
+
+	// Task Stats
+	var taskStats bytes.Buffer
+	for _, g := range stats {
+		statusName := ""
+		switch g.Status {
+		case TaskQueued:
+			statusName = "queued"
+			break
+		case TaskDeferred:
+			statusName = "deferred"
+			break
+		case TaskActive:
+			statusName = "active"
+			break
+		case TaskBlocked:
+			statusName = "blocked"
+			break
+		}
+		taskStats.WriteString(p.Sprintf("%s: **%d**\n", statusName, g.Tuples))
+	}
+
+	r := &discordgo.MessageEmbed{
+		Title:       "Crawler Tasks",
+		Author:      &discordgo.MessageEmbedAuthor{},
+		Color:       0x010101,
+		Description: taskStats.String(),
 		Fields:      fields,
 		Timestamp:   time.Now().Format(time.RFC3339),
 	}

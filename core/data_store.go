@@ -1332,7 +1332,7 @@ func (ds *DataStore) getSystemStats() (*SystemStats, error) {
 
 	// Get the number of tasks
 	query = fmt.Sprintf(`
-		select t_status, count(*) from task group by t_status
+		SELECT t_status, count(*) FROM task GROUP BY t_status
 	`)
 	results, err = ds.db.Query(query)
 	if err != nil {
@@ -1354,3 +1354,29 @@ func (ds *DataStore) getSystemStats() (*SystemStats, error) {
 // -------------------------------------------------------------------------------------------------------------
 // Init active player scan
 // -------------------------------------------------------------------------------------------------------------
+
+func (ds *DataStore) initFullPlayerScan() (*int, error) {
+	query := fmt.Sprintf(`
+		SELECT didact_schedule_scan(NULL)
+	`)
+	row := ds.db.QueryRow(query)
+	var rc *int
+	err := row.Scan(&rc)
+	if err != nil {
+		return rc, err
+	}
+	return rc, nil
+}
+
+func (ds *DataStore) initActivePlayerScan(days int) (*int, error) {
+	query := fmt.Sprintf(`
+		SELECT didact_schedule_scan(INTERVAL '%d days')
+	`)
+	row := ds.db.QueryRow(query)
+	var rc *int
+	err := row.Scan(&rc)
+	if err != nil {
+		return rc, err
+	}
+	return rc, nil
+}

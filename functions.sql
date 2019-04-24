@@ -59,14 +59,15 @@ RETURNS INTEGER AS $$
         t TIMESTAMP := clock_timestamp();
     BEGIN
         IF (SELECT COUNT(*) FROM task WHERE t_status = 0) > 0 THEN
-            RAISE NOTICE 'Crawler is not idle.';
+            RAISE EXCEPTION 'Crawler is not idle.';
+            RETURN 1;
         ELSIF d IS NULL THEN
             PERFORM didact_init_player_stat_scan();
         ELSE
             PERFORM didact_init_active_player_stat_scan(d);
         END IF;
         RAISE NOTICE 'Duration=%', clock_timestamp() - t;
-        RETURN 1;
+        RETURN 0;
     END
 $$ LANGUAGE plpgsql;
 
@@ -413,7 +414,7 @@ RETURNS INTEGER AS $$
                 )
             FROM player;
         RAISE NOTICE 'Duration=%', clock_timestamp() - t;
-        RETURN 1;
+        RETURN 0;
     END
 $$ LANGUAGE plpgsql;
 
@@ -433,7 +434,7 @@ RETURNS INTEGER AS $$
                     'MatchID', match_id
                 );
         RAISE NOTICE 'Duration=%', clock_timestamp() - t;
-        RETURN 1;
+        RETURN 0;
     END
 $$ LANGUAGE plpgsql;
 
@@ -463,7 +464,7 @@ RETURNS INTEGER AS $$
                 ) recent_gamertags
             WHERE p_gamertag = mp_gamertag;
         RAISE NOTICE 'Duration=%', clock_timestamp() - t;
-        RETURN 1;
+        RETURN 0;
     END
 $$ LANGUAGE plpgsql;
 
@@ -491,7 +492,7 @@ RETURNS INTEGER AS $$
                     WHERE m_id IS NULL
                 ) m;
         RAISE NOTICE 'Duration=%', clock_timestamp() - t;
-        RETURN 1;
+        RETURN 0;
     END
 $$ LANGUAGE plpgsql;
 
@@ -510,7 +511,7 @@ RETURNS INT AS $$
             RAISE NOTICE 'Refreshing %.%', schema_arg, r.matviewname;
             EXECUTE 'REFRESH MATERIALIZED VIEW ' || schema_arg || '.' || r.matviewname;
         END LOOP;
-        RETURN 1;
+        RETURN 0;
     END 
 $$ LANGUAGE plpgsql;
 
@@ -526,7 +527,7 @@ RETURNS INT AS $$
             EXECUTE 'REFRESH MATERIALIZED VIEW CONCURRENTLY ' || schema_arg || '.' || r.matviewname;
         END LOOP;
 
-        RETURN 1;
+        RETURN 0;
     END
 $$ LANGUAGE plpgsql;
 
