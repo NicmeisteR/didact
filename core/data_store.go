@@ -1263,6 +1263,32 @@ func (ds *DataStore) getPlayerMatchAggregates(player_id int, player_name string,
 // Get system statistics
 // -------------------------------------------------------------------------------------------------------------
 
+func (ds *DataStore) getTaskStats() ([]*TaskStats, error) {
+	// Get the number of tasks
+	query := fmt.Sprintf(`
+		select t_status, count(*) from task group by t_status
+	`)
+	results, err := ds.db.Query(query)
+	if err != nil {
+		return nil, err
+	}
+
+	// Read all results
+	var taskStats []*TaskStats
+	for results.Next() {
+		stats := &TaskStats{}
+		err := results.Scan(
+			&stats.Status,
+			&stats.Tuples,
+		)
+		if err != nil {
+			return nil, err
+		}
+		taskStats = append(taskStats, stats)
+	}
+	return taskStats, nil
+}
+
 func (ds *DataStore) getSystemStats() (*SystemStats, error) {
 	// Get the relation sizes
 	query := fmt.Sprintf(`
@@ -1314,18 +1340,7 @@ func (ds *DataStore) getSystemStats() (*SystemStats, error) {
 	}
 
 	// Read all results
-	var taskStats []*TaskStats
-	for results.Next() {
-		stats := &TaskStats{}
-		err := results.Scan(
-			&stats.Status,
-			&stats.Tuples,
-		)
-		if err != nil {
-			return nil, err
-		}
-		taskStats = append(taskStats, stats)
-	}
+	taskStats, err := ds.getTaskStats()
 
 	sysStats := &SystemStats{
 		DBSize:    dbSize,
@@ -1335,3 +1350,7 @@ func (ds *DataStore) getSystemStats() (*SystemStats, error) {
 
 	return sysStats, nil
 }
+
+// -------------------------------------------------------------------------------------------------------------
+// Init active player scan
+// -------------------------------------------------------------------------------------------------------------

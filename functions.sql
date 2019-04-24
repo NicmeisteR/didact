@@ -53,15 +53,17 @@ $$ LANGUAGE plpgsql;
 -- UTILS
 -- ----------------------------------------------------------------------------
 
-CREATE OR REPLACE FUNCTION didact_schedule_scan()
+CREATE OR REPLACE FUNCTION didact_schedule_scan(IN d INTERVAL)
 RETURNS INTEGER AS $$
     DECLARE
         t TIMESTAMP := clock_timestamp();
     BEGIN
-        IF (SELECT COUNT(*) FROM task) > 0 THEN
+        IF (SELECT COUNT(*) FROM task WHERE t_status = 0) > 0 THEN
             RAISE NOTICE 'Crawler is not idle.';
+        ELSIF d IS NULL THEN
+            PERFORM didact_init_player_stat_scan();
         ELSE
-            PERFORM didact_init_active_player_stat_scan(INTERVAL '30 days');
+            PERFORM didact_init_active_player_stat_scan(d);
         END IF;
         RAISE NOTICE 'Duration=%', clock_timestamp() - t;
         RETURN 1;
