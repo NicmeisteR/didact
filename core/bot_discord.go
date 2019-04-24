@@ -136,6 +136,32 @@ func (bot *DiscordBot) waypointMatchURL(matchUUID string, gamertag string) (*url
 // Handlers
 // -------------------------------------------------------------------------------------------------------------
 
+var authorizedGuildIDs = map[string]bool{
+	"493106248472985602": true, // Test
+	"451897042436882456": true, // HWTC
+}
+
+var authorizedChannelIDs = map[string]bool{
+	"493300632913182720": true, // Test - didact
+	"513788534486728705": true, // HWTC - didact
+}
+
+var authorizedUserIDs = map[string]bool{
+	"426126402279178261": true, // x6767
+	"165889087905988609": true,
+	"156904361350529024": true,
+	"409845863934853121": true, //
+	"410479385720651780": true, // Roger
+}
+
+// Is authorized?
+func isAuthorized(m *discordgo.MessageCreate) bool {
+	_, guildOK := authorizedGuildIDs[m.GuildID]
+	_, channelOK := authorizedChannelIDs[m.ChannelID]
+	_, userOK := authorizedUserIDs[m.Author.ID]
+	return guildOK && channelOK && userOK
+}
+
 // This function will be called (due to AddHandler above) every time a new
 // message is created on any channel that the autenticated bot has access to.
 func (bot *DiscordBot) onMessageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
@@ -189,6 +215,10 @@ func (bot *DiscordBot) onMessageCreate(s *discordgo.Session, m *discordgo.Messag
 
 	// Process the command
 	switch cmd {
+	case "whoami":
+		bot.sendResponse(m, fmt.Sprintf("Guild: **%s**\nChannel: **%s**\nUser: **%s**\nAuthorized: **%t**", m.GuildID, m.ChannelID, m.Author.ID, isAuthorized(m)))
+		break
+
 	case "status":
 		bot.getStatus(m)
 		break
@@ -198,6 +228,10 @@ func (bot *DiscordBot) onMessageCreate(s *discordgo.Session, m *discordgo.Messag
 		return
 
 	case "communityscan":
+		if !isAuthorized(m) {
+			bot.sendResponse(m, "You are not authorized to run this command.")
+			return
+		}
 		bot.scanCommunity(m, args)
 		break
 
