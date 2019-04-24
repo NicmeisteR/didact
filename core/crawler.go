@@ -98,10 +98,6 @@ func (crawler *Crawler) Start() {
 
 			// Loop until workers are dying
 			for atomic.LoadUint32(&crawler.stopSignal) == 0 {
-				// Get a new key
-				// This may block if no keys are available
-				key := crawler.apiKeys.pop()
-
 				// Check if we have to shutdown
 				if atomic.LoadUint32(&crawler.stopSignal) != 0 {
 					break
@@ -110,9 +106,6 @@ func (crawler *Crawler) Start() {
 				// Fetch task
 				task, err := crawler.dataStore.startTask()
 				if err == sql.ErrNoRows {
-					// Release the key
-					crawler.apiKeys.pushUnused(key)
-
 					// We could be interrupted
 					select {
 					case <-crawler.interruptChannels[workerID]:
@@ -127,7 +120,6 @@ func (crawler *Crawler) Start() {
 				}
 				if err != nil {
 					log.Println(err)
-					crawler.apiKeys.pushUnused(key)
 					continue
 				}
 
@@ -145,14 +137,6 @@ func (crawler *Crawler) Start() {
 				default:
 					log.Printf("unknown task type: %d\n", task.ID)
 				}
-
-				if err != nil {
-					log.Println(err)
-					crawler.apiKeys.push(key)
-					continue
-				}
-
-				crawler.apiKeys.push(key)
 			}
 
 			// Mark worker as stopped
