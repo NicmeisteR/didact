@@ -539,22 +539,8 @@ CREATE INDEX team_encounter_match_uuid_idx
 -- Team
 -- ----------------------------------------------------------------------------
 
-CREATE TABLE team (
-    t_p1_id INTEGER,
-    t_p2_id INTEGER,
-    t_p3_id INTEGER,
-    t_l_id INTEGER,
-
-    PRIMARY KEY (a_p1_id, a_p2_id, a_p3_id, a_l_id),
-    FOREIGN KEY (a_l_id) REFERENCES label(l_id),
-);
-
-CREATE INDEX team_label_idx
-    ON team
-    USING BTREE(t_l_id);
-
 CREATE TABLE label (
-    l_id INTEGER,
+    l_id SERIAL NOT NULL,
     l_name VARCHAR(100) UNIQUE,
 
     PRIMARY KEY (l_id)
@@ -563,3 +549,16 @@ CREATE TABLE label (
 CREATE INDEX label_name_idx
     ON label
     USING BTREE(l_name);
+
+CREATE TABLE team (
+    t_p1_id INTEGER,
+    t_p2_id INTEGER,
+    t_p3_id INTEGER,
+    t_l_id INTEGER,
+
+    FOREIGN KEY (t_l_id) REFERENCES label(l_id)
+);
+
+CREATE INDEX team_label_idx
+    ON team
+    USING BTREE(t_l_id);

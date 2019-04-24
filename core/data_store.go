@@ -7,6 +7,7 @@ import (
 	"fmt"
 	_ "github.com/lib/pq"
 	"log"
+	"sort"
 	"strings"
 	"time"
 )
@@ -1142,10 +1143,10 @@ func (ds *DataStore) findPlayer(query string) ([]string, error) {
 }
 
 // -------------------------------------------------------------------------------------------------------------
-// Annotate a match
+// Team
 // -------------------------------------------------------------------------------------------------------------
 
-func (ds *DataStore) annotateMatch(matchID int, labels []string) error {
+func (ds *DataStore) annotateTeam(team []int, label int) error {
 	// Create transaction
 	ctx := context.Background()
 	txOpts := new(sql.TxOptions)
@@ -1159,47 +1160,80 @@ func (ds *DataStore) annotateMatch(matchID int, labels []string) error {
 		tx.Rollback()
 	}()
 
-	for _, label := range labels {
-		_, err := tx.Exec(`
-			INSERT INTO match_annotation (
-				ma_match_id,
-				ma_label
-			)
-			VALUES (
-				$1, $2
-			)
-			ON CONFLICT DO NOTHING
-		`, matchID, label)
+	sort.Ints(team)
 
-		if err != nil {
-			return err
-		}
+	pidPtrs := []*int{}
+	for _, pid := range team {
+		pidPtrs = append(pidPtrs, &pid)
+	}
+	pidPtrs = append(pidPtrs, nil)
+	pidPtrs = append(pidPtrs, nil)
+	pidPtrs = append(pidPtrs, nil)
+
+	_, err = tx.Exec(`
+		INSERT INTO team (
+			t_p1_id,
+			t_p2_id,
+			t_p3_id,
+			t_l_id
+		)
+		VALUES (
+			$1, $2, $3, $4
+		)
+		ON CONFLICT DO NOTHING
+	`, pidPtrs[0], pidPtrs[1], pidPtrs[2], label)
+
+	if err != nil {
+		return err
 	}
 	return nil
 }
 
-func (ds *DataStore) getMatchAnnotations(matchID int) ([]string, error) {
-	results, err := ds.db.Query(`
-		SELECT ma_label
-		FROM match_annotation
-		WHERE ma_match_id = $1
-	`, matchID)
+// Get label id
+func (ds *DataStore) getLabelID(label string) (int, string, error) {
+	// Query row
+	row := ds.db.QueryRow(`
+		SELECT l_id, l_name
+		FROM label
+		WHERE l_name = $1
+		LIMIT 1
+	`, label)
 
+	// Scan row
+	var labelID int
+	var labelName string
+	err := row.Scan(&labelID, &labelName)
+
+	// Erro?
 	if err != nil {
-		return nil, err
+		return 0, "", err
 	}
-
-	var labels []string
-	for results.Next() {
-		var label string
-		err := results.Scan(&label)
-		if err != nil {
-			return nil, err
-		}
-		labels = append(labels, label)
-	}
-	return labels, nil
+	return labelID, labelName, nil
 }
+
+// XXX
+// func (ds *DataStore) getMatchAnnotations(matchID int) ([]string, error) {
+// 	results, err := ds.db.Query(`
+// 		SELECT ma_label
+// 		FROM match_annotation
+// 		WHERE ma_match_id = $1
+// 	`, matchID)
+//
+// 	if err != nil {
+// 		return nil, err
+// 	}
+//
+// 	var labels []string
+// 	for results.Next() {
+// 		var label string
+// 		err := results.Scan(&label)
+// 		if err != nil {
+// 			return nil, err
+// 		}
+// 		labels = append(labels, label)
+// 	}
+// 	return labels, nil
+// }
 
 // -------------------------------------------------------------------------------------------------------------
 // Get player matches

@@ -213,6 +213,10 @@ func (bot *DiscordBot) onMessageCreate(s *discordgo.Session, m *discordgo.Messag
 	args = strings.TrimPrefix(args, cmd)
 	args = strings.TrimLeft(args, " ")
 
+	notAuthorized := func() {
+		bot.sendResponse(m, "You are not authorized to run this command.")
+	}
+
 	// Process the command
 	switch cmd {
 	case "whoami":
@@ -227,9 +231,17 @@ func (bot *DiscordBot) onMessageCreate(s *discordgo.Session, m *discordgo.Messag
 		bot.findPlayer(m, args)
 		return
 
+	case "annotate":
+		if !isAuthorized(m) {
+			notAuthorized()
+			return
+		}
+		bot.annotateTeam(m, args)
+		break
+
 	case "communityscan":
 		if !isAuthorized(m) {
-			bot.sendResponse(m, "You are not authorized to run this command.")
+			notAuthorized()
 			return
 		}
 		bot.scanCommunity(m, args)
@@ -490,116 +502,66 @@ func (bot *DiscordBot) getPlayerID(m *discordgo.MessageCreate, args string) (int
 }
 
 // -------------------------------------------------------------------------------------------------------------
-// Annotate a match
+// Annotate a team
 // -------------------------------------------------------------------------------------------------------------
 
-func (bot *DiscordBot) annotateMatch(m *discordgo.MessageCreate, argString string) {
-	// Read args
-	rawArgs := strings.Split(argString, " ")
-	args := []string{}
-	for _, rawArg := range rawArgs {
-		args = append(args, strings.Trim(rawArg, "\"'"))
-	}
-	bot.markAsTyping(m.ChannelID)
-
-	// Too few?
-	if len(args) < 2 {
-		bot.sendResponse(m, "Invalid arguments. Give me a waypoint match uuid and at least one label.")
+func (bot *DiscordBot) annotateTeam(m *discordgo.MessageCreate, argString string) {
+	printUsage := func() {
+		bot.sendResponse(m, "Invalid usage. !didact annotate <p1>, (<p2>, <p3>): <label>")
 		return
 	}
 
-	// Update the match result
-	newLabels := args[1:]
-	bot.sendResponse(m, fmt.Sprintf("I will try to annotate the match **%v** with the labels **%v**.", args[0], newLabels))
-	matchID, ok := bot.updateMatchResult(m, args[0])
-	if !ok {
+	// Read sections
+	sections := strings.Split(argString, ":")
+	if len(sections) != 2 {
+		printUsage()
 		return
 	}
-	bot.sendResponse(m, fmt.Sprintf("I stored the match **%v** with id **%v**.", args[0], matchID))
+
+	// Get labels and gamertags
+	rawLabel := strings.Trim(sections[1], " \"'")
+	gts := []string{}
+	for _, rawGT := range strings.Split(sections[0], ",") {
+		gts = append(gts, strings.Trim(rawGT, " \"'"))
+	}
+	if len(gts) == 0 {
+		printUsage()
+		return
+	}
+
+	// Mark as busy
 	bot.markAsTyping(m.ChannelID)
 
-	// Annotate the match
-	err := bot.dataStore.annotateMatch(matchID, newLabels)
+	// Get player ids
+	pids := []int{}
+	for _, gt := range gts {
+		playerID, gamertag, err := bot.dataStore.getPlayerID(gt)
+		if err != nil {
+			bot.sendResponse(m, fmt.Sprintf("Could not find player: **%v**.", gt))
+			return
+		}
+		bot.sendResponse(m, fmt.Sprintf("I found player **%s** with id **%d**.", gamertag, playerID))
+		pids = append(pids, playerID)
+	}
+
+	// Get label id
+	labelID, label, err := bot.dataStore.getLabelID(rawLabel)
+	if err != nil {
+		bot.sendResponse(m, fmt.Sprintf("Could not find label: **%v**.", rawLabel))
+		return
+	}
+	bot.sendResponse(m, fmt.Sprintf("I found label **%s** with id **%d**.", label, labelID))
+
+	// Mark as busy
+	bot.markAsTyping(m.ChannelID)
+
+	// Annotate the team
+	err = bot.dataStore.annotateTeam(pids, labelID)
 	if err != nil {
 		bot.sendResponse(m, fmt.Sprintf("Ouch! Something went wrong: %v.", err))
 		return
 	}
-
-	// Get the annotations
-	labels, err := bot.dataStore.getMatchAnnotations(matchID)
-	if err != nil {
-		bot.sendResponse(m, fmt.Sprintf("Ouch! Something went wrong: %v.", err))
-		return
-	}
-
-	// Create result message
-	var buffer bytes.Buffer
-	for _, label := range labels {
-		buffer.WriteString(label)
-		buffer.WriteString("\n")
-	}
-	fields := []*discordgo.MessageEmbedField{}
-	fields = append(fields, &discordgo.MessageEmbedField{
-		Name:   "Results",
-		Value:  buffer.String(),
-		Inline: true,
-	})
-	r := &discordgo.MessageEmbed{
-		Title:     "Match annotations",
-		Author:    &discordgo.MessageEmbedAuthor{},
-		Color:     0x010101,
-		Fields:    fields,
-		Timestamp: time.Now().Format(time.RFC3339),
-	}
-
-	// Send message
-	bot.session.ChannelMessageSendEmbed(m.ChannelID, r)
-}
-
-// -------------------------------------------------------------------------------------------------------------
-// Get match annotations
-// -------------------------------------------------------------------------------------------------------------
-
-func (bot *DiscordBot) getMatchAnnotations(m *discordgo.MessageCreate, arg string) {
-	// Read args
-	bot.markAsTyping(m.ChannelID)
-
-	// The match exists already?
-	matchID, matchExists := bot.dataStore.matchExists(arg)
-	if !matchExists {
-		bot.sendResponse(m, fmt.Sprintf("I don't know match **%v**.", arg))
-		return
-	}
-
-	// Get the annotations
-	labels, err := bot.dataStore.getMatchAnnotations(matchID)
-	if err != nil {
-		bot.sendResponse(m, fmt.Sprintf("Ouch! Something went wrong: %v.", err))
-		return
-	}
-
-	// Create result message
-	var buffer bytes.Buffer
-	for _, label := range labels {
-		buffer.WriteString(label)
-		buffer.WriteString("\n")
-	}
-	fields := []*discordgo.MessageEmbedField{}
-	fields = append(fields, &discordgo.MessageEmbedField{
-		Name:   "Result",
-		Value:  buffer.String(),
-		Inline: true,
-	})
-	r := &discordgo.MessageEmbed{
-		Title:     "Match annotations",
-		Author:    &discordgo.MessageEmbedAuthor{},
-		Color:     0x010101,
-		Fields:    fields,
-		Timestamp: time.Now().Format(time.RFC3339),
-	}
-
-	// Send message
-	bot.session.ChannelMessageSendEmbed(m.ChannelID, r)
+	bot.sendResponse(m, fmt.Sprintf("Annotated player(s) **%v** with label **%d**", pids, labelID))
 }
 
 // -------------------------------------------------------------------------------------------------------------
