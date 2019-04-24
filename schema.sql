@@ -536,44 +536,30 @@ CREATE INDEX team_encounter_match_uuid_idx
     USING BTREE(te_match_uuid);
 
 -- ----------------------------------------------------------------------------
--- RATED GAME
+-- Team
 -- ----------------------------------------------------------------------------
 
-CREATE TABLE rated_match (
-    rm_match_id         INTEGER,
+CREATE TABLE team (
+    t_p1_id INTEGER,
+    t_p2_id INTEGER,
+    t_p3_id INTEGER,
+    t_l_id INTEGER,
 
-    rm_t1_p1_id         INTEGER,
-    rm_t1_p2_id         INTEGER,
-    rm_t1_p3_id         INTEGER,
-
-    rm_t2_p1_id         INTEGER,
-    rm_t2_p2_id         INTEGER,
-    rm_t2_p3_id         INTEGER,
-
-    rm_t1_p1_pos        INTEGER,
-    rm_t1_p2_pos        INTEGER,
-    rm_t1_p3_pos        INTEGER,
-
-    rm_t2_p1_pos        INTEGER,
-    rm_t2_p2_pos        INTEGER,
-    rm_t2_p3_pos        INTEGER,
-
-    rm_start_date       TIMESTAMP NOT NULL,
-    rm_duration         INTERVAL,
-    rm_match_outcome    INTEGER NOT NULL,
-
-    rm_map_uuid         UUID NOT NULL,
-    rm_match_uuid       UUID NOT NULL,
-    rm_playlist_uuid    UUID,
-    rm_season_uuid      UUID,
-
-    rm_mmr_min          DOUBLE PRECISION,
-    rm_mmr_max          DOUBLE PRECISION,
-    rm_mmr_avg_diff     DOUBLE PRECISION,
-
-    FOREIGN KEY (rm_match_id)
-        REFERENCES match(m_id)
-        ON DELETE CASCADE,
-
-    PRIMARY KEY (rm_match_id)
+    PRIMARY KEY (a_p1_id, a_p2_id, a_p3_id, a_l_id),
+    FOREIGN KEY (a_l_id) REFERENCES label(l_id),
 );
+
+CREATE INDEX team_label_idx
+    ON team
+    USING BTREE(t_l_id);
+
+CREATE TABLE label (
+    l_id INTEGER,
+    l_name VARCHAR(100) UNIQUE,
+
+    PRIMARY KEY (l_id)
+);
+
+CREATE INDEX label_name_idx
+    ON label
+    USING BTREE(l_name);
