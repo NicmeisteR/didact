@@ -148,9 +148,9 @@ var authorizedChannelIDs = map[string]bool{
 
 var authorizedUserIDs = map[string]bool{
 	"426126402279178261": true, // x6767
-	"165889087905988609": true,
-	"156904361350529024": true,
-	"409845863934853121": true, //
+	"165889087905988609": true, // Mike
+	"156904361350529024": true, // Admiration
+	"409845863934853121": true, // L1am
 	"410479385720651780": true, // Roger
 }
 
