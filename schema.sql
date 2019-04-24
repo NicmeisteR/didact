@@ -586,3 +586,17 @@ CREATE UNIQUE INDEX team_3v3_unique_idx
 
 CREATE UNIQUE INDEX favo_2col_uni_idx ON favorites (user_id, recipe_id)
 WHERE menu_id IS NULL;
+
+-- ----------------------------------------------------------------------------
+-- Blacklist
+-- ----------------------------------------------------------------------------
+
+CREATE TABLE blacklist (
+    bl_match_id INTEGER NOT NULL,
+
+    PRIMARY KEY (bl_match_id)
+);
+
+CREATE INDEX blacklist_match_idx
+    ON blacklist
+    USING BTREE(bl_match_id);
