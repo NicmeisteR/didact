@@ -1163,8 +1163,8 @@ func (ds *DataStore) annotateTeam(team []int, label int) error {
 	sort.Ints(team)
 
 	pidPtrs := []*int{}
-	for _, pid := range team {
-		pidPtrs = append(pidPtrs, &pid)
+	for i, _ := range team {
+		pidPtrs = append(pidPtrs, &team[i])
 	}
 	pidPtrs = append(pidPtrs, nil)
 	pidPtrs = append(pidPtrs, nil)

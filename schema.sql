@@ -562,3 +562,27 @@ CREATE TABLE team (
 CREATE INDEX team_label_idx
     ON team
     USING BTREE(t_l_id);
+
+CREATE UNIQUE INDEX team_1v1_unique_idx
+    ON team
+    USING BTREE(t_p1_id)
+    WHERE t_p1_id IS NOT NULL
+    AND t_p2_id IS NULL
+    AND t_p3_id IS NULL;
+
+CREATE UNIQUE INDEX team_2v2_unique_idx
+    ON team
+    USING BTREE(t_p1_id, t_p2_id)
+    WHERE t_p1_id IS NOT NULL
+    AND t_p2_id IS NOT NULL
+    AND t_p3_id IS NULL;
+
+CREATE UNIQUE INDEX team_3v3_unique_idx
+    ON team
+    USING BTREE(t_p1_id, t_p2_id, t_p3_id)
+    WHERE t_p1_id IS NOT NULL
+    AND t_p2_id IS NOT NULL
+    AND t_p3_id IS NOT NULL;
+
+CREATE UNIQUE INDEX favo_2col_uni_idx ON favorites (user_id, recipe_id)
+WHERE menu_id IS NULL;
